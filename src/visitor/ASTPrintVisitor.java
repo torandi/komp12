@@ -1,0 +1,349 @@
+/** ASTPrintVisitor - prints the abstract syntax tree in a constructor
+ * style with parenthesized comma-separated lists. This visitor can
+ * help check for the correctness of a MiniJava abstract syntax tree.
+ * The implementation is based on that of PrettyPrintVisitor, and the
+ * author was tempted to call it UglyPrintVisitor.
+ *
+ * Author: Todd Neller, Gettysburg College 1/29/04 */ 
+
+package visitor;
+
+import java.io.PrintWriter;
+import syntaxtree.*;
+
+public class ASTPrintVisitor implements Visitor {
+    private PrintWriter stream;
+
+    public ASTPrintVisitor(PrintWriter stream) {
+        this.stream=stream;
+    }
+
+    // MainClass m;
+    // ClassDeclList cl;
+    public void visit(Program n) {
+	stream.println("Program(");
+	n.m.accept(this);
+	stream.println("ClassDeclList(");
+	for ( int i = 0; i < n.cl.size(); i++ ) {
+	    if (i>0) stream.println(", ");
+	    n.cl.elementAt(i).accept(this);
+	}
+	stream.println("))");
+    }
+  
+    // Identifier i1,i2;
+    // Statement s;
+    public void visit(MainClass n) {
+	stream.print("MainClass(");
+	n.i1.accept(this);
+	stream.print(", ");
+	n.i2.accept(this);
+	stream.print(", ");
+	n.s.accept(this);
+	stream.println(")");
+    }
+
+    // Identifier i;
+    // VarDeclList vl;
+    // MethodDeclList ml;
+    public void visit(ClassDeclSimple n) {
+	stream.print("ClassDeclSimple(");
+	n.i.accept(this);
+	stream.print(", (");
+	for ( int i = 0; i < n.vl.size(); i++ ) {
+	    n.vl.elementAt(i).accept(this);
+	    if ( i+1 < n.vl.size() ) 
+		stream.print(", ");
+	}
+	stream.println("),");
+	stream.println("(");
+	for ( int i = 0; i < n.ml.size(); i++ ) {
+	    n.ml.elementAt(i).accept(this);
+	    if ( i+1 < n.ml.size() ) 
+		stream.println(", ");
+	}
+	stream.println("))");
+    }
+ 
+    // Identifier i;
+    // Identifier j;
+    // VarDeclList vl;
+    // MethodDeclList ml;
+    public void visit(ClassDeclExtends n) {
+	stream.print("ClassDeclExtends(");
+	n.i.accept(this);
+	stream.print(", ");
+	n.j.accept(this);
+	stream.print(", (");
+	for ( int i = 0; i < n.vl.size(); i++ ) {
+	    n.vl.elementAt(i).accept(this);
+	    if ( i+1 < n.vl.size() ) 
+		stream.print(", ");
+	}
+	for ( int i = 0; i < n.ml.size(); i++ ) {
+	    stream.println();
+	    if ( i+1 < n.ml.size() ) 
+		stream.println(", ");
+	}
+	stream.println();
+	stream.println("))");
+    }
+
+    // Type t;
+    // Identifier i;
+    public void visit(VarDecl n) {
+	stream.print("VarDecl(");
+	n.t.accept(this);
+	stream.print(", ");
+	n.i.accept(this);
+	stream.print(")");
+    }
+
+    // Type t;
+    // Identifier i;
+    // FormalList fl;
+    // VarDeclList vl;
+    // StatementList sl;
+    // Exp e;
+    public void visit(MethodDecl n) {
+	stream.print("MethodDecl(");
+	n.t.accept(this);
+	stream.print(", ");
+	n.i.accept(this);
+	stream.print(", (");
+	for ( int i = 0; i < n.fl.size(); i++ ) {
+	    n.fl.elementAt(i).accept(this);
+	    if (i+1 < n.fl.size()) 
+		stream.print(", ");
+	}
+	stream.println("), (");
+	for ( int i = 0; i < n.vl.size(); i++ ) {
+	    n.vl.elementAt(i).accept(this);
+	    if ( i+1 < n.vl.size() )
+		stream.print(", ");
+	}
+	stream.println("), (");
+	for ( int i = 0; i < n.sl.size(); i++ ) {
+	    n.sl.elementAt(i).accept(this);
+	    if ( i+1 < n.sl.size() ) 
+		stream.println(", ");
+	}
+	stream.println("), ");
+	n.e.accept(this);
+	stream.println(")");
+    }
+
+    // Type t;
+    // Identifier i;
+    public void visit(Formal n) {
+	stream.print("Formal(");
+	n.t.accept(this);
+	stream.print(", ");
+	n.i.accept(this);
+	stream.print(")");
+    }
+
+    public void visit(IntArrayType n) {
+	stream.print("IntArrayType()");
+    }
+
+    public void visit(BooleanType n) {
+	stream.print("BooleanType()");
+    }
+
+    public void visit(IntegerType n) {
+	stream.print("IntegerType()");
+    }
+
+    // String s;
+    public void visit(IdentifierType n) {
+	stream.print("IdentifierType(" + n.s + ")");
+    }
+
+    // StatementList sl;
+    public void visit(Block n) {
+	stream.println("Block((");
+	for ( int i = 0; i < n.sl.size(); i++ ) {
+	    n.sl.elementAt(i).accept(this);
+	    if ( i+1 < n.sl.size()) 
+		stream.println(",");
+	}
+	stream.print("))");
+    }
+
+    // Exp e;
+    // Statement s1,s2;
+    public void visit(If n) {
+	stream.print("If(");
+	n.e.accept(this);
+	stream.println(",");
+	n.s1.accept(this);
+	stream.println(",");
+	n.s2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e;
+    // Statement s;
+    public void visit(While n) {
+	stream.print("While(");
+	n.e.accept(this);
+	stream.println(",");
+	n.s.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e;
+    public void visit(Print n) {
+	stream.print("Print(");
+	n.e.accept(this);
+	stream.print(")");
+    }
+  
+    // Identifier i;
+    // Exp e;
+    public void visit(Assign n) {
+	stream.print("Assign(");
+	n.i.accept(this);
+	stream.print(", ");
+	n.e.accept(this);
+	stream.print(")");
+    }
+
+    // Identifier i;
+    // Exp e1,e2;
+    public void visit(ArrayAssign n) {
+	stream.print("ArrayAssign(");
+	n.i.accept(this);
+	stream.print(", ");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e1,e2;
+    public void visit(And n) {
+	stream.print("And(");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e1,e2;
+    public void visit(LessThan n) {
+	stream.print("LessThan(");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e1,e2;
+    public void visit(Plus n) {
+	stream.print("Plus(");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e1,e2;
+    public void visit(Minus n) {
+	stream.print("Minus(");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e1,e2;
+    public void visit(Times n) {
+	stream.print("Times(");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e1,e2;
+    public void visit(ArrayLookup n) {
+	stream.print("ArrayLookup(");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e;
+    public void visit(ArrayLength n) {
+	stream.print("ArrayLength(");
+	n.e.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e;
+    // Identifier i;
+    // ExpList el;
+    public void visit(Call n) {
+	stream.print("Call(");
+	n.e.accept(this);
+	stream.print(", ");
+	n.i.accept(this);
+	stream.print(", (");
+	for ( int i = 0; i < n.el.size(); i++ ) {
+	    n.el.elementAt(i).accept(this);
+	    if ( i+1 < n.el.size() ) { stream.print(", "); }
+	}
+	stream.print("))");
+    }
+
+    // int i;
+    public void visit(IntegerLiteral n) {
+	stream.print("IntegerLiteral(" + n.i + ")");
+    }
+
+    public void visit(True n) {
+	stream.print("True()");
+    }
+
+    public void visit(False n) {
+	stream.print("False()");
+    }
+
+    // String s;
+    public void visit(IdentifierExp n) {
+	stream.print("IdentifierExp(" + n.s + ")");
+    }
+
+    public void visit(This n) {
+	stream.print("This()");
+    }
+
+    // Exp e;
+    public void visit(NewArray n) {
+	stream.print("NewArray(");
+	n.e.accept(this);
+	stream.print(")");
+    }
+
+    // Identifier i;
+    public void visit(NewObject n) {
+	stream.print("NewObject(");
+	stream.print(n.i.s);
+	stream.print(")");
+    }
+
+    // Exp e;
+    public void visit(Not n) {
+	stream.print("Not(");
+	n.e.accept(this);
+	stream.print(")");
+    }
+
+    // String s;
+    public void visit(Identifier n) {
+	stream.print("Identifier(" + n.s + ")");
+    }
+}

@@ -1,0 +1,497 @@
+options {
+	STATIC = false;
+}
+/* main class definition */
+PARSER_BEGIN(Parser)  
+	package parse;
+	import basic_tree.*;
+	
+	public class Parser {
+		public static void main(String args[])
+		throws ParseException, TokenMgrError, ParseException
+		{
+			Parser parser = new Parser(System.in);
+			Start s = parser.Start();
+			System.out.println(s.toString());
+		}
+	}
+PARSER_END(Parser)
+
+/* Tokens */
+SKIP: { " "|"\t" }
+SKIP: { "\n"|"\r\n"|"\r" }
+
+// When a /* is seen in the DEFAULT state, skip it and switch to the IN_COMMENT state
+SKIP : {
+"/*": IN_COMMENT }
+      
+// When any other character is seen in the IN_COMMENT state, skip it.
+< IN_COMMENT > SKIP : {
+<  ~[] > }
+      
+// When a */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
+< IN_COMMENT > SKIP : {
+"*/": DEFAULT }
+
+SKIP: { < "//" (~["\n"])* "\n" > }
+
+TOKEN: { <INT: (["0"-"9"])+ > }
+TOKEN: { <PLUS: "+" > }
+TOKEN: {	<MINUS: "-" > }
+TOKEN: {	<MULT: "*" > }
+TOKEN: {	<LT: "<" > }
+TOKEN: {	<SET: "=" > }
+TOKEN: { <AND: "&&" > }
+TOKEN: { <OPAR: "("> }
+TOKEN: {	<CPAR: ")"> }
+TOKEN: {	<OSB: "[">}
+TOKEN: {	<CSB: "]">}
+TOKEN: {	<OBRACE: "{">}
+TOKEN: {	<CBRACE: "}">}
+TOKEN: {	<EXCL: "!">}
+TOKEN: { <SCL: ";"> }
+TOKEN: { <KWINT: "int"> }
+TOKEN: { <KWBOOL : "boolean"> }
+TOKEN: { <SOPL : "System.out.println"> }
+TOKEN: { <BOOL: "true"|"false"> }
+
+TOKEN: { <DOT: "." > }
+TOKEN: { <NEW: "new" > }
+TOKEN: { <LENGTH: "length" > }
+TOKEN: { <PUBLIC: "public"> }
+TOKEN: { <STATIC: "static"> }
+TOKEN: { <IF: "if"> }
+TOKEN: { <ELSE: "else"> }
+TOKEN: { <CLASS: "class"> }
+TOKEN: { <WHILE: "while"> }
+TOKEN: { <RETURN: "return"> }
+TOKEN: { <COMMA: ","> }
+TOKEN: { <VOID: "void"> }
+
+
+TOKEN: { <ID: ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9","_"])* > }
+
+
+/* Parser */
+
+Start Start() throws ParseException:
+{
+	Start start;
+	basic_tree.Class c;	
+}
+{
+	c = MainClass()
+	{ start= new Start(c); }
+	(
+		c = ClassDecl()
+		{ start.addClass(c); }
+	)*
+	{ return start; }
+}
+
+basic_tree.Class MainClass () throws ParseException:
+{ 
+	basic_tree.Class mainClass;
+	Token className,method,type,id;
+}
+{
+	<CLASS>
+	className=<ID>
+	<OBRACE>
+	<PUBLIC>
+	<STATIC>
+	<VOID>
+	method=<ID>
+	<OPAR>
+	type=<ID>
+	<OSB>
+	<CSB>
+	id=<ID>
+	<CPAR>
+	<OBRACE>
+	{
+		//Check id's
+		if( !method.image.equals("main") || !type.image.equals("String")) {
+			throw new ParseException("Expected method public static void main (String[] id)");
+		}
+		mainClass = new basic_tree.Class(className.image);
+		Method main=new Method("main",new VoidType());
+		main.addParameter(new Variable(id.image,null));
+		mainClass.addMethod(main);
+		Statement s;
+	}
+	(
+		s = Statement()
+		{ main.addStatement(s); }
+	)*
+	<CBRACE>
+	<CBRACE>
+	{ return mainClass; }
+}
+
+Statement Statement () throws ParseException:
+{ 
+	Token id;
+	Statement statement;
+	Expression e;
+	Statement s;
+	Variable var;
+}
+{
+	(
+		<OBRACE>
+		{ BasicStatement bs = new BasicStatement(); }
+		( 
+			LOOKAHEAD(2)
+			var = VarDecl()
+			{ bs.addVariable(var); }
+		)*
+		( 
+			s = Statement()
+			{ bs.addStatement(s); }
+		)*
+		<CBRACE>
+		{ statement = bs; }
+	|
+		<IF>
+		<OPAR>
+		e = Expression()
+		<CPAR>
+		s = Statement()
+		{ IfStatement ifs = new IfStatement(e,s); }
+	//	( 
+			<ELSE>
+			s = Statement()
+			{ ifs.addElseStatement(s); }
+	//	)?
+		{ statement = ifs; }
+	|
+		<WHILE>
+		<OPAR>
+		e = Expression()
+		<CPAR>
+		s = Statement()
+		{ statement = new WhileStatement(e,s); }
+	|
+		<SOPL>
+		<OPAR>
+		e=Expression()
+		<CPAR>
+		<SCL>
+		{ statement = new SOPLStatement(e); }
+	|
+		id=<ID>
+		(
+			<SET>
+			e = Expression()
+			<SCL>
+			{ statement = new SetStatement(id.image,e); }
+		|
+			{ Expression e2; }
+			<OSB>
+			e = Expression()
+			<CSB>
+			<SET>
+			e2 = Expression()
+			<SCL>
+			{ statement = new SetIndexStatement(id.image,e,e2); }
+		)
+	)
+	{ return statement; }
+}
+
+
+basic_tree.Class ClassDecl () throws ParseException: 
+{ 
+	basic_tree.Class c;
+	Token className;
+	Variable v;
+	Method m;
+}
+{
+	<CLASS>
+	className=<ID>
+	<OBRACE>
+	{ c = new basic_tree.Class(className.image); }
+	(
+		v = VarDecl()
+		{ c.addVariable(v); }
+	)*
+	(
+		m = MethodDecl()
+		{ c.addMethod(m); }
+	)*
+	<CBRACE>
+	{ return c; }
+}
+
+Variable VarDecl() throws ParseException:
+{
+	Token id;
+	Type t;
+}
+{
+	t = Type()
+	id = <ID>
+	<SCL>
+	{ return new Variable(id.image,t); }
+}
+
+Method MethodDecl() throws ParseException:
+{	
+	Token id;
+	Type t;
+	Method m;
+	Variable v;
+	Statement s;
+	Expression e;
+}
+{
+	<PUBLIC>
+	t = Type()
+	id = <ID>
+	<OPAR>
+	{ m = new Method(id.image,t); }
+	( FormalList(m) )?
+	<CPAR>
+	<OBRACE>
+	( 
+		LOOKAHEAD(2)
+		v = VarDecl()
+		{ m.addVariable(v); }
+	)*
+	( 
+		s = Statement()
+		{ m.addStatement(s); }
+	)*
+	<RETURN>
+	e = Expression()
+	{ m.setReturnExpression(e); }
+	<SCL>
+	<CBRACE>
+	{ return m; }
+}
+
+void FormalList(Method m) throws ParseException:
+{
+	Type t;
+	Token id;
+}
+{
+	t = Type()
+	id = <ID>
+	{ m.addParameter(new Variable(id.image,t)); }
+	(
+		<COMMA>
+		t = Type()
+		id = <ID>
+		{ m.addParameter(new Variable(id.image,t)); }
+	)*
+}
+
+Type Type () throws ParseException:
+{ 
+	Type t;
+	Token id;
+}
+{
+	(
+		<KWINT>
+		{ t = new IntegerType(); }
+		(
+			<OSB>
+			<CSB>
+			{ t = new IntegerArrayType(); }
+		)?
+	|
+		<KWBOOL>
+		{ t = new BooleanType(); }
+	|
+		id=<ID>
+		{
+			t = new CustomType(id.image);
+		}
+	)
+	{ return t; }
+}
+
+Expression Expression() throws ParseException:
+{
+	Expression e;
+	AndOperand op;
+}
+{
+	op = AndOperand()
+	{ e = new Expression(op); }
+	(
+		LOOKAHEAD(2)
+		<AND>
+		op = AndOperand()
+		{ e.addOperand(op); }
+	)* 
+	{ return e; }
+}
+
+AndOperand AndOperand() throws ParseException:
+{
+	AndOperand op;
+	LessOperand op2;
+}
+{
+	op2 = LessOperand()
+	{ op = new AndOperand(op2); }
+	(
+		LOOKAHEAD(2)
+		<LT>
+		op2 = LessOperand()
+		{ op.addOperand(op2); }
+	)*
+	{ return op; }
+}
+
+LessOperand LessOperand() throws ParseException:
+{
+	LessOperand op;
+	Term t;
+}
+{
+	t = Term()
+	{ op = new LessOperand(t); }
+	(
+		LOOKAHEAD(2)
+		(
+			<PLUS>
+			t = Term()
+			{ op.addOperand(new PlusTerm(t)); }
+		|
+			<MINUS>
+			t = Term()
+			{ op.addOperand(new MinusTerm(t)); }
+		)
+	)*
+	{ return op; }
+}
+
+Term Term() throws ParseException:
+{
+	Term op;
+	Factor f;
+}
+{
+	f = Factor()
+	{ op = new Term(f); }
+	(
+		LOOKAHEAD(2)
+		<MULT>
+		f = Factor()
+		{ op.addOperand(f); }
+	)*	
+	{ return op; }
+}
+
+Factor Factor() throws ParseException:
+{
+	Factor f;
+	Primary p;
+	Sufix s;
+}
+{
+	p = Primary()
+	{ f = new Factor(p); }
+	(
+		LOOKAHEAD(2)
+		s = Sufix()
+		{ f.addSufix(s); }
+	)*	
+	{ return f; }
+}
+
+Sufix Sufix() throws ParseException:
+{
+	Sufix s;
+	Token id;
+}
+{
+	(
+		<OSB>
+		{ Expression e; }
+		e = Expression()
+		<CSB>
+		{ s = new IndexSufix(e); }
+	|
+		<DOT>
+		(
+			<LENGTH>
+			{ s = new LengthSufix(); }
+		|
+			id=<ID>
+			<OPAR>
+			{ MethodSufix ms = new MethodSufix(id.image); }
+			ExpList(ms)
+			<CPAR>
+			{ s = ms; }
+		)
+	)
+	{ return s; }
+}
+
+Primary Primary() throws ParseException:
+{
+	Primary p;
+	Token v;
+	Expression e;
+}
+{
+	(
+		v = <INT>
+		{ p = new IntPrimary(v.image); }
+	|
+		<MINUS>
+		v=<INT>
+		{ p = new IntPrimary("-"+v.image); }
+	|
+		v = <BOOL>
+		{ p = new BooleanPrimary(v.image); }
+	|
+		v=<ID>
+		{ p = new IdPrimary(v.image); }
+	|
+		<NEW>
+		(
+			<KWINT>
+			<OSB>
+			e = Expression()
+			<CSB>
+			{ p = new NewIntPrimary(e); }
+		|
+			v=<ID>
+			<OPAR>
+			<CPAR>
+			{ p = new NewPrimary(v.image); }
+		)
+	|
+		<EXCL>
+		e = Expression()
+		{ p = new NotExpressionPrimary(e); }
+	|
+		<OPAR>
+		e = Expression()
+		<CPAR>
+		{ p = new ExpressionPrimary(e); }
+	)
+	{ return p; }
+}
+
+void ExpList(MethodSufix m) throws ParseException:
+{ Expression e; }
+{
+	(
+		e = Expression()
+		{ m.addParameter(e); }
+		(
+			<COMMA>
+		 	e = Expression()
+			{ m.addParameter(e); }
+		)*
+	)?
+}

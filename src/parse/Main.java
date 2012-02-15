@@ -1,0 +1,74 @@
+package parse;
+
+import basic_tree.Start;
+import error.ErrorMsg;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
+import syntaxtree.AbstractTree;
+import visitor.ASTPrintVisitor;
+import visitor.TypeBindVisitor;
+import visitor.TypeDefVisitor;
+
+
+public class Main {
+    ErrorMsg error;
+
+    AbstractTree abstractTree;
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        if(!main.begin(args)) {
+            System.exit(-1);
+        } 
+    }
+
+    public Main() {
+        error = new ErrorMsg(System.err);
+    }
+
+    public boolean begin(String[] args) {
+        try {
+            Reader r = new FileReader(args[0]);
+            System.out.println("Building from "+args[0]);
+            Start basicTree = parse(r);
+            abstractTree = new AbstractTree(basicTree,error);
+            abstractTree.build();
+
+            if(error.anyErrors)
+               return false;
+
+            //Build abstract tree
+            ASTPrintVisitor pv = new ASTPrintVisitor(new PrintWriter (args[0]+".syntax"));
+            pv.visit(abstractTree.program);
+            System.out.println("Syntax saved to "+args[0]+".syntax");
+
+            //Check syntax
+            TypeDefVisitor tdv= new TypeDefVisitor(error);
+            tdv.visit(abstractTree.program);
+
+            TypeBindVisitor tbv= new TypeBindVisitor(error);
+            tbv.visit(abstractTree.program);
+
+            if(error.anyErrors)
+               return false;
+
+            
+
+            return true;
+        } catch (FileNotFoundException ex) {
+            error.complain(args[0]+" not found.");
+            return false;
+        } catch (ParseException ex) {
+            error.complain("Parse exception in line "+ex.currentToken.beginLine+": "+ex);
+            return false;
+        }
+    }
+
+    private Start parse(Reader r) throws ParseException {
+        Parser parser = new Parser(r);
+        return parser.Start();
+    }
+}

@@ -1,0 +1,10 @@
+class HelloWorld {
+	public static void main (String[] args) {
+		{ 
+			int x;
+			int y;
+			x = 1 + 2 - 3 -4 +5 -7*2;
+			System.out.println(x+y);
+		}
+	}
+}
