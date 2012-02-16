@@ -1,0 +1,65 @@
+OSB = Opening Square Bracket [
+CSB = Closing Square Bracket ]
+OBRACE = Opening Brace {
+CBRACE = Closing Brace }
+OPAR = Opening Paranthesis (
+CPAR = Opening Paranthesis )
+EXCL = Exclamation mark !
+ID = Identifier
+KWINT = Keyword int
+KWBOOL = Keyword boolean
+INT = Integer
+BOOL = Boolean
+SOPL = System.out.println
+SCL = Semicolon
+
+AND=&&
+LT=Less than <
+SET = “=”
+
+Start -> MainClass ( ClassDecl )*
+
+/* Classes and methods */
+MainClass -> CLASS ID OBRACE PUBLIC STATIC VOID ID OPAR ID OSB CSB ID CPAR OBRACE Statement* CBRACE CBRACE
+
+ClassDecl -> CLASS ID OBRACE VarDecl* MethodDecl* CBRACE
+VarDecl -> Type ID SCL
+MethodDecl -> PUBLIC Type ID OPAR FormalList CPAR OBRACE VarDecl* Statement* RETURN Expression SCL CBRACE
+
+FormalList -> Type ID ( COMMA Type ID) *
+
+/* Type */
+Type -> KWINT OSB CSB
+Type -> KWBOOL
+Type -> KWINT
+Type -> ID
+
+/* Statement */
+Statement -> OBRACE VarDecl* Statement* CBRACE
+Statement -> IF OPAR Expression CPAR Statement ELSE Statement
+Statement -> WHILE OPAR Expression CPAR Statement
+Statement -> SOPL OPAR Expression CPAR SCL
+Statement -> ID SET Expression SCL
+Statement -> ID OSB Expression CSB SET Expression SCL
+
+/* Expression and friends */
+Expression -> AndOperand (AND AndOperand)*
+AndOperand -> LessOperand (LT LessOperand)*
+LessOperand -> Term ( PLUS Term)*
+LessOperand -> Term ( MINUS Term)*
+Term -> Fact (MULT Fact)*
+Fact -> Primary ( Sufix )*
+Sufix -> OSB Expression CSB  
+Sufix -> DOT LENGTH
+Sufix -> DOT ID OPAR ExpList CPAR
+
+Primary ->INT
+Primary -> MINUS INT
+Primary -> BOOL
+Primary -> ID
+Primary -> NEW KWINT OSB Expression CSB
+Primary -> NEW ID OPAR CPAR
+Primary -> EXCL Exp
+Primary -> OPAR Expression CPAR
+
+ExpList -> ( Expression ( COMMA Expression )* )?
