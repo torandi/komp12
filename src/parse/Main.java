@@ -41,8 +41,10 @@ public class Main {
                return false;
 
             //Build abstract tree
-            ASTPrintVisitor pv = new ASTPrintVisitor(new PrintWriter (args[0]+".syntax"));
+				PrintWriter pw = new PrintWriter (args[0]+".syntax");
+            ASTPrintVisitor pv = new ASTPrintVisitor(pw);
             pv.visit(abstractTree.program);
+				pw.flush();
             System.out.println("Syntax saved to "+args[0]+".syntax");
 
             //Check syntax
