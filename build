@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar dist/Kompilator.jar $@
+java -cp bin/ parse.Main $@
