@@ -20,8 +20,10 @@ class HelloWorld {
 }
 
 class Derp {
+	int x;
 	public int herp(int foo) {
-		Derp  x;
-		return foo+2;
+		Derp x;
+		int y;
+		return foo;
 	}
 }

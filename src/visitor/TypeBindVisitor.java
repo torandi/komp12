@@ -86,6 +86,8 @@ public class TypeBindVisitor implements TypeVisitor{
         for(Statement s : n.sl.getList()) {
             s.accept(this);
         }
+        //return statement
+        n.e.accept(this);
         st.popScope();
         return n.t.accept(this);
     }
@@ -152,7 +154,7 @@ public class TypeBindVisitor implements TypeVisitor{
         Type t1 = n.i.accept(this);
         Type t2 = n.e.accept(this);
         if(!t1.equals(t2)) {
-            error.complain("In "+st+": Assigning "+t2+" to \""+n.i+"\", which is of type "+t1);
+            error.complain("In "+st+": Assigning variable of type "+t2+" to \""+n.i+"\", which is of type "+t1);
         }
         return t1.accept(this);
     }

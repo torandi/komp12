@@ -77,6 +77,7 @@ public class Main {
             return false;
         } catch (ParseException ex) {
             error.complain("Parse exception in line "+ex.currentToken.beginLine+": "+ex);
+            ex.printStackTrace();
             return false;
         }
     }
