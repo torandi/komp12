@@ -3,6 +3,7 @@ package symbol;
 import java.util.Iterator;
 import java.util.LinkedList;
 import syntaxtree.Identifier;
+import syntaxtree.MethodDecl;
 import syntaxtree.Type;
 
 public class SymbolTable {
@@ -15,18 +16,30 @@ public class SymbolTable {
     public void popScope() {
         scopes.removeFirst();
     }
-
+    
     public Symbol lookup(String id) {
+        return lookup(id, false);
+    }
+
+    /*
+     * finds the variable with name id in the current scope. 
+     * @param onlyMethodScope Set to true to stop after method scope has been checked
+     */
+    public Symbol lookup(String id, boolean onlyMethodScope) {
         Symbol sym=null;
         for(Scope s : scopes) {
             sym = s.lookup(id);
             if(sym!=null)
                 return sym;
+            else if(onlyMethodScope && s instanceof MethodDecl) 
+                return null;
         }
         return null;
     }
 
     public boolean addVariable(Identifier id, Symbol sym) {
+        if(lookup(id.s, true) != null)
+            return false;
         return scopes.getFirst().addVariable(id, sym);
     }
 

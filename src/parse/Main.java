@@ -58,6 +58,7 @@ public class Main {
             TypeBindVisitor tbv= new TypeBindVisitor(error);
             tbv.visit(abstractTree.program);
             
+            
             if(error.anyErrors)
                return false;
             

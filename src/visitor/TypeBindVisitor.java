@@ -16,12 +16,6 @@ public class TypeBindVisitor implements TypeVisitor{
     private Program curProgram=null;
     private ClassDecl curClass=null;
     private frame.VMFrame curFrame = null;
-    //HashSet to enforce unique variables in whole method:
-    private HashSet<String> uniqueNameScope = new HashSet<String>();
-
-    public boolean unique_in_scope(String name) {
-        return !uniqueNameScope.add(name);
-    }
     
     public TypeBindVisitor(ErrorMsg e) {
         error=e;
@@ -54,7 +48,6 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(ClassDeclSimple n) {
         st.pushScope(n);
-        uniqueNameScope.clear();
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
             //Allocate field:
@@ -63,7 +56,6 @@ public class TypeBindVisitor implements TypeVisitor{
         for(MethodDecl m : n.ml.getList()) {
             m.frame = Main.frameFactory.newFrame(curClass.i.s+"$"+m.i.s, m.fl, m.t);
             curFrame = m.frame;
-            uniqueNameScope.clear();
             m.accept(this);
         }
         curFrame = null;
@@ -76,9 +68,6 @@ public class TypeBindVisitor implements TypeVisitor{
     }
 
     public Type visit(VarDecl n) {
-        if(unique_in_scope(n.i.s)) {
-            error.complain("Variable name "+n.i.s+" is not unique in the method scope (java requires this)");
-        }
         n.t.accept(this);
         n.i.accept(this);
         return null; //Return value ignored
