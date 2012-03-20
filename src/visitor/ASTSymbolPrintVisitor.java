@@ -24,7 +24,7 @@ public class ASTSymbolPrintVisitor implements Visitor {
     public void visit(MainClass n) {
 	stream.println("MainClass: "+n.i1.s+" {"+n.record+"}");
         stream.add_tab();
-        stream.println("\tvoid main {"+n.mainMethodFrame+"}");
+        stream.println("void main {"+n.mainMethodFrame+"}");
         stream.add_tab();
         n.s.accept(this);
         stream.reset_tabs();

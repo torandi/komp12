@@ -1,5 +1,6 @@
 package syntaxtree;
 import java.util.ArrayList;
+import java.util.HashSet;
 import symbol.Scope;
 import visitor.Visitor;
 import visitor.TypeVisitor;

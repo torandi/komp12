@@ -54,9 +54,12 @@ public class Main {
             TypeDefVisitor tdv= new TypeDefVisitor(error);
             tdv.visit(abstractTree.program);
 
-            //
+            //Bind symbols and allocate records, frames and accesses
             TypeBindVisitor tbv= new TypeBindVisitor(error);
             tbv.visit(abstractTree.program);
+            
+            if(error.anyErrors)
+               return false;
             
             pw = new PrintWriter(args[0]+".symbols");
             ASTSymbolPrintVisitor symbolpv= new ASTSymbolPrintVisitor(new StackedTabPrinter(pw));
@@ -64,9 +67,6 @@ public class Main {
             System.out.println("SymbolTable saved to "+args[0]+".symbols");
 
             pw.close();
-            
-            if(error.anyErrors)
-               return false;
 
             
 

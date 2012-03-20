@@ -9,13 +9,14 @@
 package visitor;
 
 import java.io.PrintWriter;
+import parse.StackedTabPrinter;
 import syntaxtree.*;
 
 public class ASTPrintVisitor implements Visitor {
-    private PrintWriter stream;
+    private StackedTabPrinter stream;
 
     public ASTPrintVisitor(PrintWriter stream) {
-        this.stream=stream;
+        this.stream=new StackedTabPrinter(stream);
     }
 
     // MainClass m;
@@ -23,11 +24,14 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(Program n) {
 	stream.println("Program(");
 	n.m.accept(this);
+        stream.add_tab();
 	stream.println("ClassDeclList(");
+        stream.add_tab();
 	for ( int i = 0; i < n.cl.size(); i++ ) {
 	    if (i>0) stream.println(", ");
 	    n.cl.elementAt(i).accept(this);
 	}
+        stream.del_tab();
 	stream.println("))");
     }
   
@@ -35,11 +39,13 @@ public class ASTPrintVisitor implements Visitor {
     // Statement s;
     public void visit(MainClass n) {
 	stream.print("MainClass(");
+        stream.add_tab();
 	n.i1.accept(this);
 	stream.print(", ");
 	n.i2.accept(this);
 	stream.print(", ");
 	n.s.accept(this);
+        stream.del_tab();
 	stream.println(")");
     }
 
@@ -49,19 +55,24 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(ClassDeclSimple n) {
 	stream.print("ClassDeclSimple(");
 	n.i.accept(this);
-	stream.print(", (");
+	stream.println(", (");
+        stream.add_tab();
 	for ( int i = 0; i < n.vl.size(); i++ ) {
 	    n.vl.elementAt(i).accept(this);
 	    if ( i+1 < n.vl.size() ) 
 		stream.print(", ");
 	}
+        stream.println();
+        stream.del_tab();
 	stream.println("),");
 	stream.println("(");
+        stream.add_tab();
 	for ( int i = 0; i < n.ml.size(); i++ ) {
 	    n.ml.elementAt(i).accept(this);
 	    if ( i+1 < n.ml.size() ) 
 		stream.println(", ");
 	}
+        stream.del_tab();
 	stream.println("))");
     }
  
@@ -106,28 +117,36 @@ public class ASTPrintVisitor implements Visitor {
     // StatementList sl;
     // Exp e;
     public void visit(MethodDecl n) {
-	stream.print("MethodDecl(");
+	stream.println("MethodDecl(");
 	n.t.accept(this);
-	stream.print(", ");
+	stream.println(", ");
 	n.i.accept(this);
-	stream.print(", (");
+	stream.println(", (");
+        stream.add_tab();
 	for ( int i = 0; i < n.fl.size(); i++ ) {
 	    n.fl.elementAt(i).accept(this);
 	    if (i+1 < n.fl.size()) 
 		stream.print(", ");
 	}
+        stream.println();
+        stream.del_tab();
 	stream.println("), (");
+        stream.add_tab();
 	for ( int i = 0; i < n.vl.size(); i++ ) {
 	    n.vl.elementAt(i).accept(this);
 	    if ( i+1 < n.vl.size() )
 		stream.print(", ");
 	}
+        stream.println();
+        stream.del_tab();
 	stream.println("), (");
+        stream.add_tab();
 	for ( int i = 0; i < n.sl.size(); i++ ) {
 	    n.sl.elementAt(i).accept(this);
 	    if ( i+1 < n.sl.size() ) 
 		stream.println(", ");
 	}
+        stream.del_tab();
 	stream.println("), ");
 	n.e.accept(this);
 	stream.println(")");
@@ -163,12 +182,15 @@ public class ASTPrintVisitor implements Visitor {
     // StatementList sl;
     public void visit(Block n) {
 	stream.println("Block((");
+        stream.add_tab();
 	for ( int i = 0; i < n.sl.size(); i++ ) {
 	    n.sl.elementAt(i).accept(this);
 	    if ( i+1 < n.sl.size()) 
 		stream.println(",");
 	}
-	stream.print("))");
+        stream.println();
+        stream.del_tab();
+	stream.println("))");
     }
 
     // Exp e;

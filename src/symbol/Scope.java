@@ -20,4 +20,5 @@ public abstract class Scope {
     public boolean addVariable(Identifier id,Symbol s) {
       return (variables.put(id.toString(), s)==null);
     }
+    
 }
