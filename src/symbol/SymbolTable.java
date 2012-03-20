@@ -1,4 +1,4 @@
-package symbols;
+package symbol;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,18 +16,18 @@ public class SymbolTable {
         scopes.removeFirst();
     }
 
-    public Type lookup(String id) {
-        Type t=null;
+    public Symbol lookup(String id) {
+        Symbol sym=null;
         for(Scope s : scopes) {
-            t = s.lookup(id);
-            if(t!=null)
-                return t;
+            sym = s.lookup(id);
+            if(sym!=null)
+                return sym;
         }
         return null;
     }
 
-    public boolean addVariable(Identifier id, Type t) {
-        return scopes.getFirst().addVariable(id, t);
+    public boolean addVariable(Identifier id, Symbol sym) {
+        return scopes.getFirst().addVariable(id, sym);
     }
 
     public Scope peek() {

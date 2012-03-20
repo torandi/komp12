@@ -1,12 +1,13 @@
 package visitor;
 
 import error.ErrorMsg;
-import symbols.Scope;
-import symbols.SymbolTable;
+import symbol.Symbol;
+import symbol.SymbolTable;
 import syntaxtree.*;
 
 /**
  * A visitor that handles type definitions
+ * This class should create all the 
  */
 public class TypeDefVisitor implements Visitor{
     private ErrorMsg error;
@@ -18,7 +19,7 @@ public class TypeDefVisitor implements Visitor{
 
     public void visit(Program n) {
 
-        //You can create new objects of the main class, but you can't do shit with it.
+        //Add the main class as a class without methods or variables
         n.addClass(n.m.i1, new ClassDeclSimple(n.m.i1, new VarDeclList(),new MethodDeclList()));
 
         n.m.accept(this);
@@ -58,7 +59,8 @@ public class TypeDefVisitor implements Visitor{
     }
 
     public void visit(VarDecl n) {
-        if(!st.addVariable(n.i,n.t)) {
+        n.i.sym = new Symbol(n.t);
+        if(!st.addVariable(n.i,n.i.sym)) {
             error.complain(n.i+" is already defined in current scope ("+st+")");
         }
     }
@@ -78,7 +80,8 @@ public class TypeDefVisitor implements Visitor{
     }
 
     public void visit(Formal n) {
-        if(!st.addVariable(n.i,n.t)) {
+        n.i.sym = new Symbol(n.t);
+        if(!st.addVariable(n.i,n.i.sym)) {
             error.complain(n.i+" in formal list is already defined in current scope ("+st+")");
         }
     }

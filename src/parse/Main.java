@@ -4,22 +4,25 @@ import basic_tree.Start;
 import error.ErrorMsg;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import syntaxtree.AbstractTree;
+import visitor.ASTSymbolPrintVisitor;
 import visitor.ASTPrintVisitor;
 import visitor.TypeBindVisitor;
 import visitor.TypeDefVisitor;
 
 
 public class Main {
+    public static frame.VMFactory frameFactory;
+    
     ErrorMsg error;
 
     AbstractTree abstractTree;
 
     public static void main(String[] args) {
         Main main = new Main();
+        frameFactory = new jvm.Factory();
         if(!main.begin(args)) {
             System.exit(-1);
         } 
@@ -41,19 +44,27 @@ public class Main {
                return false;
 
             //Build abstract tree
-				PrintWriter pw = new PrintWriter (args[0]+".syntax");
+	    PrintWriter pw = new PrintWriter (args[0]+".syntax");
             ASTPrintVisitor pv = new ASTPrintVisitor(pw);
             pv.visit(abstractTree.program);
-				pw.flush();
+            pw.close();
             System.out.println("Syntax saved to "+args[0]+".syntax");
 
-            //Check syntax
+            //Check syntax and bind types
             TypeDefVisitor tdv= new TypeDefVisitor(error);
             tdv.visit(abstractTree.program);
 
+            //
             TypeBindVisitor tbv= new TypeBindVisitor(error);
             tbv.visit(abstractTree.program);
+            
+            pw = new PrintWriter(args[0]+".symbols");
+            ASTSymbolPrintVisitor symbolpv= new ASTSymbolPrintVisitor(new StackedTabPrinter(pw));
+            symbolpv.visit(abstractTree.program);
+            System.out.println("SymbolTable saved to "+args[0]+".symbols");
 
+            pw.close();
+            
             if(error.anyErrors)
                return false;
 

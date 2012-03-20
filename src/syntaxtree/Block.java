@@ -1,5 +1,5 @@
 package syntaxtree;
-import symbols.Scope;
+import symbol.Scope;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 

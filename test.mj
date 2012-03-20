@@ -1,0 +1,27 @@
+class HelloWorld {
+	public static void main (String[] args) {
+		{ 
+			int x;
+			int y;
+			Derp d;
+
+			{ 
+				int x;
+				int y;
+				x = 1;
+				y = 2;
+			}
+			d = new Derp();
+			y = d.herp(0);
+
+			System.out.println(x+y);
+		}
+	}
+}
+
+class Derp {
+	public int herp(int foo) {
+		Derp  x;
+		return foo+2;
+	}
+}

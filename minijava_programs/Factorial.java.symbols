@@ -1,0 +1,11 @@
+MainClass: Factorial {jvm.Record(Factorial, 0)}
+		void main {jvm.Frame(Factorial$main, ()V)}
+Class: Fac
+	Fields: 
+		Methods: 
+		int ComputeFac {jvm.Frame(Fac$ComputeFac, (I)I)}
+			Formals:
+				int num {jvm.IntegerInFrame(0, num, I)}
+			Locals:
+				int num_aux {jvm.IntegerInFrame(1, num_aux, I)}
+

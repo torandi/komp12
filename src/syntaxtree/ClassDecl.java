@@ -1,7 +1,7 @@
 package syntaxtree;
 import java.util.ArrayList;
 import java.util.HashMap;
-import symbols.Scope;
+import symbol.Scope;
 import visitor.TypeBindVisitor;
 import visitor.Visitor;
 import visitor.TypeVisitor;
@@ -10,8 +10,9 @@ public abstract class ClassDecl extends Scope{
   public Identifier i;
   public VarDeclList vl;
   public MethodDeclList ml;
+  public frame.VMRecord record;
 
-  private HashMap<String, ArrayList<MethodDecl>  > methods =
+  public HashMap<String, ArrayList<MethodDecl>  > methods =
                 new HashMap<String,ArrayList<MethodDecl> >();
 
   public abstract void accept(Visitor v);
@@ -56,12 +57,8 @@ public abstract class ClassDecl extends Scope{
   private MethodDecl findMethod(ArrayList<MethodDecl> list, ArrayList<Type> tl) {
 
       for(MethodDecl m : list) {
-          System.out.print("Testing parameters: ("+TypeBindVisitor.typeListToString(m.fl.getTypeList())+"): ");
           if(m.compareParameters(tl)) {
-              System.out.println("YES");
               return m;
-          } else {
-              System.out.println("NO");
           }
       }
       return null;

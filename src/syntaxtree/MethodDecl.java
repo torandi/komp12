@@ -1,6 +1,6 @@
 package syntaxtree;
 import java.util.ArrayList;
-import symbols.Scope;
+import symbol.Scope;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
@@ -11,6 +11,7 @@ public class MethodDecl extends Scope{
   public VarDeclList vl;
   public StatementList sl;
   public Exp e;
+  public frame.VMFrame frame;
 
   public MethodDecl(Type at, Identifier ai, FormalList afl, VarDeclList avl, 
                     StatementList asl, Exp ae) {
@@ -27,12 +28,10 @@ public class MethodDecl extends Scope{
 
   public boolean compareParameters(ArrayList<Type> tl) {
       if(tl.size()!=fl.size()) {
-          System.out.print("WS...");
           return false;
       }
       for(int i=0;i<tl.size();++i) {
           if(!tl.get(i).equals(fl.getTypeList().get(i))) {
-              System.out.print(tl.get(i)+"!="+fl.getTypeList().get(i)+"...");
               return false;
           }
       }

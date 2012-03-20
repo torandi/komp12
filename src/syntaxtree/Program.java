@@ -7,7 +7,7 @@ public class Program {
   public MainClass m;
   public ClassDeclList cl;
 
-  private HashMap<String,ClassDecl> classes = new HashMap<String, ClassDecl>();
+  public HashMap<String,ClassDecl> classes = new HashMap<String, ClassDecl>();
 
   public Program(MainClass am, ClassDeclList acl) {
     m=am; cl=acl;

@@ -1,11 +1,3 @@
-/** ASTPrintVisitor - prints the abstract syntax tree in a constructor
- * style with parenthesized comma-separated lists. This visitor can
- * help check for the correctness of a MiniJava abstract syntax tree.
- * The implementation is based on that of PrettyPrintVisitor, and the
- * author was tempted to call it UglyPrintVisitor.
- *
- * Author: Todd Neller, Gettysburg College 1/29/04 */ 
-
 package visitor;
 
 import syntaxtree.*;

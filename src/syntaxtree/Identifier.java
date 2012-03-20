@@ -1,10 +1,11 @@
 package syntaxtree;
+import symbol.Symbol;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
 public class Identifier {
   public String s;
-  public Type t=null; //Set in type bind
+  public Symbol sym=null; //Set in symbol bind
 
   public Identifier(String as) { 
     s=as;

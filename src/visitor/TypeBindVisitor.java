@@ -2,7 +2,8 @@ package visitor;
 
 import error.ErrorMsg;
 import java.util.ArrayList;
-import symbols.SymbolTable;
+import parse.Main;
+import symbol.SymbolTable;
 import syntaxtree.*;
 
 /**
@@ -13,6 +14,7 @@ public class TypeBindVisitor implements TypeVisitor{
     private SymbolTable st=new SymbolTable();
     private Program curProgram=null;
     private ClassDecl curClass=null;
+    private frame.VMFrame curFrame = null;
 
     public TypeBindVisitor(ErrorMsg e) {
         error=e;
@@ -20,9 +22,17 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(Program n) {
         curProgram=n;
+        //Main class
+        n.m.record = Main.frameFactory.newRecord(n.m.i1.s);
+        n.m.mainMethodFrame = Main.frameFactory.newFrame(n.m.i1+"$main", new FormalList(), null);
+        curFrame = n.m.mainMethodFrame;
         n.m.accept(this);
+        curFrame = null;
+        
+        //other classes:
         for(ClassDecl c : n.cl.getList()) {
             curClass=c;
+            c.record = Main.frameFactory.newRecord(c.i.toString());
             c.accept(this);
         }
         return null;
@@ -39,10 +49,15 @@ public class TypeBindVisitor implements TypeVisitor{
         st.pushScope(n);
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
+            //Allocate field:
+            v.i.sym.access = curClass.record.allocField(v.i.s, v.t);
         }
         for(MethodDecl m : n.ml.getList()) {
+            m.frame = Main.frameFactory.newFrame(curClass.i.s+"$"+m.i.s, m.fl, m.t);
+            curFrame = m.frame;
             m.accept(this);
         }
+        curFrame = null;
         st.popScope();
         return null;
     }
@@ -61,9 +76,11 @@ public class TypeBindVisitor implements TypeVisitor{
         st.pushScope(n);
         for(Formal f : n.fl.getList()) {
             f.accept(this);
+            f.i.sym.access = n.frame.allocFormal(f.i.s,f.t);
         }
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
+            v.i.sym.access = n.frame.allocLocal(v.i.s, v.t);
         }
         for(Statement s : n.sl.getList()) {
             s.accept(this);
@@ -102,7 +119,8 @@ public class TypeBindVisitor implements TypeVisitor{
     public Type visit(Block n) {
         st.pushScope(n);
         for(VarDecl v : n.vl.getList()) {
-            v.accept(this);
+           v.accept(this);
+           v.i.sym.access = curFrame.allocLocal(v.i.s, v.t);
         }
         for(Statement s : n.sl.getList()) {
             s.accept(this);
@@ -253,15 +271,14 @@ public class TypeBindVisitor implements TypeVisitor{
     }
 
     public Type visit(IdentifierExp n) {
-        n.t=st.lookup(n.s);
-        if(n.t==null) {
+        n.sym=st.lookup(n.s);
+        if(n.sym==null) {
             error.complain("In "+st+": Undeclared variable "+n.s);
             System.exit(-1); //Unrecoverable error
             return null;
         } else {
-            return n.t.accept(this);
+            return n.sym.type.accept(this);
         }
-        
     }
 
     public Type visit(This n) {
@@ -305,13 +322,13 @@ public class TypeBindVisitor implements TypeVisitor{
     }
 
     public Type visit(Identifier n) {
-        n.t=st.lookup(n.s);
-        if(n.t==null) {
+        n.sym=st.lookup(n.s);
+        if(n.sym == null) {
             error.complain("In "+st+": Undeclared variable "+n.s);
             System.exit(-1); //Unrecoverable error
             return null;
         } else {
-            return n.t.accept(this);
+            return n.sym.type.accept(this);
         }
     }
 
