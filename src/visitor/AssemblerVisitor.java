@@ -317,7 +317,9 @@ public class AssemblerVisitor implements Visitor{
     
     public void visit(ArrayLookup n) { }
     
-    public void visit(ArrayLength n) { }
+    public void visit(ArrayLength n) {
+        
+    }
     
     public void visit(Call n) {
         //Add instructions for pushing the object to call the method on:
@@ -364,21 +366,25 @@ public class AssemblerVisitor implements Visitor{
         push();
     }
     
-    public void visit(NewArray n) {}
+    public void visit(NewArray n) {
+        n.e.accept(this);
+        instr("newarray I");
+    }
     
     public void visit(NewObject n){
         instr("new "+convert_classname(n.cls.fullName()));
         instr("dup");
         push(2);
-        instr("invokespecial "+convert_classname(n.cls.fullName())+"/<init>()V");
+        instr("invokespecial "+convert_classname(n.cls.fullName())+"/<init>()V"); 
         pop();
     }
 
     public void visit(Not n) {
         n.e.accept(this);
-        instr("ixor 1 ; boolean not");
+        instr("iconst_1");
+        instr("ixor ; boolean not");
     }
     
-    public void visit(Identifier n) { }
+    public void visit(Identifier n) { } //Never called in this visitor
     
 }

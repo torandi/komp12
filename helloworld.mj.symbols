@@ -8,8 +8,8 @@ Class: Derp
 		Methods: 
 		int herp {jvm.Frame(herp, (I)I)}
 			Formals:
-				int foo {jvm.IntegerInFrame(0, foo, I)}
+				int foo {jvm.IntegerInFrame(1, foo, I)}
 			Locals:
-				int x {jvm.IntegerInFrame(1, x, I)}
-				boolean b {jvm.IntegerInFrame(2, b, B)}
+				int x {jvm.IntegerInFrame(2, x, I)}
+				boolean b {jvm.IntegerInFrame(3, b, B)}
 
