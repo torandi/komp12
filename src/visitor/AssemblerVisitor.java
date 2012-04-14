@@ -360,7 +360,7 @@ public class AssemblerVisitor implements Visitor{
         } else if(n.i > -1 && n.i < 6) {
             instr("iconst_"+n.i);
         } else {
-            if(((short)n.i) == n.i) {
+            if(n.i > Short.MIN_VALUE && n.i < Short.MAX_VALUE) {
                 instr("sipush "+n.i);
             } else {
                 instr("ldc "+n.i);

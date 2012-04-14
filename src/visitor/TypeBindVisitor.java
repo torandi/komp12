@@ -1,11 +1,8 @@
 package visitor;
 
 import error.ErrorMsg;
-import frame.VMAccess;
 import java.util.ArrayList;
-import java.util.HashSet;
 import parse.Main;
-import symbol.Symbol;
 import symbol.SymbolTable;
 import syntaxtree.*;
 
@@ -98,7 +95,6 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(Formal n) {
         n.i.accept(this);
-        n.i.sym.initialized = true; //formals are always initialized
         return n.t.accept(this);
     }
 
@@ -161,7 +157,6 @@ public class TypeBindVisitor implements TypeVisitor{
         if(!t1.equals(t2)) {
             error.complain("In "+st+": Assigning variable of type "+t2+" to \""+n.i+"\", which is of type "+t1);
         }
-        n.i.sym.initialized = true;
         return t1.accept(this);
     }
 
@@ -287,10 +282,6 @@ public class TypeBindVisitor implements TypeVisitor{
             System.exit(-1); //Unrecoverable error
             return null;
         } else {
-            if(!n.sym.initialized) {
-                error.complain("In "+st+": variable "+n.s+" might not have been initialized");
-                n.sym.initialized = true; //Only warn once
-            }
             return n.sym.type.accept(this);
         }
     }

@@ -27,7 +27,7 @@ public class Main {
             frameFactory = new jvm.Factory();
             if(!main.begin(s)) {
                 System.out.println("Compilation failed: "+s);
-            } 
+            }
         }
     }
 
@@ -81,8 +81,6 @@ public class Main {
             System.out.println("Begin assembling!");
             asmVisitor.run(abstractTree.program);
             System.out.println("Assembly outputed to "+asmVisitor.getOutputDir());
-
-            
 
             return true;
         } catch (FileNotFoundException ex) {
