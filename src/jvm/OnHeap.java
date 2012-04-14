@@ -18,17 +18,17 @@ public class OnHeap implements frame.VMAccess
 
     public String load() {
         return
-	    "    aload_0 ; this\n" +
-	    "    getfield " + c + "/" + f + " " + s;
+	    "aload_0 ; this\n" +
+	    "getfield " + c + "/" + f + " " + s;
     }
 
     // We get one extra instruction here, since the arguments
     // end up in wrong order on the stack.
     public String store() {
         return
-	    "    aload_0 ; this\n" +
-	    "    swap\n" +
-	    "    putfield " + c + "/" + f + " " + s;
+	    "aload_0 ; this\n" +
+	    "swap\n" +
+	    "putfield " + c + "/" + f + " " + s;
     }
 
     private String c;

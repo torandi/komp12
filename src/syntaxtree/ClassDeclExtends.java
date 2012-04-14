@@ -3,7 +3,7 @@ import visitor.Visitor;
 import visitor.TypeVisitor;
 
 public class ClassDeclExtends extends ClassDecl {
-  public Identifier j;
+  public Identifier j; //Parent
  
   public ClassDeclExtends(Identifier ai, Identifier aj, 
                   VarDeclList avl, MethodDeclList aml) {
@@ -16,5 +16,9 @@ public class ClassDeclExtends extends ClassDecl {
 
   public Type accept(TypeVisitor v) {
     return v.visit(this);
+  }
+  
+  public String parent() {
+      return j.s;
   }
 }

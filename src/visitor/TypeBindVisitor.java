@@ -25,7 +25,7 @@ public class TypeBindVisitor implements TypeVisitor{
         curProgram=n;
         //Main class
         n.m.record = Main.frameFactory.newRecord(n.m.i1.s);
-        n.m.mainMethodFrame = Main.frameFactory.newFrame(n.m.i1+"$main", new FormalList(), null);
+        n.m.mainMethodFrame = Main.frameFactory.newFrame("main", new FormalList(), null);
         curFrame = n.m.mainMethodFrame;
         n.m.accept(this);
         curFrame = null;
@@ -54,7 +54,7 @@ public class TypeBindVisitor implements TypeVisitor{
             v.i.sym.access = curClass.record.allocField(v.i.s, v.t);
         }
         for(MethodDecl m : n.ml.getList()) {
-            m.frame = Main.frameFactory.newFrame(curClass.i.s+"$"+m.i.s, m.fl, m.t);
+            m.frame = Main.frameFactory.newFrame(m.i.s, m.fl, m.t);
             curFrame = m.frame;
             m.accept(this);
         }

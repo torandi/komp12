@@ -9,6 +9,7 @@ import java.io.Reader;
 import syntaxtree.AbstractTree;
 import visitor.ASTSymbolPrintVisitor;
 import visitor.ASTPrintVisitor;
+import visitor.AssemblerVisitor;
 import visitor.TypeBindVisitor;
 import visitor.TypeDefVisitor;
 
@@ -66,8 +67,18 @@ public class Main {
             ASTSymbolPrintVisitor symbolpv= new ASTSymbolPrintVisitor(new StackedTabPrinter(pw));
             symbolpv.visit(abstractTree.program);
             System.out.println("SymbolTable saved to "+args[0]+".symbols");
+            
 
             pw.close();
+            
+            if(error.anyErrors)
+               return false;
+            
+            //Output assembly!
+            AssemblerVisitor asmVisitor = new AssemblerVisitor();
+            System.out.println("Begin assembling!");
+            asmVisitor.visit(abstractTree.program);
+            System.out.println("Assembly outputed to "+asmVisitor.getOutputDir());
 
             
 

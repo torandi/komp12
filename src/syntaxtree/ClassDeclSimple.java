@@ -15,4 +15,8 @@ public class ClassDeclSimple extends ClassDecl {
   public Type accept(TypeVisitor v) {
     return v.visit(this);
   }
+  
+  public String parent() {
+      return "java.lang.Object";
+  }
 }

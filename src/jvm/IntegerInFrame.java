@@ -18,23 +18,23 @@ public class IntegerInFrame implements frame.VMAccess
 
     public String load() {
 	switch(o) {
-	case 0: return "    iload_0 ; " + n;
-	case 1: return "    iload_1 ; " + n;
-	case 2: return "    iload_2 ; " + n;
-	case 3: return "    iload_3 ; " + n;
+	case 0: return "iload_0 ; " + n;
+	case 1: return "iload_1 ; " + n;
+	case 2: return "iload_2 ; " + n;
+	case 3: return "iload_3 ; " + n;
 	default:
-	    return "    iload " + o + " ; " + n;
+	    return "iload " + o + " ; " + n;
 	}
     }
 
     public String store() {
 	switch(o) {
-	case 0: return "    istore_0 ; " + n;
-	case 1: return "    istore_1 ; " + n;
-	case 2: return "    istore_2 ; " + n;
-	case 3: return "    istore_3 ; " + n;
+	case 0: return "istore_0 ; " + n;
+	case 1: return "istore_1 ; " + n;
+	case 2: return "istore_2 ; " + n;
+	case 3: return "istore_3 ; " + n;
 	default:
-	    return "    istore " + o + " ; " + n;
+	    return "istore " + o + " ; " + n;
 	}
     }
 

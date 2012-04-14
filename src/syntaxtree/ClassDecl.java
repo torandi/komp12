@@ -63,6 +63,11 @@ public abstract class ClassDecl extends Scope{
       }
       return null;
   }
+  
+  /**
+   * Return name of superclass
+   */
+  public abstract String parent();
 
   
 }
