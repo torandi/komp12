@@ -182,7 +182,15 @@ public class AssemblerVisitor implements Visitor{
         n.e.accept(this);
         
         if(pass == 2) {
-            instr("return");
+            if(n.t != null) {
+                if(n.t instanceof IntegerType || n.t instanceof BooleanType) {
+                    instr("ireturn");
+                } else {
+                    instr("areturn");
+                }
+            } else {
+                instr("return");
+            }
             directive(".end method");
         } else {
             stack_size.put(n, current_max_stack_size);
