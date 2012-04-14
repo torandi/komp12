@@ -50,6 +50,9 @@ public class AssemblerVisitor implements Visitor{
     
     private void pop(int num_vars) {
         current_stack_size-=num_vars;
+        if(current_stack_size < 0) {
+            System.out.println("Warning, stack poped below 0");
+        }
     }
     
     private String convert_classname(String str) {
@@ -269,7 +272,14 @@ public class AssemblerVisitor implements Visitor{
         instr(n.i.sym.access.store());
     }
     
-    public void visit(ArrayAssign n) { }
+    public void visit(ArrayAssign n) {
+        instr(n.i.sym.access.load());
+        push();
+        n.e1.accept(this);
+        n.e2.accept(this);
+        instr("iastore");
+        pop(3);
+    }
     
     public void visit(And n) {
         Label l_false = create_label();
@@ -321,10 +331,16 @@ public class AssemblerVisitor implements Visitor{
         pop();
     }
     
-    public void visit(ArrayLookup n) { }
+    public void visit(ArrayLookup n) {
+        n.e1.accept(this);
+        n.e2.accept(this);
+        instr("iaload");
+        pop();
+    }
     
     public void visit(ArrayLength n) {
-        
+        n.e.accept(this);
+        instr("arraylength");
     }
     
     public void visit(Call n) {
@@ -374,7 +390,7 @@ public class AssemblerVisitor implements Visitor{
     
     public void visit(NewArray n) {
         n.e.accept(this);
-        instr("newarray I");
+        instr("newarray int");
     }
     
     public void visit(NewObject n){
