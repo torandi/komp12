@@ -4,25 +4,25 @@
 */
 class IfAnd
 {
-    public static void main(String[] a){
-	System.out.println(new Test().go());
-    }
+	public static void main(String[] a){
+		System.out.println(new Test().go());
+	}
 }
 
 class Test {
-    int a;
+	int a;
 
-    public int go() {
-	a = 17;
-	if(a < 13 && this.change()) {
+	public int go() {
+		a = 17;
+		if(a < 13 && this.change()) {
+		}
+		else {
+		}
+		return a;
 	}
-	else {
-	}
-	return a;
-    }
 
-    public boolean change() {
-	a = 4711;
-	return true;
-    }
+	public boolean change() {
+		a = 4711;
+		return true;
+	}
 }

@@ -19,7 +19,7 @@ public class OnHeap implements frame.VMAccess
     public String load() {
         return
 	    "aload_0 ; this\n" +
-	    "getfield " + c + "/" + f + " " + s;
+	    "\tgetfield " + c + "/" + f + " " + s;
     }
 
     // We get one extra instruction here, since the arguments
@@ -27,8 +27,8 @@ public class OnHeap implements frame.VMAccess
     public String store() {
         return
 	    "aload_0 ; this\n" +
-	    "swap\n" +
-	    "putfield " + c + "/" + f + " " + s;
+	    "\tswap\n" +
+	    "\tputfield " + c + "/" + f + " " + s;
     }
 
     private String c;

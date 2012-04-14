@@ -141,11 +141,10 @@ public class AssemblerVisitor implements Visitor{
         load_class_output(n.i.s);
         directive(".class "+convert_classname(n.fullName()));
         directive(".super java/lang/Object");
-        create_constructor(n);
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
         }
-
+        create_constructor(n);
         for(MethodDecl m : n.ml.getList()) {
             m.accept(this);
         }
@@ -273,10 +272,17 @@ public class AssemblerVisitor implements Visitor{
     public void visit(ArrayAssign n) { }
     
     public void visit(And n) {
+        Label l_false = create_label();
+        Label l_end = create_label();
         n.e1.accept(this);
+        instr("ifeq "+l_false.name());
+        pop();
         n.e2.accept(this);
-        instr("iand");
-        pop(); //Actually pop(2) push(1)
+        instr("goto "+l_end.name());
+        label(l_false.declare());
+        instr("iconst_0");
+        push();
+        label(l_end.declare());
     }
     
     public void visit(LessThan n) {
@@ -285,7 +291,7 @@ public class AssemblerVisitor implements Visitor{
         Label l_true, l_end;
         l_true = create_label();
         l_end = create_label();
-        instr("ifcmplt "+l_true.name());
+        instr("if_icmplt "+l_true.name());
         pop(2);
         instr("iconst_0");
         instr("goto "+l_end.name());
