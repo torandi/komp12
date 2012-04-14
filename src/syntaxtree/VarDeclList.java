@@ -16,6 +16,10 @@ public class VarDeclList {
    public VarDecl elementAt(int i)  { 
       return list.get(i); 
    }
+   
+   public void push_front(VarDecl n) {
+       list.add(0, n);
+   }
 
    public int size() { 
       return list.size(); 

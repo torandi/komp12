@@ -8,6 +8,7 @@ public class Call extends Exp {
     
   public Identifier i;
   public ExpList el;
+  public MethodDecl method; //Method that will be called
   
   public Call(Exp ae, Identifier ai, ExpList ael) {
     e=ae; i=ai; el=ael;

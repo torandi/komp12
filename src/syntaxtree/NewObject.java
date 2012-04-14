@@ -4,6 +4,7 @@ import visitor.TypeVisitor;
 
 public class NewObject extends Exp {
   public Identifier i;
+  public ClassDecl cls; //The class to create a new object of
   
   public NewObject(Identifier ai) {
     i=ai;

@@ -11,8 +11,9 @@ public class MethodDecl extends Scope{
   public FormalList fl;
   public VarDeclList vl;
   public StatementList sl;
-  public Exp e;
+  public Exp e; //return statement
   public frame.VMFrame frame;
+  public ClassDecl cls; //Class this method belongs to
 
   public MethodDecl(Type at, Identifier ai, FormalList afl, VarDeclList avl, 
                     StatementList asl, Exp ae) {
@@ -37,6 +38,10 @@ public class MethodDecl extends Scope{
           }
       }
       return true;
+  }
+  
+  public String fullName() {
+      return cls.fullName()+"."+i.s;
   }
 
   public String toString() {

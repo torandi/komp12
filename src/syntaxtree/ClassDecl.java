@@ -11,7 +11,7 @@ public abstract class ClassDecl extends Scope{
   public VarDeclList vl;
   public MethodDeclList ml;
   public frame.VMRecord record;
-
+  
   public HashMap<String, ArrayList<MethodDecl>  > methods =
                 new HashMap<String,ArrayList<MethodDecl> >();
 
@@ -30,6 +30,7 @@ public abstract class ClassDecl extends Scope{
       }
       if (findMethod(container, tl)==null) {
           container.add(m);
+          m.cls = this;
           return true;
       } else {
           return false;
@@ -69,5 +70,9 @@ public abstract class ClassDecl extends Scope{
    */
   public abstract String parent();
 
+  public String fullName() {
+      //Add package name here if packages are to be used
+      return i.s;
+  }
   
 }

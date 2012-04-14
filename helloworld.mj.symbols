@@ -1,7 +1,15 @@
-SymbolTable:
-{}: 
-	x=int	y=int
-HelloWorld.main(): 
-
-HelloWorld: 
+MainClass: HelloWorld {jvm.Record(HelloWorld, 0)}
+	void main {jvm.Frame(main, ()V)}
+		Block:
+			int x {jvm.IntegerInFrame(0, x, I)}
+			int y {jvm.IntegerInFrame(1, y, I)}
+Class: Derp
+	Fields: 
+		Methods: 
+		int herp {jvm.Frame(herp, (I)I)}
+			Formals:
+				int foo {jvm.IntegerInFrame(0, foo, I)}
+			Locals:
+				int x {jvm.IntegerInFrame(1, x, I)}
+				boolean b {jvm.IntegerInFrame(2, b, B)}
 

@@ -1,9 +1,11 @@
 package visitor;
 
 import error.ErrorMsg;
+import frame.VMAccess;
 import java.util.ArrayList;
 import java.util.HashSet;
 import parse.Main;
+import symbol.Symbol;
 import symbol.SymbolTable;
 import syntaxtree.*;
 
@@ -48,6 +50,7 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(ClassDeclSimple n) {
         st.pushScope(n);
+        
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
             //Allocate field:
@@ -56,6 +59,7 @@ public class TypeBindVisitor implements TypeVisitor{
         for(MethodDecl m : n.ml.getList()) {
             m.frame = Main.frameFactory.newFrame(m.i.s, m.fl, m.t);
             curFrame = m.frame;
+            curFrame.allocLocal("<this>", new IdentifierType(n));
             m.accept(this);
         }
         curFrame = null;
@@ -248,6 +252,7 @@ public class TypeBindVisitor implements TypeVisitor{
             }
             MethodDecl m = c.findMethod(n.i, tl);
             if(m!=null) {
+                n.method = m;
                 return m.t.accept(this);
             } else {
                 error.complain("In "+st+": Unknown method "+c.i+"."+n.i+"("+typeListToString(tl)+")");
@@ -312,6 +317,7 @@ public class TypeBindVisitor implements TypeVisitor{
         } else {
             IdentifierType it = new IdentifierType(c.i.s);
             it.c=c;
+            n.cls = c;
             return it;
         }
     }

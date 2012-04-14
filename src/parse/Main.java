@@ -77,7 +77,7 @@ public class Main {
             //Output assembly!
             AssemblerVisitor asmVisitor = new AssemblerVisitor();
             System.out.println("Begin assembling!");
-            asmVisitor.visit(abstractTree.program);
+            asmVisitor.run(abstractTree.program);
             System.out.println("Assembly outputed to "+asmVisitor.getOutputDir());
 
             

@@ -9,7 +9,7 @@ import syntaxtree.Type;
 
 public class Hardware
 {
-    static String signature(Type t) {
+    public static String signature(Type t) {
 	if(t instanceof BooleanType) {
 	    return "B";
 	}
@@ -27,7 +27,7 @@ public class Hardware
 	}
     }
 
-    static String methodSignature(FormalList formals, Type returnType) {
+    public static String methodSignature(FormalList formals, Type returnType) {
 	String sig = "(";
 	if(formals != null) {
 	    for(int i = 0; i < formals.size(); i++) {

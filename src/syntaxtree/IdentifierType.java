@@ -16,6 +16,11 @@ public class IdentifierType extends Type {
   public IdentifierType(String as) {
     s=as;
   }
+  
+  public IdentifierType(ClassDecl c) {
+      s = c.i.s;
+      this.c = c;
+  }
 
   public void accept(Visitor v) {
     v.visit(this);
