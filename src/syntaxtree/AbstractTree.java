@@ -22,6 +22,9 @@ import basic_tree.Variable;
 
 import error.ErrorMsg;
 import java.io.PrintWriter;
+import javax.swing.text.html.HTMLEditorKit.Parser;
+import parse.ParserConstants;
+import parse.Token;
 
 
 public class AbstractTree {
@@ -72,7 +75,7 @@ public class AbstractTree {
         for(basic_tree.Method m : in.getMethods()) {
             mdl.addElement(method(m));
         }
-
+        //@TODO: Extended/Simple select
         cd = new ClassDeclSimple(id(in.getName()),vdl, mdl);
         return cd;
 
@@ -193,15 +196,38 @@ public class AbstractTree {
         for(LessOperand op : in.getOperands()) {
             el.addElement(less(op));
         }
-        return buildLess(el);
+        return buildCompare(el, in.getOperator());
     }
-    private Exp buildLess(ExpList el) {
+    private Exp buildCompare(ExpList el, Token operator) {
+        Compare.Operator op = tokenToOperator(operator);
         if(el.size()>1) {
-            return new LessThan(el.elementAt(0),buildLess(el.sublist()));
+            return new Compare(el.elementAt(0),buildCompare(el.sublist(), operator), op);
         } else {
             return el.elementAt(0);
         }
     }
+    
+    private Compare.Operator tokenToOperator(Token t) {
+        if(t == null)
+            return Compare.Operator.NOP;
+        switch(t.kind) {
+            case ParserConstants.LT:
+                return Compare.Operator.LT;
+            case ParserConstants.LEQ:
+                return Compare.Operator.LTEQ;
+            case ParserConstants.GT:
+                return Compare.Operator.GT;
+            case ParserConstants.GEQ:
+                return Compare.Operator.GTEQ;
+            case ParserConstants.EQ:
+                return Compare.Operator.EQ;
+            case ParserConstants.NEQ:
+                return Compare.Operator.NEQ;
+            default:
+                error.complain("Invalid comparison operator");
+                return null;
+        }
+    }   
 
     private Exp less(basic_tree.LessOperand in) {
         ExpList pl = new ExpList();

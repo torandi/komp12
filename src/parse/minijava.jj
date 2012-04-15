@@ -40,6 +40,11 @@ TOKEN: { <PLUS: "+" > }
 TOKEN: {	<MINUS: "-" > }
 TOKEN: {	<MULT: "*" > }
 TOKEN: {	<LT: "<" > }
+TOKEN: {	<LEQ: "<=" > }
+TOKEN: {	<GT: ">" > }
+TOKEN: {	<GEQ: ">=" > }
+TOKEN: {	<EQ: "==" > }
+TOKEN: {	<NEQ: "!=" > }
 TOKEN: {	<SET: "=" > }
 TOKEN: { <AND: "&&" > }
 TOKEN: { <OPAR: "("> }
@@ -67,6 +72,7 @@ TOKEN: { <WHILE: "while"> }
 TOKEN: { <RETURN: "return"> }
 TOKEN: { <COMMA: ","> }
 TOKEN: { <VOID: "void"> }
+TOKEN: { <EXTENDS: "extends"> }
 
 
 TOKEN: { <ID: ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9","_"])* > }
@@ -204,15 +210,20 @@ Statement Statement () throws ParseException:
 basic_tree.Class ClassDecl () throws ParseException: 
 { 
 	basic_tree.Class c;
-	Token className;
+	Token className, superClassName;
 	Variable v;
 	Method m;
 }
 {
 	<CLASS>
-	className=<ID>
-	<OBRACE>
+	className = <ID>
 	{ c = new basic_tree.Class(className.image); }
+	(
+		<EXTENDS>
+		superClassName = <ID>
+		{ c.setSuper(superClassName.image); }
+	)?
+	<OBRACE>
 	(
 		v = VarDecl()
 		{ c.addVariable(v); }
@@ -336,17 +347,42 @@ AndOperand AndOperand() throws ParseException:
 {
 	AndOperand op;
 	LessOperand op2;
+	Token cmp_op;
 }
 {
 	op2 = LessOperand()
 	{ op = new AndOperand(op2); }
 	(
 		LOOKAHEAD(2)
-		<LT>
+		cmp_op = CompareOperator()
 		op2 = LessOperand()
-		{ op.addOperand(op2); }
+		{ 
+			op.addOperand(op2);
+			op.setOperator(cmp_op);
+		}
 	)*
 	{ return op; }
+}
+
+Token CompareOperator() throws ParseException:
+{
+	Token t;
+}
+{
+	(
+		t = <LT>
+	|
+		t = <LEQ>
+	| 
+		t = <GT>
+	| 
+		t = <GEQ>
+	| 
+		t = <EQ>
+	| 
+		t = <NEQ>
+	)
+	{ return t; }
 }
 
 LessOperand LessOperand() throws ParseException:

@@ -1,3 +1,5 @@
+.PHONY: src/parse
+
 all: src/parse parser
 
 src/parse:

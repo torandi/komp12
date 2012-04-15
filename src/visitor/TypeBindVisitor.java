@@ -185,11 +185,17 @@ public class TypeBindVisitor implements TypeVisitor{
         return new BooleanType();
     }
 
-    public Type visit(LessThan n) {
+    public Type visit(Compare n) {
         Type t1=n.e1.accept(this);
         Type t2=n.e2.accept(this);
-        if(!(t1 instanceof IntegerType && t2 instanceof IntegerType)) {
-            error.complain("In "+st+": Operator < can not be applied to "+t1+", "+t2);
+        if(n.op != Compare.Operator.EQ && n.op != Compare.Operator.NEQ && !(
+                t1 instanceof IntegerType && t2 instanceof IntegerType)) {
+            error.complain("In "+st+": Operator "+Compare.op_to_str(n.op)+" can not be applied to "+t1+", "+t2);
+        } else if((n.op == Compare.Operator.EQ || n.op == Compare.Operator.NEQ) && !(
+                (t1 instanceof IntegerType || t1 instanceof BooleanType)
+                &&
+                (t2 instanceof IntegerType || t2 instanceof BooleanType))) {
+            error.complain("In "+st+": Operator "+Compare.op_to_str(n.op)+" can not be applied to "+t1+", "+t2);
         }
         return new BooleanType();
     }

@@ -107,7 +107,11 @@ public class AssemblerVisitor implements Visitor{
     }
 
     private Label create_label() {
-        return new Label(next_label++);
+        return create_label(null);
+    }
+    
+    private Label create_label(String hint) {
+        return new Label(next_label++, hint);
     }
     
     public AssemblerVisitor() {}
@@ -213,37 +217,38 @@ public class AssemblerVisitor implements Visitor{
             s.accept(this);
         }
     }
-
+    
     public void visit(If n) {
-        Label l_true, l_end;
-        l_true = create_label();
-        l_end = create_label();
-        
-        if(n.e instanceof LessThan) {
-            LessThan lt = (LessThan) n.e;
-            instr("; begin lt if ");
-            lt.e1.accept(this);
-            lt.e2.accept(this);
-            instr("if_icmplt "+l_true.name());
-            pop(2);
+        Label l_true, l_false, l_end;
+        l_true = create_label("if_true");
+        l_end = create_label("if_end");
+
+        if(n.e instanceof Compare) {
+            Compare compare = (Compare) n.e;
+            compare.e1.accept(this);
+            compare.e2.accept(this);
+            compare_instruction(compare.op, l_true);
         } else {
-            instr("; begin if expression");
             n.e.accept(this);
-            instr("ifne "+l_true.name()+" ; if jump");
+            instr("ifne "+l_true.name());
             pop();
         }
+        
+        
         instr("; if false");
         n.s2.accept(this);
         instr("goto "+l_end.name());
-        label(l_true.declare()+" ; if true");
+        //true
+        label(l_true.declare());
         n.s1.accept(this);
-        label(l_end.declare()+" ; end if");
+        label(l_end.declare());
+        
     }
 
     public void visit(While n) {
         Label l_start, l_end;
-        l_start = create_label();
-        l_end = create_label();
+        l_start = create_label("while_begin");
+        l_end = create_label("while_end");
         label(l_start.declare()+" ; begin while");
         n.e.accept(this);
         //@TODO: Optimize for lt
@@ -282,30 +287,72 @@ public class AssemblerVisitor implements Visitor{
         instr("iastore");
         pop(3);
     }
-    
-    public void visit(And n) {
-        Label l_false = create_label();
-        Label l_end = create_label();
-        instr("; begin and");
-        n.e1.accept(this);
-        instr("ifeq "+l_false.name()+" ; and middle");
+
+    //Set label l_true to null to fall through on true
+    public void create_and(Exp e1, Exp e2, Label l_true, Label l_false) {
+        e1.accept(this);
+        instr("ifeq "+l_false.name());
         pop();
-        n.e2.accept(this);
+        e2.accept(this);
+        instr("ifeq "+l_false.name());
+        pop();
+        if(l_true != null) {
+            instr("goto "+l_true.name());
+        }
+    }
+        
+    public void visit(And n) {
+        Label l_false = create_label("and_false");
+        Label l_end = create_label("and_end");
+        
+        create_and(n.e1, n.e2, null, l_false); //Null => fall through on true
+        instr("iconst_1");
         instr("goto "+l_end.name());
         label(l_false.declare());
-        instr("iconst_0 ; and false");
+        instr("iconst_0");
+        label(l_end.declare());
+        
         push();
-        label(l_end.declare()+ " ; and exit");
     }
     
-    public void visit(LessThan n) {
+    private void compare_instruction(Compare.Operator op, Label label) {
+        switch(op) {
+            case LT:
+                instr("if_icmplt "+label.name());
+                pop(2);
+                break;
+            case LTEQ:
+                instr("if_icmple "+label.name());
+                pop(2);
+                break;
+            case GT:
+                instr("if_icmpgt "+label.name());
+                pop(2);
+                break;
+            case GTEQ:
+                instr("if_icmpge "+label.name());
+                pop(2);
+                break;
+            case EQ:
+                instr("if_icmpeq "+label.name());
+                pop(2);
+                break;
+            case NEQ:
+                instr("if_icmpne "+label.name());
+                pop(2);
+                break;
+        }
+    }
+    
+    public void visit(Compare n) {
         n.e1.accept(this);
         n.e2.accept(this);
         Label l_true, l_end;
         l_true = create_label();
         l_end = create_label();
-        instr("if_icmplt "+l_true.name());
-        pop(2);
+        
+        compare_instruction(n.op, l_true);
+        
         instr("iconst_0");
         instr("goto "+l_end.name());
         label(l_true.declare());

@@ -254,11 +254,13 @@ public class ASTPrintVisitor implements Visitor {
     }
 
     // Exp e1,e2;
-    public void visit(LessThan n) {
-	stream.print("LessThan(");
+    public void visit(Compare n) {
+	stream.print("Compare(");
 	n.e1.accept(this);
 	stream.print(", ");
 	n.e2.accept(this);
+	stream.print(", ");
+        stream.print(Compare.op_to_str(n.op));
 	stream.print(")");
     }
 

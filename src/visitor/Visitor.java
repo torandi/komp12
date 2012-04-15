@@ -81,7 +81,7 @@ public interface Visitor {
     public void visit(And n);
 
     // Exp e1,e2;
-    public void visit(LessThan n);
+    public void visit(Compare n);
 
     // Exp e1,e2;
     public void visit(Plus n);
