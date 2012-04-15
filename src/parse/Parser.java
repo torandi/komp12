@@ -510,7 +510,7 @@
   }
 
   final public Primary Primary() throws ParseException, ParseException {
-        Primary p;
+        Primary p, p2;
         Token v;
         Expression e;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -555,8 +555,8 @@
       break;
     case EXCL:
       jj_consume_token(EXCL);
-      e = Expression();
-                  p = new NotExpressionPrimary(e);
+      p2 = Primary();
+                  p = new NotExpressionPrimary(p2);
       break;
     case OPAR:
       jj_consume_token(OPAR);

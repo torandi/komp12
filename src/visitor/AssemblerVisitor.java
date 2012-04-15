@@ -74,7 +74,7 @@ public class AssemblerVisitor implements Visitor{
         instr("aload_0");
         instr("invokespecial "+superclass+"/<init>()V");
         instr("return");
-        directive(".end method");
+        directive(".end method\n");
     }
      
     private void output(String str) {
@@ -143,10 +143,11 @@ public class AssemblerVisitor implements Visitor{
     public void visit(ClassDeclSimple n) {
         load_class_output(n.i.s);
         directive(".class "+convert_classname(n.fullName()));
-        directive(".super java/lang/Object");
+        directive(".super java/lang/Object\n");
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
         }
+        output("");
         create_constructor(n);
         for(MethodDecl m : n.ml.getList()) {
             m.accept(this);
@@ -193,7 +194,7 @@ public class AssemblerVisitor implements Visitor{
             } else {
                 instr("return");
             }
-            directive(".end method");
+            directive(".end method\n");
         } else {
             stack_size.put(n, current_max_stack_size);
         }
@@ -243,9 +244,10 @@ public class AssemblerVisitor implements Visitor{
         Label l_start, l_end;
         l_start = create_label();
         l_end = create_label();
-        label(l_start.declare());
+        label(l_start.declare()+" ; begin while");
         n.e.accept(this);
-        instr("ifeq "+l_end.name()+" ; begin While");
+        //@TODO: Optimize for lt
+        instr("ifeq "+l_end.name()+" ; while condition");
         n.s.accept(this);
         instr("goto "+l_start.name()+" ; loop while");
         label(l_end.declare()+" ; end while");
@@ -284,15 +286,16 @@ public class AssemblerVisitor implements Visitor{
     public void visit(And n) {
         Label l_false = create_label();
         Label l_end = create_label();
+        instr("; begin and");
         n.e1.accept(this);
-        instr("ifeq "+l_false.name());
+        instr("ifeq "+l_false.name()+" ; and middle");
         pop();
         n.e2.accept(this);
         instr("goto "+l_end.name());
         label(l_false.declare());
-        instr("iconst_0");
+        instr("iconst_0 ; and false");
         push();
-        label(l_end.declare());
+        label(l_end.declare()+ " ; and exit");
     }
     
     public void visit(LessThan n) {
@@ -402,6 +405,7 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(Not n) {
+        instr("; not start");
         n.e.accept(this);
         instr("iconst_1");
         instr("ixor ; boolean not");

@@ -1,6 +1,6 @@
 all: src/parse parser
 
-src/parse: src/parse/minijava.jj
+src/parse:
 	cd src/parse ; \
 	javacc minijava.jj
 

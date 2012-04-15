@@ -3,15 +3,15 @@ package basic_tree;
 
 public class NotExpressionPrimary extends Primary{
 
-	private Expression expression;
+	private Primary primary;
 
-	public NotExpressionPrimary(Expression expression) {
+	public NotExpressionPrimary(Primary primary) {
 		super();
-		this.expression = expression;
+		this.primary = primary;
 	}
 
-	public Expression getExpression() {
-		return expression;
+	public Primary getPrimary() {
+		return primary;
 	}
 	
 }
