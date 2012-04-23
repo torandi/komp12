@@ -1,0 +1,16 @@
+\section{Introduction}
+This document describes the design process and decisions behind my complitator for the minijava language \ref{minijava}. The compilator compiles minijava into jasmine \ref{jasmine} assembler.
+
+\section{Lexer and Parser}
+For the lexer and parser I used JavaCC, a LL parser code generator. LL feels more natural than LR and the process of converting the grammar to LL was not too tedious.
+
+\section{Abstract Syntax Tree}
+The syntax tree created by the parser (in the code called ''basic\_tree'') is more complex than
+is necesary, and is in princip a tree representation of the original language. To simplify future change of source language, and simply make the rest of the process easier the basic tree is
+converted to a abstract syntax tree (AST).
+
+This convertion is done in the syntaxtree.AbstractTree class and is done by traversing the tree
+and building the abstract representation.
+
+\section{Typechecking}
+
