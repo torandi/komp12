@@ -2,3 +2,4 @@
 *.symbols
 bin/*
 bin/*.class
+src/parse/*.java

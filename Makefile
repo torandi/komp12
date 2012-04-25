@@ -1,14 +1,16 @@
 .PHONY: src/parse clean
 
-all: src/parse parser
+all: parser mjc
 
-src/parse:
-	cd src/parse ; \
-	javacc minijava.jj
+parser:
+	lib/javacc/javacc -output_directory=src/parse/ src/parse/minijava.jj 
 
-parser: src/
+mjc: src/
 	javac -cp src/ src/mjc/JVMMain.java -d bin/
 
 clean:
-	rm -rf src/parse/TokenMgrError.java src/parse/ParseException.java src/parse/Token.java src/parse/SimpleCharStream.java
+	rm -rf src/parse/*.java
 	rm -rf bin/*
+
+tigris.tar.gz: clean src/ report.pdf DESC lib/ build.xml
+	tar -czf tigris.tar.gz src/ lib/ DESC report.pdf build.xml 
