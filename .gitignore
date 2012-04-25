@@ -1,2 +1,4 @@
 *.syntax
+*.symbols
+bin/*
 bin/*.class

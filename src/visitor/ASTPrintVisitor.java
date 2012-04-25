@@ -9,7 +9,7 @@
 package visitor;
 
 import java.io.PrintWriter;
-import parse.StackedTabPrinter;
+import mjc.StackedTabPrinter;
 import syntaxtree.*;
 
 public class ASTPrintVisitor implements Visitor {

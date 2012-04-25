@@ -1,4 +1,4 @@
-package parse;
+package mjc;
 
 import java.io.PrintWriter;
 

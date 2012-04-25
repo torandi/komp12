@@ -3,6 +3,7 @@ package visitor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import jvm.Hardware;
 import jvm.Label;
@@ -23,8 +24,11 @@ public class AssemblerVisitor implements Visitor{
     
     private int next_label = 0;
     
-    public void run(Program program) {
-        dir = "output/"+program.m.i1.s;
+    private ArrayList<String> output_files;
+    
+    public ArrayList<String> run(Program program, String output_dir) {
+        dir = output_dir;
+        output_files = new ArrayList<String>();
         new File(dir).mkdirs();
         
         pass = 1;
@@ -32,6 +36,7 @@ public class AssemblerVisitor implements Visitor{
         next_label = 0;
         pass = 2;
         visit(program);
+        return output_files;
     }
 
     private void push() {
@@ -97,7 +102,8 @@ public class AssemblerVisitor implements Visitor{
     private void load_class_output(String cls) {
         if(current_output != null)
             current_output.close();
-        current_file = new File(dir+"/"+cls+".j");
+        current_file = new File(dir+cls+".j");
+        output_files.add(dir+cls+".j");
         next_label = 0;
         try {
             current_output = new PrintWriter(current_file);

@@ -1,3 +1,2 @@
 #!/bin/bash
-java -cp bin/ parse.Main $@
-jasmin -d output/classes output/*/*.j
+java -cp bin/ mjc.JVMMain $@

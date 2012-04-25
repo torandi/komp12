@@ -43,7 +43,6 @@ public abstract class ClassDecl extends Scope{
   public MethodDecl findMethod(Identifier id, ArrayList<Type> tl) {
       ArrayList<MethodDecl> container = methods.get(id.s.intern());
       if(container!=null) {
-        System.out.println("Searching for "+id+"("+TypeBindVisitor.typeListToString(tl)+")");
         return findMethod(container, tl);
       } else {
           System.out.println("No method named "+id+" defined in class "+i);
