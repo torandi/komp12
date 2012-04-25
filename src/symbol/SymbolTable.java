@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import syntaxtree.Identifier;
 import syntaxtree.MethodDecl;
-import syntaxtree.Type;
 
 public class SymbolTable {
     private LinkedList<Scope> scopes=new LinkedList<Scope>();

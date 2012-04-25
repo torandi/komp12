@@ -1,6 +1,6 @@
 package visitor;
 
-import parse.StackedTabPrinter;
+import mjc.StackedTabPrinter;
 import syntaxtree.*;
 
 public class ASTSymbolPrintVisitor implements Visitor {

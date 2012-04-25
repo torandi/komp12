@@ -2,7 +2,7 @@ package visitor;
 
 import error.ErrorMsg;
 import java.util.ArrayList;
-import parse.Main;
+import mjc.JVMMain;
 import symbol.SymbolTable;
 import syntaxtree.*;
 
@@ -23,8 +23,8 @@ public class TypeBindVisitor implements TypeVisitor{
     public Type visit(Program n) {
         curProgram=n;
         //Main class
-        n.m.record = Main.frameFactory.newRecord(n.m.i1.s);
-        n.m.mainMethodFrame = Main.frameFactory.newFrame("main", new FormalList(), null);
+        n.m.record = JVMMain.frameFactory.newRecord(n.m.i1.s);
+        n.m.mainMethodFrame = JVMMain.frameFactory.newFrame("main", new FormalList(), null);
         curFrame = n.m.mainMethodFrame;
         n.m.accept(this);
         curFrame = null;
@@ -32,7 +32,7 @@ public class TypeBindVisitor implements TypeVisitor{
         //other classes:
         for(ClassDecl c : n.cl.getList()) {
             curClass=c;
-            c.record = Main.frameFactory.newRecord(c.i.toString());
+            c.record = JVMMain.frameFactory.newRecord(c.i.toString());
             c.accept(this);
         }
         return null;
@@ -54,7 +54,7 @@ public class TypeBindVisitor implements TypeVisitor{
             v.i.sym.access = curClass.record.allocField(v.i.s, v.t);
         }
         for(MethodDecl m : n.ml.getList()) {
-            m.frame = Main.frameFactory.newFrame(m.i.s, m.fl, m.t);
+            m.frame = JVMMain.frameFactory.newFrame(m.i.s, m.fl, m.t);
             curFrame = m.frame;
             curFrame.allocLocal("<this>", new IdentifierType(n));
             m.accept(this);
