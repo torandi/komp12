@@ -1,0 +1,40 @@
+<project name="Minijava Compiler" default="dist" basedir=".">
+    <description>
+        A compiler for the Minijava Language
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+
+  <target name="init">
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+	 <mkdir dir="${src}/parse"/>
+ </target>
+
+ <target name="parser" depends="init">
+	 <javacc javacchome="lib/javacc" target="${src}/mjc/minijava.jj" outputdirectory="${src}/parse"/>
+ </target>
+
+  <target name="compile" depends=" parser"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}"/>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+
+    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+    <jar jarfile="mjc.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+		  <!-- Delete the ${build} and ${dist} directory trees -->
+	  <delete dir="${src}/parse"/>
+	 <delete dir="${build}"/>
+	 <delete file="mjc.jar" />
+  </target>
+</project>
