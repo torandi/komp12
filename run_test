@@ -36,25 +36,53 @@ function build_mjc() {
 ## Functions
 function compile() {
 	_dirname=$(mkdirname $1)
+	mkdir -p "$_dirname"
 	eval $compile -o "$output_dir/$_dirname" $1 2>&1
+}
+
+function extention_list() {
+	_lines=$(cat DESC | wc -l)
+	tail -n $(($_lines-2)) DESC
+}
+
+function test_extentions() {
+	_file="$1"
+	_extentions=$(cat $_file | grep "//EXT" | sed -e 's/\/\/EXT:\(.*\)/\1/')
+	for ext in $_extentions; do
+		count=$(echo $extentions | grep $ext -cx)
+		if [[ $count == "0" ]]; then
+			return 1
+		fi
+	done
+	return 0
 }
 
 # Expect compilation of $1 to succed
 function compile_ok() {
 	_file=$1
 	echo -ne "Compiling: $_file \t\t"
-	_res=$(compile $_file)
-	ex=$?
-	if [ $ex -eq 0 ]; then
-		echo "OK"
+	test_extentions $_file
+	if [ $? -eq 0 ]; then
+		_res=$(compile $_file)
+		ex=$?
+		if [ $ex -eq 0 ]; then
+			echo "OK"
+		else
+			echo "ERROR"
+			echo "Compiler output: return status $ex"
+			echo -e "$_res"
+		fi
 	else
-		echo "ERROR"
-		echo "Compiler output: return status $ex"
-		echo -e "$_res"
+		echo "EXT MISS"
 	fi
 }
 
 ## BEGIN EXECUTION
+
+extentions=$(extention_list)
+
+# Set no_exec to 1 in shell to be able to source this file without shit executing!
+if [[ $no_exec != "1" ]]; then
 
 build_mjc
 
@@ -69,3 +97,5 @@ mkdir $output_dir
 for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
 	compile_ok $file
 done
+
+fi
