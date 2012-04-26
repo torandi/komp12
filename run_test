@@ -5,6 +5,8 @@ flags="-S -ast -sym"
 output_dir="output"
 
 compile="java -cp mjc.jar mjc.JVMMain $flags" 
+jasmine="jasmine"
+build="ant"
 
 inheritence_tests=0 # Set to 1 to test inheritence
 
@@ -24,7 +26,7 @@ function mkdirname() {
 
 function build_mjc() {
 	echo -ne "Compiling compiler \t"
-	res=$(ant)
+	res=$($build)
 	if [ $? -eq 0 ]; then
 		echo "OK"
 		return 0
@@ -38,7 +40,7 @@ function build_mjc() {
 ## Functions
 function compile() {
 	_dirname=$(mkdirname $1)
-	mkdir -p "$_dirname"
+	mkdir -p "$output_dir/$_dirname"
 	eval $compile -o "$output_dir/$_dirname" $1 2>&1
 }
 
@@ -103,6 +105,32 @@ function compile_fail() {
 	fi
 }
 
+function assemble() {
+	_file=$1
+	_dirname=$(mkdirname $_file)
+	out="$output_dir/$_dirname/bin" 
+	mkdir -p "$out"
+	echo -en "Assembling: $_file \t\t"
+	test_extentions $_file
+	
+	if [ $? -eq 0 ]; then
+		_res=$($jasmine -d "$out" "$output_dir/$_dirname/*.j")
+		ex=$?
+		if [ $ex -eq 0 ]; then
+			echo "OK"
+			return 0
+		else
+			echo "ERROR"
+			echo "Jasmine output: return status $ex"
+			echo -e "$_res\n"
+			return 1
+		fi
+	else
+		echo "EXT MISS"
+		return 0
+	fi
+}
+
 ## BEGIN EXECUTION
 
 extentions=$(extention_list)
@@ -130,16 +158,37 @@ for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
 	fi
 done
 
-if [ $any_error -eq 0 ]; then
-	echo "Compiling code that should fail"
+if [ $any_error -ne 0 ]; then
+	echo "Previous test failed. Not continuing"
+	exit 1
+fi
 
-	for file in $(ls $noncomplile_tests); do
-		compile_fail $file
-		if [ $? -ne 0 ]; then
-			any_error=1
-		fi
-	done
-	#echo "Assembling code"
+echo "Compiling code that should fail"
+
+for file in $(ls $noncomplile_tests); do
+	compile_fail $file
+	if [ $? -ne 0 ]; then
+		any_error=1
+	fi
+done
+
+if [ $any_error -ne 0 ]; then
+	echo "Previous test failed. Not continuing"
+	exit 1
+fi
+
+echo "Assembling"
+
+for file in $(ls $execute_tests $nonexecute_tests); do
+	assemble $file
+	if [ $? -ne 0 ]; then
+		any_error=1
+	fi
+done
+
+if [ $any_error -ne 0 ]; then
+	echo "Previous test failed. Not continuing"
+	exit 1
 fi
 
 fi
