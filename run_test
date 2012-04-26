@@ -171,6 +171,63 @@ function assemble() {
 	fi
 }
 
+# Get the output file for $1
+function output_file() {
+	_file=$(echo "$1" | sed 's/\.java//g')
+	if [ -f "$_file.out" ]; then
+		echo "$_file.out"
+		return 0
+	else 
+		if [ -f "$_file.output" ]; then
+			echo "$_file.output" 
+			return 0
+		else
+			return 1
+		fi
+	fi
+}
+
+function execute_test() {
+	_file=$1
+	_dirname=$(mkdirname $_file)
+	out="$output_dir/$_dirname/bin" 
+
+	echo -en "Executing: $_file \t\t"
+	test_extentions $_file
+	
+	if [ $? -eq 0 ]; then
+		_res=$(java -cp $out Main)
+		ex=$?
+		if [ $ex -eq 0 ]; then
+			_outfile=$(output_file $_file)
+			if [ $? -eq 0 ]; then
+				_diff=$(echo $_res | diff - "$_outfile")
+
+				if [ $? -eq 0 ]; then 
+					echo -e "$txtgrn OK $txtrst"
+					return 0
+				else
+					echo -e "$txtred ERROR $txtrst"
+					echo "Diff (program output, expected output):"
+					echo -e "$_diff\n"
+					return 1
+				fi
+			else
+				echo -e "$txtylw NO OUTPUT DEFINED $txtrst"
+				return 0
+			fi
+		else
+			echo -e "$txtred JVM ERROR $txtrst"
+			echo "JVM Output:"
+			echo -e "$_res\n"
+			return 1
+		fi
+	else
+		echo "EXT MISS"
+		return 0
+	fi
+}
+
 ## BEGIN EXECUTION
 
 extentions=$(extention_list)
@@ -184,55 +241,63 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-rm -rf $output_dir
-mkdir $output_dir
+#rm -rf $output_dir
+#mkdir $output_dir
 
 any_error=0
 
 # Start by compiling everything that should be compiled
-echo "Compling code"
-for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
-	compile_ok $file
+#echo "Compling code"
+#for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
+	#compile_ok $file
+	#if [ $? -ne 0 ]; then
+		#any_error=1
+	#fi
+#done
+
+#if [ $any_error -ne 0 ]; then
+	#echo "Previous test failed. Not continuing"
+	#exit 1
+#fi
+
+#echo -e "\n====================================\n"
+
+#echo "Compiling code that should fail"
+
+#for file in $(ls $noncompile_tests); do
+	#compile_fail $file
+	#if [ $? -ne 0 ]; then
+		#any_error=1
+	#fi
+#done
+
+#if [ $any_error -ne 0 ]; then
+	#echo "Previous test failed. Not continuing"
+	#exit 1
+#fi
+
+#echo -e "\n====================================\n"
+
+#echo "Assembling"
+
+#for file in $(ls $execute_tests $nonexecute_tests $compile_tests); do
+	#assemble $file
+	#if [ $? -ne 0 ]; then
+		#any_error=1
+	#fi
+#done
+
+#if [ $any_error -ne 0 ]; then
+	#echo "Previous test failed. Not continuing"
+	#exit 1
+#fi
+
+echo "Running execution test"
+for file in $(ls $execute_tests); do
+	execute_test $file
 	if [ $? -ne 0 ]; then
 		any_error=1
 	fi
 done
-
-if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
-	exit 1
-fi
-
-echo -e "\n====================================\n"
-
-echo "Compiling code that should fail"
-
-for file in $(ls $noncompile_tests); do
-	compile_fail $file
-	if [ $? -ne 0 ]; then
-		any_error=1
-	fi
-done
-
-if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
-	exit 1
-fi
-
-echo -e "\n====================================\n"
-
-echo "Assembling"
-
-for file in $(ls $execute_tests $nonexecute_tests); do
-	assemble $file
-	if [ $? -ne 0 ]; then
-		any_error=1
-	fi
-done
-
-if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
-	exit 1
-fi
 
 fi
