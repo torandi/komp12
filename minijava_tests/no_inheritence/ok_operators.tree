@@ -1,0 +1,216 @@
+(Program 
+ (MainClass 
+  Identifier[ Main ]
+  Identifier[ s ]
+  (Print 
+   (Expr 
+    1
+
+   )
+  )
+ )
+ (Class 
+  Identifier[ A ]
+  (FieldDecl 
+   (int)
+   Identifier[ z ]
+  )
+  (MethDecl 
+   (int)
+   Identifier[ f ]
+   (Formal 
+    (int)
+    Identifier[ x ]
+    (int)
+    Identifier[ y ]
+    (boolean)
+    Identifier[ b1 ]
+    (boolean)
+    Identifier[ b2 ]
+   )
+   (Assign 
+    Identifier[ x ]
+    (Expr 
+     1
+
+     MINUS
+     2
+
+     MINUS
+     3
+
+    )
+   )
+   (Assign 
+    Identifier[ x ]
+    (Expr 
+     1
+
+     MINUS
+     (Params
+      (Expr 
+       2
+
+       MINUS
+       3
+
+      )
+     )
+
+    )
+   )
+   (Assign 
+    Identifier[ x ]
+    (Expr 
+     1
+
+     TIMES
+     2
+
+     PLUS
+     3
+
+    )
+   )
+   (Assign 
+    Identifier[ x ]
+    (Expr 
+     1
+
+     TIMES
+     (Params
+      (Expr 
+       2
+
+       PLUS
+       3
+
+      )
+     )
+
+    )
+   )
+   (Assign 
+    Identifier[ x ]
+    (Expr 
+     1
+
+     PLUS
+     2
+
+     TIMES
+     3
+
+    )
+   )
+   (Assign 
+    Identifier[ y ]
+    (Expr 
+     (Call 
+      (NEW
+       Object       Identifier[ A ]
+      )
+
+      Identifier[ f ]
+      (ExpList 
+       (Expr 
+        1
+
+       )
+       (Expr 
+        2
+
+       )
+       (Expr 
+        True
+
+       )
+       (Expr 
+        False
+
+       )
+      ) 
+     )
+    )
+   )
+   (Assign 
+    Identifier[ b2 ]
+    (Expr 
+     1
+
+     Less
+     2
+
+     And
+     (Negate
+      (Expr 
+       (Params
+        (Expr 
+         Identifier[ x ]
+         Less
+         Identifier[ y ]
+        )
+       )
+
+       And
+       (Negate
+        (Expr 
+         Identifier[ b2 ]
+         And
+         (Params
+          (Expr 
+           1
+
+           Less
+           Identifier[ x ]
+          )
+         )
+
+        )
+       )
+
+      )
+     )
+
+    )
+   )
+   (Assign 
+    Identifier[ b2 ]
+    (Expr 
+     1
+
+     PLUS
+     2
+
+     Less
+     3
+
+     PLUS
+     4
+
+     And
+     5
+
+     MINUS
+     6
+
+     Less
+     7
+
+     MINUS
+     8
+
+    )
+   )
+   (MethDecl 
+    (Expr 
+     Identifier[ x ]
+     TIMES
+     Identifier[ x ]
+     PLUS
+     Identifier[ y ]
+    )
+   )
+  )
+ )
+)

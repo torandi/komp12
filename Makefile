@@ -1,16 +1,20 @@
-.PHONY: src/parse clean
+.PHONY: parser clean mjc 
 
 all: parser mjc
 
 parser:
-	lib/javacc/javacc -output_directory=src/parse/ src/parse/minijava.jj 
+	ant parser
 
 mjc: src/
-	javac -cp src/ src/mjc/JVMMain.java -d bin/
+	ant
 
 clean:
-	rm -rf src/parse/*.java
-	rm -rf bin/*
+	ant clean
+	rm -rf tigris
 
 tigris.tar.gz: clean src/ report.pdf DESC lib/ build.xml
-	tar -czf tigris.tar.gz src/ lib/ DESC report.pdf build.xml 
+	tar -czf tigris.tar.gz src/ lib/ DESC report.pdf build.xml
+
+tigris: clean src/ report.pdf DESC lib/ build.xml
+	cp -rf src/ report.pdf DESC lib/ build.xml tigris/
+	tar -cf - tigris | gzip | uuencode x | mailx -r taran@kth.se -s '' submit@tigris.csc.kth.se

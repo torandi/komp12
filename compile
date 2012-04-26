@@ -1,2 +1,2 @@
 #!/bin/bash
-java -cp bin/ mjc.JVMMain $@
+java -cp mjc.jar mjc.JVMMain $@
