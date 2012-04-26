@@ -330,7 +330,7 @@ public class AbstractTree {
             return new NewObject(id(ip.getId()));
         } else if(in instanceof NotExpressionPrimary) {
             NotExpressionPrimary nep = (NotExpressionPrimary) in;
-            return new Not(primary(nep.getPrimary()));
+            return new Not(and(nep.getOperand()));
         } else if(in instanceof ExpressionPrimary) {
             ExpressionPrimary ep = (ExpressionPrimary) in;
             return exp(ep.getExpression());

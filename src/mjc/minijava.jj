@@ -479,9 +479,10 @@ Sufix Sufix() throws ParseException:
 
 Primary Primary() throws ParseException:
 {
-	Primary p, p2;
+	Primary p;
 	Token v;
 	Expression e;
+	AndOperand ao;
 }
 {
 	(
@@ -513,8 +514,8 @@ Primary Primary() throws ParseException:
 		)
 	|
 		<EXCL>
-		p2 = Primary()
-		{ p = new NotExpressionPrimary(p2); }
+		ao = AndOperand()
+		{ p = new NotExpressionPrimary(ao); }
 	|
 		<OPAR>
 		e = Expression()

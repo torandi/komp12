@@ -59,6 +59,24 @@ class CT {
 		} else {
 		}
 
+		if(this.equal(1, 0)) {
+			System.out.println(8);
+			errors = errors + 1;
+		} else {
+		}
+
+		if(this.equal(1, 1)) {
+		} else {
+			System.out.println(9);
+			errors = errors + 1;
+		}
+
+		if(this.equal(0, 1)) {
+			System.out.println(10);
+			errors = errors + 1;
+		} else {
+		}
+
 		return errors; 
 	}
 
@@ -66,8 +84,8 @@ class CT {
 		a = 1;
 		return true;
 	}
-/*
+
 	public boolean equal(int a, int b) {
 		return !(a < b) && !(b < a);
-	}*/
+	}
 }

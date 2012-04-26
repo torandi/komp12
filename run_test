@@ -69,13 +69,37 @@ function compile_ok() {
 		ex=$?
 		if [ $ex -eq 0 ]; then
 			echo "OK"
+			return 0
 		else
 			echo "ERROR"
 			echo "Compiler output: return status $ex"
-			echo -e "$_res"
+			echo -e "$_res\n"
+			return 1
 		fi
 	else
 		echo "EXT MISS"
+		return 0
+	fi
+}
+
+#Expect compilation of $1 to fail
+function compile_fail() {
+	_file=$1
+	echo -ne "Compiling: $_file \t\t"
+	test_extentions $_file
+	if [ $? -eq 0 ]; then
+		_res=$(compile $_file)
+		ex=$?
+		if [ $ex -ne 0 ]; then
+			echo "OK"
+			return 0
+		else
+			echo "ERROR"
+			return 1
+		fi
+	else
+		echo "EXT MISS"
+		return 0
 	fi
 }
 
@@ -95,9 +119,27 @@ fi
 rm -rf $output_dir
 mkdir $output_dir
 
+any_error=0
+
 # Start by compiling everything that should be compiled
+echo "Compling code"
 for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
 	compile_ok $file
+	if [ $? -ne 0 ]; then
+		any_error=1
+	fi
 done
+
+if [ $any_error -eq 0 ]; then
+	echo "Compiling code that should fail"
+
+	for file in $(ls $noncomplile_tests); do
+		compile_fail $file
+		if [ $? -ne 0 ]; then
+			any_error=1
+		fi
+	done
+	#echo "Assembling code"
+fi
 
 fi
