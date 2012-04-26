@@ -5,7 +5,7 @@ flags="-S -ast"
 output_dir="output"
 
 compile="java -cp mjc.jar mjc.JVMMain $flags" 
-jasmine="jasmine"
+jasmin="jasmin"
 build="ant"
 
 inheritence_tests=0 # Set to 1 to test inheritence
@@ -155,14 +155,13 @@ function assemble() {
 	test_extentions $_file
 	
 	if [ $? -eq 0 ]; then
-		_res=$($jasmine -d "$out" "$output_dir/$_dirname/*.j")
-		ex=$?
-		if [ $ex -eq 0 ]; then
+		_res=$($jasmin -d "$out" $output_dir/$_dirname/*.j 2>&1)
+		if [ -z "$_res" ]; then
 			echo -e "$txtgrn OK $txtrst"
 			return 0
 		else
 			echo -e "$txtred ERROR $txtrst"
-			echo "Jasmine output: return status $ex"
+			echo "Jasmin output: "
 			echo -e "$_res\n"
 			return 1
 		fi
