@@ -28,7 +28,7 @@ function build_mjc() {
 		return 0
 	else
 		echo "ERROR"
-		echo $res
+		echo -e  "$res"
 		return 1
 	fi
 }
@@ -44,12 +44,13 @@ function compile_ok() {
 	_file=$1
 	echo -ne "Compiling: $_file \t\t"
 	_res=$(compile $_file)
-	if [ $? -eq 0 ]; then
+	ex=$?
+	if [ $ex -eq 0 ]; then
 		echo "OK"
 	else
 		echo "ERROR"
-		echo "Compiler output: return status $_res"
-		echo $_res
+		echo "Compiler output: return status $ex"
+		echo -e "$_res"
 	fi
 }
 
