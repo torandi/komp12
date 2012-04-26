@@ -7,7 +7,7 @@ class Bogus4 {
 	a = new A();
 			while(i < 10 && i < 12 && i < 13 && i+2-2+2-2 < 1339-2+(2-2)*5-10+10 && true && new A().returnField() < a.returnField())    {
 		i = new A().returnField();
-		while(a.returnField())
+		while(a.returnField()) //This should return an bool good damit!
 			a = new A();
 	}
 
