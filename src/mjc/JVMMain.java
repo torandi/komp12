@@ -139,7 +139,7 @@ public class JVMMain {
 
             return true;
         } catch (FileNotFoundException ex) {
-            error.complain(file+" not found.");
+            error.complain(ex.getMessage());
             return false;
         } catch (ParseException ex) {
             error.complain("Parse exception in line "+ex.currentToken.beginLine+": "+ex);
