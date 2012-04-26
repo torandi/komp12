@@ -75,7 +75,7 @@ TOKEN: { <VOID: "void"> }
 TOKEN: { <EXTENDS: "extends"> }
 
 
-TOKEN: { <ID: ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9","_"])* > }
+TOKEN: { <ID: ["A"-"Z","a"-"z", "_"](["A"-"Z","a"-"z","0"-"9","_"])* > }
 
 
 /* Parser */
