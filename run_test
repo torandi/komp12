@@ -47,7 +47,7 @@ function extention_list() {
 
 function test_extentions() {
 	_file="$1"
-	_extentions=$(cat $_file | grep "//EXT" | sed -e 's/\/\/EXT:\(.*\)/\1/')
+	_extentions=$(cat $_file | grep "//.*EXT" | sed -e 's/\/\/EXT:\(.*\)/\1/')
 	for ext in $_extentions; do
 		count=$(echo $extentions | grep $ext -cx)
 		if [[ $count == "0" ]]; then
