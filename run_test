@@ -1,0 +1,70 @@
+#!/bin/bash
+
+output_dir="output"
+
+compile="java -cp mjc.jar mjc.JVMMain -S" 
+
+inheritence_tests=0 # Set to 1 to test inheritence
+
+compile_tests="student-test-cases/compile/*/*.java"
+noncomplile_tests="student-test-cases/noncomplie/*/*.java minijava_tests/no_inheritence/err_*.java"
+execute_tests="student-test-cases/execute/*/*.java minijava_tests/no_inheritence/ok*.java"
+nonexecute_tests="student-test-cases/nonexecute/*/*.java"
+
+if [ $inheritence_tests -eq 1 ]; then
+	execute_tests="$execute_tests minijava_tests/inheritence/*.java"
+fi
+
+##Filename to dir
+function mkdirname() {
+	echo "$1" | sed 's/\.java//g' | tr '[A-Z]' '[a-z]'
+}
+
+function build_mjc() {
+	echo -ne "Compiling compiler \t"
+	res=$(ant)
+	if [ $? -eq 0 ]; then
+		echo "OK"
+		return 0
+	else
+		echo "ERROR"
+		echo $res
+		return 1
+	fi
+}
+
+## Functions
+function compile() {
+	_dirname=$(mkdirname $1)
+	eval $compile -o "$output_dir/$_dirname" $1 2>&1
+}
+
+# Expect compilation of $1 to succed
+function compile_ok() {
+	_file=$1
+	echo -ne "Compiling: $_file \t\t"
+	_res=$(compile $_file)
+	if [ $? -eq 0 ]; then
+		echo "OK"
+	else
+		echo "ERROR"
+		echo "Compiler output: return status $_res"
+		echo $_res
+	fi
+}
+
+## BEGIN EXECUTION
+
+build_mjc
+
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+rm -rf $output_dir
+mkdir $output_dir
+
+# Start by compiling everything that should be compiled
+for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
+	compile_ok $file
+done
