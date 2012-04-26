@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import parse.ParseException;
 import parse.Parser;
 import syntaxtree.AbstractTree;
-import visitor.ASTSymbolPrintVisitor;
 import visitor.ASTPrintVisitor;
 import visitor.AssemblerVisitor;
 import visitor.TypeBindVisitor;
@@ -23,7 +22,6 @@ public class JVMMain {
     public static frame.VMFactory frameFactory;
     public static boolean assemble = true;
     public static boolean print_ast = false;
-    public static boolean print_symbols = false;
     
     ErrorMsg error;
 
@@ -52,8 +50,6 @@ public class JVMMain {
                 
             } else if(args[i].equals("-ast")) {
                 print_ast = true;
-            } else if(args[i].equals("-sym")) {
-                print_symbols = true;
             } else {
                 srcfile = args[i];
             }
@@ -111,13 +107,6 @@ public class JVMMain {
             //Bind symbols and allocate records, frames and accesses
             TypeBindVisitor tbv= new TypeBindVisitor(error);
             tbv.visit(abstractTree.program);
-            
-            if(print_symbols) {
-                pw = new PrintWriter(output_dir+basename+".symbols");
-                ASTSymbolPrintVisitor symbolpv= new ASTSymbolPrintVisitor(new StackedTabPrinter(pw));
-                symbolpv.visit(abstractTree.program);
-                System.out.println("SymbolTable saved to "+output_dir+basename+".symbols");
-            }
             
             if(error.anyErrors)
                return false;

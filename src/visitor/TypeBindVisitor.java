@@ -96,7 +96,10 @@ public class TypeBindVisitor implements TypeVisitor{
             s.accept(this);
         }
         //return statement
-        n.e.accept(this);
+        Type ret_type = n.e.accept(this);
+        if(!ret_type.equals(n.t)) {
+            error.complain("In "+st+": returning "+ret_type+" in method declared as "+n.t);
+        }
         st.popScope();
         return n.t.accept(this);
     }

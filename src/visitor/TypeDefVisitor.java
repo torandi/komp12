@@ -7,7 +7,6 @@ import syntaxtree.*;
 
 /**
  * A visitor that handles type definitions
- * This class should create all the 
  */
 public class TypeDefVisitor implements Visitor{
     private ErrorMsg error;
@@ -81,6 +80,8 @@ public class TypeDefVisitor implements Visitor{
         for(Statement s : n.sl.getList()) {
             s.accept(this);
         }
+        //return statement
+        n.e.accept(this);
         st.popScope();
     }
 
