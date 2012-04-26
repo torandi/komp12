@@ -2,6 +2,7 @@ package mjc;
 
 import basic_tree.Start;
 import error.ErrorMsg;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -79,6 +80,7 @@ public class JVMMain {
 
     public boolean begin(String file, String output_dir)  {
         try {
+            String basename = new File(file).getName();
             Reader r = new FileReader(file);
             System.out.println("Building from "+file);
             Start basicTree = parse(r);
@@ -89,13 +91,13 @@ public class JVMMain {
                return false;
 
             //Build abstract tree
-            PrintWriter pw = new PrintWriter (file+".ast");
+            PrintWriter pw = new PrintWriter (output_dir+basename+".ast");
             
             if(print_ast) {
                 ASTPrintVisitor pv = new ASTPrintVisitor(pw);
                 pv.visit(abstractTree.program);
                 pw.close();
-                System.out.println("AST saved to "+file+".ast");
+                System.out.println("AST saved to "+output_dir+basename+".ast");
             }
 
             
@@ -111,10 +113,10 @@ public class JVMMain {
             tbv.visit(abstractTree.program);
             
             if(print_symbols) {
-                pw = new PrintWriter(file+".symbols");
+                pw = new PrintWriter(output_dir+basename+".symbols");
                 ASTSymbolPrintVisitor symbolpv= new ASTSymbolPrintVisitor(new StackedTabPrinter(pw));
                 symbolpv.visit(abstractTree.program);
-                System.out.println("SymbolTable saved to "+file+".symbols");
+                System.out.println("SymbolTable saved to "+output_dir+basename+".symbols");
             }
             
             if(error.anyErrors)
