@@ -1,8 +1,10 @@
 #!/bin/bash
 
+flags="-S -ast -sym"
+
 output_dir="output"
 
-compile="java -cp mjc.jar mjc.JVMMain -S" 
+compile="java -cp mjc.jar mjc.JVMMain $flags" 
 
 inheritence_tests=0 # Set to 1 to test inheritence
 

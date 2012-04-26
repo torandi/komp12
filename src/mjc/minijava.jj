@@ -99,6 +99,8 @@ basic_tree.Class MainClass () throws ParseException:
 { 
 	basic_tree.Class mainClass;
 	Token className,method,type,id;
+	Variable v;
+	Statement s;
 }
 {
 	<CLASS>
@@ -124,9 +126,13 @@ basic_tree.Class MainClass () throws ParseException:
 		Method main=new Method("main",new VoidType());
 		main.addParameter(new Variable(id.image,null));
 		mainClass.addMethod(main);
-		Statement s;
 	}
-	(
+	( 
+		LOOKAHEAD(2)
+		v = VarDecl()
+		{ main.addVariable(v); }
+	)*
+	( 
 		s = Statement()
 		{ main.addStatement(s); }
 	)*

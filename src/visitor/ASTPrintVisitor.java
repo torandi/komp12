@@ -44,7 +44,22 @@ public class ASTPrintVisitor implements Visitor {
 	stream.print(", ");
 	n.i2.accept(this);
 	stream.print(", ");
-	n.s.accept(this);
+	stream.println(" (");
+        stream.add_tab();
+	for ( int i = 0; i < n.vl.size(); i++ ) {
+	    n.vl.elementAt(i).accept(this);
+	    if ( i+1 < n.vl.size() )
+		stream.print(", ");
+	}
+        stream.println();
+        stream.del_tab();
+	stream.println("), (");
+        stream.add_tab();
+	for ( int i = 0; i < n.sl.size(); i++ ) {
+	    n.sl.elementAt(i).accept(this);
+	    if ( i+1 < n.sl.size() ) 
+		stream.println(", ");
+	}
         stream.del_tab();
 	stream.println(")");
     }

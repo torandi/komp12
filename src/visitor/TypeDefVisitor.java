@@ -34,7 +34,12 @@ public class TypeDefVisitor implements Visitor{
 
     public void visit(MainClass n) {
         st.pushScope(n);
-        n.s.accept(this);
+        for(VarDecl v : n.vl.getList()) {
+            v.accept(this);
+        }
+        for(Statement s : n.sl.getList()) {
+            s.accept(this);
+        }
         st.popScope();
     }
 

@@ -141,7 +141,13 @@ public class AssemblerVisitor implements Visitor{
             directive(".limit locals "+(n.mainMethodFrame.numberOfLocals()+1));
             directive(".limit stack "+stack_size.get(null));
         }
-        n.s.accept(this);
+        
+        for(VarDecl v : n.vl.getList()) {
+            v.accept(this);
+        }
+        for(Statement s : n.sl.getList()) {
+            s.accept(this);
+        }
         
         instr("return");
         directive(".end method");

@@ -44,15 +44,24 @@ public class AbstractTree {
 
     private MainClass buildMainClass() {
         Identifier i1,i2;
-        Statement s;
         basic_tree.Class mainClass = basicTree.getMainClass();
 
+        basic_tree.Method m = mainClass.getMethods().get(0);
+        
         i1=id(mainClass.getName());
-        i2=id(mainClass.getMethods().get(0).getParameters().get(0).getName());
+        i2=id(m.getParameters().get(0).getName());
+        
+        MainClass mc = new MainClass(i1,i2);
 
-        s = statement(mainClass.getMethods().get(0).getStatements().get(0));
+        for(Variable v : m.getVariables()) {
+            mc.vl.addElement(variable(v));
+        }
 
-        return new MainClass(i1,i2,s);
+        for(basic_tree.Statement s : m.getStatements()) {
+            mc.sl.addElement(statement(s));
+        }
+
+        return mc;
     }
 
     private ClassDeclList buildClassDeclList() {

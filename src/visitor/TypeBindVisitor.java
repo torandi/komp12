@@ -40,7 +40,15 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(MainClass n) {
         st.pushScope(n);
-        n.s.accept(this);
+        
+        for(VarDecl v : n.vl.getList()) {
+            v.accept(this);
+            v.i.sym.access = n.mainMethodFrame.allocLocal(v.i.s, v.t);
+        }
+        for(Statement s : n.sl.getList()) {
+            s.accept(this);
+        }
+        
         st.popScope();
         return null;
     }

@@ -26,7 +26,17 @@ public class ASTSymbolPrintVisitor implements Visitor {
         stream.add_tab();
         stream.println("void main {"+n.mainMethodFrame+"}");
         stream.add_tab();
-        n.s.accept(this);
+	stream.println("Locals:");
+        stream.add_tab();
+	for ( VarDecl v : n.vl.getList()) {
+            stream.println(v.t.toString()+" "+v.i.s+" {"+v.i.sym.access+"}");
+        }
+        
+        stream.del_tab();
+        stream.println();
+	for ( Statement s : n.sl.getList()) {
+            s.accept(this);
+	}
         stream.reset_tabs();
     }
 

@@ -1,6 +1,5 @@
 class HelloWorld {
 	public static void main (String[] args) {
-		{ 
 			int x;
 			int y;
 			y = 2546;
@@ -8,7 +7,6 @@ class HelloWorld {
 			x = 1 + 2 - 3 -4 +5 -7*2;
 			System.out.println(x+y);
 			System.out.println(888888888);
-		}
 	}
 }
 

@@ -20,6 +20,9 @@ import visitor.TypeDefVisitor;
 
 public class JVMMain {
     public static frame.VMFactory frameFactory;
+    public static boolean assemble = true;
+    public static boolean print_ast = false;
+    public static boolean print_symbols = false;
     
     ErrorMsg error;
 
@@ -27,7 +30,6 @@ public class JVMMain {
 
     public static void main(String[] args) {
         String output_dir = ".";
-        boolean assemble = true;
         String srcfile = null;
         for(int i=0; i < args.length; ++i) {
             if(args[i].equals("-S")) {
@@ -46,6 +48,11 @@ public class JVMMain {
                         + "everything else is used as source dirs");
             } else if(args[i].equals("-fno-array-bounds-checks")) {
                 //tigris forces us to accept this flag
+                
+            } else if(args[i].equals("-ast")) {
+                print_ast = true;
+            } else if(args[i].equals("-sym")) {
+                print_symbols = true;
             } else {
                 srcfile = args[i];
             }
@@ -58,7 +65,7 @@ public class JVMMain {
         
         JVMMain main = new JVMMain();
         frameFactory = new jvm.Factory();
-        if(!main.begin(srcfile, assemble, output_dir)) {
+        if(!main.begin(srcfile, output_dir)) {
             System.out.println("Compilation failed: "+srcfile);
             System.exit(1);
         } else {
@@ -70,7 +77,7 @@ public class JVMMain {
         error = new ErrorMsg(System.err);
     }
 
-    public boolean begin(String file, boolean assemble, String output_dir)  {
+    public boolean begin(String file, String output_dir)  {
         try {
             Reader r = new FileReader(file);
             System.out.println("Building from "+file);
@@ -81,18 +88,34 @@ public class JVMMain {
             if(error.anyErrors)
                return false;
 
+            //Build abstract tree
+            PrintWriter pw = new PrintWriter (file+".ast");
+            
+            if(print_ast) {
+                ASTPrintVisitor pv = new ASTPrintVisitor(pw);
+                pv.visit(abstractTree.program);
+                pw.close();
+                System.out.println("AST saved to "+file+".ast");
+            }
+
+            
             //Check syntax and bind types
             TypeDefVisitor tdv= new TypeDefVisitor(error);
             tdv.visit(abstractTree.program);
 
+            if(error.anyErrors)
+               return false;
+            
             //Bind symbols and allocate records, frames and accesses
             TypeBindVisitor tbv= new TypeBindVisitor(error);
             tbv.visit(abstractTree.program);
             
-            
-            if(error.anyErrors)
-               return false;
-            
+            if(print_symbols) {
+                pw = new PrintWriter(file+".symbols");
+                ASTSymbolPrintVisitor symbolpv= new ASTSymbolPrintVisitor(new StackedTabPrinter(pw));
+                symbolpv.visit(abstractTree.program);
+                System.out.println("SymbolTable saved to "+file+".symbols");
+            }
             
             if(error.anyErrors)
                return false;
