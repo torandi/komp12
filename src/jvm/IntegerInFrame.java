@@ -13,7 +13,7 @@ public class IntegerInFrame implements frame.VMAccess
     }
 
     public String declare() {
-	return ".var " + o + " is " + n + " " + s;
+	return ".var " + o + " is '" + n + "' " + s;
     }
 
     public String load() {
