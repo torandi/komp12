@@ -8,16 +8,10 @@ compile="java -cp mjc.jar mjc.JVMMain $flags"
 jasmin="jasmin"
 build="ant"
 
-inheritence_tests=0 # Set to 1 to test inheritence
-
-compile_tests="student-test-cases/compile/*/*.java"
-noncompile_tests="student-test-cases/noncompile/*/*.java minijava_tests/no_inheritence/err_*.java"
-execute_tests="student-test-cases/execute/*/*.java minijava_tests/no_inheritence/ok*.java"
-nonexecute_tests="student-test-cases/nonexecute/*/*.java"
-
-if [ $inheritence_tests -eq 1 ]; then
-	execute_tests="$execute_tests minijava_tests/inheritence/*.java"
-fi
+compile_tests="testcases/compile/*/*.java"
+noncompile_tests="testcases/noncompile/*/*.java"
+execute_tests="testcases/execute/*/*.java"
+nonexecute_tests="testcases/nonexecute/*/*.java"
 
 ###### COLORS
 txtblk='\e[0;30m' # Black - Regular
