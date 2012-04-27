@@ -177,8 +177,8 @@ function generate_output_file() {
 	_javac_out=`$javac -d "$_out" $_java_file 2>&1`
 	if [ $? -eq 0 ]; then
 		# Run the created program!
-		java -cp $_out $(find_main_class $_java_file) > "$_file.output" 2 >> "$_out/error.log"
-		if [ $? -eq 0]; then 
+		java -cp $_out $(find_main_class $_java_file) > "$_file.output" 2>> "$_out/error.log"
+		if [ $? -eq 0 ]; then 
 			return 0
 		else
 			return 2
@@ -194,21 +194,16 @@ function generate_output_file() {
 function get_output() {
 	_file=$(echo "$1" | sed 's/\.java//g')
 	echo "$_file.output"
-	if [ -f "$_file.out" ]; then
-		mv "$_file.out" "$_file.output"
+	if [ -f "$_file.output" ]; then
 		return 0
-	else 
-		if [ -f "$_file.output" ]; then
+	else
+		# We must generate it!
+		generate_output_file $_file
+		ex=$?
+		if [ $ex -eq 0 ]; then
 			return 0
 		else
-			# We must generate it!
-			generate_output_file $_file
-			ex=$?
-			if [ $ex -eq 0 ]; then
-				return 0
-			else
-				return $ex # Generation failed
-			fi
+			return $ex # Generation failed
 		fi
 	fi
 }
@@ -231,7 +226,7 @@ function execute_test() {
 			if [ $ex -eq 0 ]; then
 				_diff_file="$output_dir/$_dirname/output.diff"
 				echo "Diff (program output< >expected output):" > "$_diff_file"
-				diff --strip-trailing-cr -a -y --suppress-common-lines "$_program_outfile" "$_outfile" >> "$_diff_file"
+				diff -a -y --suppress-common-lines "$_program_outfile" "$_outfile" >> "$_diff_file"
 
 				if [ $? -eq 0 ]; then 
 					echo -e "$txtgrn OK $txtrst"

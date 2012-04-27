@@ -1,3 +1,4 @@
+*.output
 *.syntax
 *.symbols
 bin/*
