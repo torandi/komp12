@@ -8,17 +8,26 @@ public class IdentifierType extends Type {
     public String s;
     public ClassDecl c;
 
+    /**
+     * This method assumes that the left hand argument is trying to be fit into
+     * the right hand argument
+     * @param tp
+     * @return 
+     */
     @Override
     public boolean equals(Type tp) {
         if (!(tp instanceof IdentifierType)) {
             return false;
         }
-        return ((IdentifierType) tp).s.equals(s);
+
+        IdentifierType itp = (IdentifierType) tp;
+        return c.hasParent(itp.s);
     }
 
-    public IdentifierType(String as, int line) {
+    public IdentifierType(Program p, String as, int line) {
         super(line);
         s = as;
+        c = p.findClass(s);
     }
 
     public IdentifierType(ClassDecl c, int line) {

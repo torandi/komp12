@@ -43,16 +43,7 @@ public class MethodDecl extends Scope {
             Type arg_type = tl.get(i);
             Type formal_type = fl.getTypeList().get(i);
             if (!arg_type.equals(formal_type)) {
-                if (arg_type instanceof IdentifierType && 
-                        formal_type instanceof IdentifierType) {
-                    IdentifierType argi = (IdentifierType) arg_type;
-                    IdentifierType formli = (IdentifierType) formal_type;
-                    if(!cls.program.findClass(argi.s).hasParent(formli.s)) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
+                return false;
             }
         }
         return true;

@@ -183,7 +183,7 @@ public class AbstractTree {
         } else if(in instanceof basic_tree.BooleanType) {
             return new BooleanType(in.line_number);
         } else if(in instanceof basic_tree.CustomType) {
-            return new IdentifierType(((basic_tree.CustomType)in).getId(), in.line_number);
+            return new IdentifierType(program,((basic_tree.CustomType)in).getId(), in.line_number);
         } else { //VoidType
             return null;
         }
