@@ -489,10 +489,6 @@ Primary Primary() throws ParseException:
 		v = <INT>
 		{ p = new IntPrimary(v.image); }
 	|
-		<MINUS>
-		v=<INT>
-		{ p = new IntPrimary("-"+v.image); }
-	|
 		v = <BOOL>
 		{ p = new BooleanPrimary(v.image); }
 	|
