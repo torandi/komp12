@@ -24,9 +24,20 @@ public class AssemblerVisitor implements Visitor{
     
     private int next_label = 0;
     
+    private int current_line = 0;
+    
     private ArrayList<String> output_files;
     
-    public ArrayList<String> run(Program program, String output_dir) {
+    private String src;
+    
+    private boolean debug_symbols;
+    
+    public AssemblerVisitor(boolean debug_symbols) {
+        this.debug_symbols = debug_symbols;
+    }
+    
+    public ArrayList<String> run(Program program, String output_dir, String src) {
+        this.src = src;
         dir = output_dir;
         output_files = new ArrayList<String>();
         new File(dir).mkdirs();
@@ -37,6 +48,15 @@ public class AssemblerVisitor implements Visitor{
         pass = 2;
         visit(program);
         return output_files;
+    }
+    
+    private void line(int line) {
+        if(debug_symbols) {
+            if(pass == 2 && line != -1 && line != current_line) {
+                current_line = line;
+                directive(".line "+line);
+            }
+        }
     }
 
     private void push() {
@@ -107,8 +127,10 @@ public class AssemblerVisitor implements Visitor{
         next_label = 0;
         try {
             current_output = new PrintWriter(current_file);
+            directive(".source "+src);
         } catch (FileNotFoundException ex) {
             System.out.println("Failed to open output: "+ex);
+            System.exit(1);
         }
     }
 
@@ -119,8 +141,6 @@ public class AssemblerVisitor implements Visitor{
     private Label create_label(String hint) {
         return new Label(next_label++, hint);
     }
-    
-    public AssemblerVisitor() {}
 
     public void visit(Program n) {
         n.m.accept(this);
@@ -132,6 +152,7 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(MainClass n) {
+        line(n.line_number);
         load_class_output(n.i1.s);
         directive(".class "+convert_classname(n.i1.s));
         directive(".super java/lang/Object");
@@ -161,6 +182,7 @@ public class AssemblerVisitor implements Visitor{
     }
     
     public void class_decl_visit(ClassDecl n) {
+        line(n.line_number);
         load_class_output(n.i.s);
         directive(".class "+convert_classname(n.fullName()));
         directive(".super "+convert_classname(n.parent())+"\n");
@@ -179,10 +201,12 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(VarDecl n) {
+        line(n.line_number);
         directive(n.i.sym.access.declare());
     }
 
     public void visit(MethodDecl n) {
+        line(n.line_number);
         if(pass == 1) {
             current_max_stack_size = 0;
             current_stack_size = 0;
@@ -202,6 +226,8 @@ public class AssemblerVisitor implements Visitor{
         for(Statement s : n.sl.getList()) {
             s.accept(this);
         }
+
+        line(n.e.line_number);
         n.e.accept(this);
         
         if(pass == 2) {
@@ -238,14 +264,17 @@ public class AssemblerVisitor implements Visitor{
         Label l_true, l_false, l_end;
         l_true = create_label("if_true");
         l_end = create_label("if_end");
+        line(n.line_number);
 
         if(n.e instanceof Compare) {
             Compare compare = (Compare) n.e;
             compare.e1.accept(this);
             compare.e2.accept(this);
+            line(n.line_number);
             compare_instruction(compare.op, l_true);
         } else {
             n.e.accept(this);
+            line(n.line_number);
             instr("ifne "+l_true.name());
             pop();
         }
@@ -265,8 +294,11 @@ public class AssemblerVisitor implements Visitor{
         Label l_start, l_end;
         l_start = create_label("while_begin");
         l_end = create_label("while_end");
+        
+        line(n.line_number);
         label(l_start.declare()+" ; begin while");
         n.e.accept(this);
+        line(n.line_number);
         //@TODO: Optimize for lt
         instr("ifeq "+l_end.name()+" ; while condition");
         n.s.accept(this);
@@ -283,23 +315,29 @@ public class AssemblerVisitor implements Visitor{
     public void visit(IdentifierType n) {}
     
     public void visit(Print n) {
+        line(n.line_number);
         instr("getstatic java/lang/System/out Ljava/io/PrintStream;");
         push();
         n.e.accept(this);
+        line(n.line_number);
         instr("invokevirtual java/io/PrintStream/println(I)V");
         pop(2);
     }
     
     public void visit(Assign n) {
+        line(n.line_number);
         n.e.accept(this);
+        line(n.line_number);
         instr(n.i.sym.access.store());
     }
     
     public void visit(ArrayAssign n) {
+        line(n.line_number);
         instr(n.i.sym.access.load());
         push();
         n.e1.accept(this);
         n.e2.accept(this);
+        line(n.line_number);
         instr("iastore");
         pop(3);
     }
@@ -321,7 +359,9 @@ public class AssemblerVisitor implements Visitor{
         Label l_false = create_label("and_false");
         Label l_end = create_label("and_end");
         
+        line(n.line_number);
         create_and(n.e1, n.e2, null, l_false); //Null => fall through on true
+        line(n.line_number);
         instr("iconst_1");
         instr("goto "+l_end.name());
         label(l_false.declare());
@@ -361,11 +401,16 @@ public class AssemblerVisitor implements Visitor{
     }
     
     public void visit(Compare n) {
+        
+        line(n.line_number);
+        
         n.e1.accept(this);
         n.e2.accept(this);
         Label l_true, l_end;
         l_true = create_label();
         l_end = create_label();
+        
+        line(n.line_number);
         
         compare_instruction(n.op, l_true);
         
@@ -378,49 +423,62 @@ public class AssemblerVisitor implements Visitor{
     }
     
     public void visit(Plus n) {
+        line(n.line_number);
         n.e1.accept(this);
         n.e2.accept(this);
+        line(n.line_number);
         instr("iadd");
         pop();
     }
     public void visit(Minus n) {
+        line(n.line_number);
         n.e1.accept(this);
         n.e2.accept(this);
+        line(n.line_number);
         instr("isub");
         pop();
     }
     
     public void visit(Times n) {
+        line(n.line_number);
         n.e1.accept(this);
         n.e2.accept(this);
+        line(n.line_number);
         instr("imul");
         pop();
     }
     
     public void visit(ArrayLookup n) {
+        line(n.line_number);
         n.e1.accept(this);
         n.e2.accept(this);
+        line(n.line_number);
         instr("iaload");
         pop();
     }
     
     public void visit(ArrayLength n) {
+        line(n.line_number);
         n.e.accept(this);
+        line(n.line_number);
         instr("arraylength");
     }
     
     public void visit(Call n) {
+        line(n.line_number);
         //Add instructions for pushing the object to call the method on:
         n.e.accept(this);
         //Run through argument list
         for(Exp e : n.el.getList()) {
             e.accept(this);
         }
+        line(n.line_number);
         instr("invokevirtual "+convert_classname(n.method.fullName())+Hardware.methodSignature(n.method.fl, n.method.t));
         pop(n.method.fl.size()); //pop(1+fl.size()); push(1) (result)
     }
     
     public void visit(IntegerLiteral n) {
+        line(n.line_number);
         if(n.i == -1) {
             instr("iconst_m1");
         } else if(n.i > -1 && n.i < 6) {
@@ -436,30 +494,37 @@ public class AssemblerVisitor implements Visitor{
     }
     
     public void visit(True n) {
+        line(n.line_number);
         instr("iconst_1");
         push();
     }
     public void visit(False n) {
+        line(n.line_number);
         instr("iconst_0");
         push();
     }
     
     public void visit(IdentifierExp n) {
+        line(n.line_number);
         instr(n.sym.access.load());
         push();
     }
     
     public void visit(This n) {
+        line(n.line_number);
         instr("aload_0 ; this");
         push();
     }
     
     public void visit(NewArray n) {
+        line(n.line_number);
         n.e.accept(this);
+        line(n.line_number);
         instr("newarray int");
     }
     
     public void visit(NewObject n){
+        line(n.line_number);
         instr("new "+convert_classname(n.cls.fullName()));
         instr("dup");
         push(2);
@@ -468,8 +533,10 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(Not n) {
+        line(n.line_number);
         instr("; not start");
         n.e.accept(this);
+        line(n.line_number);
         instr("iconst_1");
         instr("ixor ; boolean not");
     }

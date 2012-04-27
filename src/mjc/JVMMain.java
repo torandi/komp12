@@ -22,6 +22,7 @@ public class JVMMain {
     public static frame.VMFactory frameFactory;
     public static boolean assemble = true;
     public static boolean print_ast = false;
+    public static boolean debug_symbols = true;
     
     ErrorMsg error;
 
@@ -42,11 +43,14 @@ public class JVMMain {
             } else if(args[i].equals("-h")) {
                 System.out.println("Flags:\n"
                         + "-S : do not run jasmin (only output assembler)\n"
-                        + "-o : set output directory"
-                        + "-h : this help"
-                        + "everything else is used as source dirs");
+                        + "-o : set output directory\n"
+                        + "-nd : don't generate debug symbols\n"
+                        + "-h : this help\n");
             } else if(args[i].equals("-fno-array-bounds-checks")) {
-                //tigris forces us to accept this flag
+                //tigris uses this flag in performance tests, so turn of debug flags:
+                debug_symbols = false;
+            } else if(args[i].equals(("-nd"))) {
+                debug_symbols = false;
                 
             } else if(args[i].equals("-ast")) {
                 print_ast = true;
@@ -65,7 +69,7 @@ public class JVMMain {
             System.exit(1);
         }
         
-        JVMMain main = new JVMMain(srcfile);
+        JVMMain main = new JVMMain();
         frameFactory = new jvm.Factory();
         if(!main.begin(srcfile, output_dir)) {
             System.out.println("Compilation failed: "+srcfile);
@@ -75,13 +79,15 @@ public class JVMMain {
         }
     }
 
-    public JVMMain(String src) {
-        error = new ErrorMsg(System.err, src);
+    public JVMMain() {
     }
 
     public boolean begin(String file, String output_dir)  {
         try {
             String basename = new File(file).getName();
+            
+            error = new ErrorMsg(System.err, basename);
+            
             Reader r = new FileReader(file);
             System.out.println("Building from "+file);
             Start basicTree = parse(r);
@@ -117,8 +123,9 @@ public class JVMMain {
                return false;
             
             //Output assembly!
-            AssemblerVisitor asmVisitor = new AssemblerVisitor();
-            ArrayList<String> asm_files = asmVisitor.run(abstractTree.program, output_dir);
+            AssemblerVisitor asmVisitor = new AssemblerVisitor(debug_symbols);
+            
+            ArrayList<String> asm_files = asmVisitor.run(abstractTree.program, output_dir, basename);
             System.out.println("Assembly outputed to "+asmVisitor.getOutputDir());
             
             if(assemble) {
