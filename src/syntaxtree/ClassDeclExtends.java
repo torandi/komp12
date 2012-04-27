@@ -1,5 +1,6 @@
 package syntaxtree;
 
+import error.MethodOverrideException;
 import java.util.ArrayList;
 import visitor.Visitor;
 import visitor.TypeVisitor;
@@ -35,6 +36,8 @@ public class ClassDeclExtends extends ClassDecl {
     public ClassDecl parent() {
         if(parent == null) {
             parent = program.findClass(parent_id.s);
+            if(parent == null)
+                throw new InternalError("Parent of class "+toString()+" ("+parent_id.s+") can't be found");
         }
         return parent;
     }
@@ -46,5 +49,18 @@ public class ClassDeclExtends extends ClassDecl {
             md = parent().findMethod(id, tl);
         
         return md;
+    }
+    
+    
+    @Override
+    public boolean addMethod(Identifier id, ArrayList<Type> tl, MethodDecl m) throws MethodOverrideException{
+        //For inheriting classes we must verify that no super class declare it, or 
+        // that the return type match
+        MethodDecl parent_method = findMethod(id, tl);
+        if(parent_method == null || m.t.equals(parent_method.t)) {
+            return super.addMethod(id, tl, m);
+        } else {
+            throw new MethodOverrideException(parent_method, m.t.toString());
+        }
     }
 }

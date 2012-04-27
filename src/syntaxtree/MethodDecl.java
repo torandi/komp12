@@ -56,4 +56,8 @@ public class MethodDecl extends Scope {
     public String toString() {
         return i.s;
     }
+    
+    public String signature() {
+        return i.s+fl.toString();
+    }
 }

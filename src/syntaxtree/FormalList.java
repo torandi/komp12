@@ -37,7 +37,7 @@ public class FormalList {
              sb.append(",");
            else
              first=false;
-           sb.append(sb);
+           sb.append(f.t);
        }
        sb.append(")");
        return sb.toString();

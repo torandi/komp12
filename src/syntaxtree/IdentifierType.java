@@ -6,7 +6,8 @@ import visitor.TypeVisitor;
 public class IdentifierType extends Type {
 
     public String s;
-    public ClassDecl c;
+    private ClassDecl c;
+    private Program program;
 
     /**
      * This method assumes that the left hand argument is trying to be fit into
@@ -24,20 +25,21 @@ public class IdentifierType extends Type {
         if(itp.s.equals(s)) {
             return true;
         } else {
-            return c.hasParent(itp.s);
+            return get_class().hasParent(itp.s);
         }
     }
 
     public IdentifierType(Program p, String as, int line) {
         super(line);
         s = as;
-        c = p.findClass(s);
+        program = p;
     }
 
     public IdentifierType(ClassDecl c, int line) {
         super(line);
         s = c.i.s;
         this.c = c;
+        program = c.program;
     }
 
     public void accept(Visitor v) {
@@ -50,5 +52,16 @@ public class IdentifierType extends Type {
 
     public String toString() {
         return s;
+    }
+
+    public ClassDecl get_class() {
+        if(c == null) {
+            c = program.findClass(s);
+        }
+        return c;
+    }
+    
+    public void set_class(ClassDecl cls) {
+        c = cls;
     }
 }

@@ -1,5 +1,6 @@
 package syntaxtree;
 
+import error.MethodOverrideException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import symbol.Scope;
@@ -29,7 +30,7 @@ public abstract class ClassDecl extends Scope {
      * Adds the specified method to the method list.
      * @return True if successfull, False if the method was already declared
      */
-    public boolean addMethod(Identifier id, ArrayList<Type> tl, MethodDecl m) {
+    public boolean addMethod(Identifier id, ArrayList<Type> tl, MethodDecl m) throws MethodOverrideException {
         ArrayList<MethodDecl> container = methods.get(id.s.intern());
         if (container == null) {
             container = new ArrayList<MethodDecl>();

@@ -182,8 +182,8 @@ public class AssemblerVisitor implements Visitor{
     }
     
     public void class_decl_visit(ClassDecl n) {
-        line(n.line_number);
         load_class_output(n.i.s);
+        line(n.line_number);
         directive(".class "+convert_classname(n.fullName()));
         directive(".super "+convert_classname(n.parent_name())+"\n");
         for(VarDecl v : n.vl.getList()) {

@@ -70,7 +70,12 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(ClassDeclSimple n) {
 	stream.print("ClassDeclSimple(");
 	n.i.accept(this);
-	stream.println(", (");
+        class_decl_visit(n);
+        
+    }
+    
+    public void class_decl_visit(ClassDecl n) {
+        stream.println(", (");
         stream.add_tab();
 	for ( int i = 0; i < n.vl.size(); i++ ) {
 	    n.vl.elementAt(i).accept(this);
@@ -100,19 +105,7 @@ public class ASTPrintVisitor implements Visitor {
 	n.i.accept(this);
 	stream.print(" {extends} ");
 	n.parent_id.accept(this);
-	stream.print(", (");
-	for ( int i = 0; i < n.vl.size(); i++ ) {
-	    n.vl.elementAt(i).accept(this);
-	    if ( i+1 < n.vl.size() ) 
-		stream.print(", ");
-	}
-	for ( int i = 0; i < n.ml.size(); i++ ) {
-	    stream.println();
-	    if ( i+1 < n.ml.size() ) 
-		stream.println(", ");
-	}
-	stream.println();
-	stream.println("))");
+        class_decl_visit(n);
     }
 
     // Type t;

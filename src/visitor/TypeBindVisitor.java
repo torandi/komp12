@@ -151,11 +151,10 @@ public class TypeBindVisitor implements TypeVisitor {
     }
 
     public Type visit(IdentifierType n) {
-        n.c = curProgram.findClass(n.s);
-        if (n.c == null) {
+        if (n.get_class() == null) {
             error.complain(st.toString(), "Unknown type \"" + n.s + "\"", n.line_number);
             //Prevent nullpointerexceptions:
-            n.c = new ClassDeclSimple(curProgram, new Identifier(n.s), new VarDeclList(), new MethodDeclList());
+            n.set_class(new ClassDeclSimple(curProgram, new Identifier(n.s), new VarDeclList(), new MethodDeclList()));
         }
         return n;
     }
@@ -292,7 +291,7 @@ public class TypeBindVisitor implements TypeVisitor {
     public Type visit(Call n) {
         Type objectType = n.e.accept(this);
         if (objectType instanceof IdentifierType) {
-            ClassDecl c = ((IdentifierType) objectType).c;
+            ClassDecl c = ((IdentifierType) objectType).get_class();
             ArrayList<Type> tl = new ArrayList<Type>(n.el.size());
             for (Exp e : n.el.getList()) {
                 tl.add(e.accept(this));
@@ -343,7 +342,6 @@ public class TypeBindVisitor implements TypeVisitor {
             return null;
         } else {
             IdentifierType it = new IdentifierType(curClass, n.line_number);
-            it.c = curClass;
             return it;
         }
     }
@@ -363,7 +361,6 @@ public class TypeBindVisitor implements TypeVisitor {
             return null;
         } else {
             IdentifierType it = new IdentifierType(c, n.line_number);
-            it.c = c;
             n.cls = c;
             return it;
         }
