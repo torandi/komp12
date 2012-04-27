@@ -3,7 +3,7 @@ package basic_tree;
 
 
 public abstract class Primary {
-
+    public int line_number=-1;
 /*
     public Primary eval(ArrayList<Sufix> sufix) throws SyntaxError {
         Primary cur=this;
