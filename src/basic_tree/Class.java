@@ -41,4 +41,8 @@ class Class{
         public String getSuperClass() {
             return super_class;
         }
+        
+        public boolean hasSuperClass() {
+            return super_class != null;
+        }
 }

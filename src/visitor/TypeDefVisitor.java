@@ -43,6 +43,10 @@ public class TypeDefVisitor implements Visitor{
     }
 
     public void visit(ClassDeclSimple n) {
+        class_decl_visit(n);
+    }
+    
+    public void class_decl_visit(ClassDecl n) {
         st.pushScope(n);
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
@@ -59,7 +63,7 @@ public class TypeDefVisitor implements Visitor{
     }
 
     public void visit(ClassDeclExtends n) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        class_decl_visit(n);
     }
 
     public void visit(VarDecl n) {

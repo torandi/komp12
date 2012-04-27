@@ -56,6 +56,14 @@ public class TypeBindVisitor implements TypeVisitor{
     public Type visit(ClassDeclSimple n) {
         st.pushScope(n);
         
+        class_decl_visit(n);
+        
+        st.popScope();
+        
+        return null;
+    }
+    
+    public void class_decl_visit(ClassDecl n) {
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
             //Allocate field:
@@ -68,12 +76,33 @@ public class TypeBindVisitor implements TypeVisitor{
             m.accept(this);
         }
         curFrame = null;
-        st.popScope();
-        return null;
+        
     }
 
     public Type visit(ClassDeclExtends n) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int num_pushes = 0;
+        n.parent = curProgram.findClass(n.parent_id.toString());
+        ClassDecl parent = n.parent;
+        while(parent instanceof ClassDeclExtends) {
+            ClassDeclExtends p = (ClassDeclExtends) parent;
+            ++num_pushes;
+            st.pushScope(parent);
+            if(p.parent == null) {
+                p.parent = curProgram.findClass(p.parent_id.toString());
+            }
+            parent = p.parent;
+        }
+        num_pushes+=2;
+        st.pushScope(parent);
+        st.pushScope(n);
+        
+        class_decl_visit(n);
+        
+        for(int i=0;i<num_pushes;++i) {
+            st.popScope();
+        }
+        
+        return null;
     }
 
     public Type visit(VarDecl n) {

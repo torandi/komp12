@@ -82,8 +82,12 @@ public class AbstractTree {
         for(basic_tree.Method m : in.getMethods()) {
             mdl.addElement(method(m));
         }
-        //@TODO: Extended/Simple select
-        cd = new ClassDeclSimple(id(in.getName()),vdl, mdl);
+        
+        if(in.hasSuperClass()) {
+            cd = new ClassDeclExtends(id(in.getName()),id(in.getSuperClass()),vdl, mdl);
+        } else {
+            cd = new ClassDeclSimple(id(in.getName()),vdl, mdl);
+        }
         return cd;
 
     }

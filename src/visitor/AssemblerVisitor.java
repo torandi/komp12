@@ -157,9 +157,13 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(ClassDeclSimple n) {
+        class_decl_visit(n);
+    }
+    
+    public void class_decl_visit(ClassDecl n) {
         load_class_output(n.i.s);
         directive(".class "+convert_classname(n.fullName()));
-        directive(".super java/lang/Object\n");
+        directive(".super "+convert_classname(n.parent())+"\n");
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
         }
@@ -171,7 +175,7 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(ClassDeclExtends n) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        class_decl_visit(n);
     }
 
     public void visit(VarDecl n) {
