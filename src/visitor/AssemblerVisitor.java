@@ -153,9 +153,9 @@ public class AssemblerVisitor implements Visitor{
 
     public void visit(MainClass n) {
         load_class_output(n.i1.s);
-        line(n.line_number);
         directive(".class "+convert_classname(n.i1.s));
         directive(".super java/lang/Object");
+        line(n.line_number);
         create_constructor(null);
         if(pass == 2) {
             directive(".method public static main([Ljava/lang/String;)V");
@@ -183,9 +183,9 @@ public class AssemblerVisitor implements Visitor{
     
     public void class_decl_visit(ClassDecl n) {
         load_class_output(n.i.s);
-        line(n.line_number);
         directive(".class "+convert_classname(n.fullName()));
         directive(".super "+convert_classname(n.parent_name())+"\n");
+        line(n.line_number);
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
         }
