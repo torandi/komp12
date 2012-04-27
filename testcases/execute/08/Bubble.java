@@ -3,7 +3,7 @@ class Bubble{
 		if(!new bool().bool(false))
 			System.out.println(new DD().DD());
 		else
-			System.out.println(new DD().DD()+-2147483648);
+			System.out.println(new DD().DD()-2147483647);
 	}
 }
 

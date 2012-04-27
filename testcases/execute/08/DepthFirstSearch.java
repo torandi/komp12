@@ -10,7 +10,7 @@ class DepthFirstSearch {
 							new Node().init0(89,15),
 							new Node().init0(3904,16),
 							new Node().init1(
-								new Node().init0(-2147483648,17),
+								new Node().init0(0-2147483647,17),
 								1994,12
 							),
 							13,11
@@ -50,7 +50,7 @@ class DepthFirstSearch {
 						),
 					77777,2
 				),
-				-0,1
+				0,1
 			),
 			12,0
 		),67111).getId());
@@ -93,7 +93,7 @@ class Stack {
 	}
 
 	public int pop() {
-		size = size + -1;
+		size = size -1;
 		return stack[size];
 	}
 

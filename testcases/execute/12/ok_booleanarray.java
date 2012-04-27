@@ -3,13 +3,13 @@ class MainClass {
 		if(new A().doStuff()) {
 			System.out.println(1337);
 		} else {
-			System.out.println(-1337);
+			System.out.println(0-1337);
 		}
 
 		if(!new A().doStuff()) {
 			System.out.println(1337);
 		} else {
-			System.out.println(-1337);
+			System.out.println(0-1337);
 		}
 
 	}
