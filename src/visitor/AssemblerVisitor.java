@@ -155,7 +155,7 @@ public class AssemblerVisitor implements Visitor{
         load_class_output(n.i1.s);
         directive(".class "+convert_classname(n.i1.s));
         directive(".super java/lang/Object");
-        line(n.line_number);
+
         create_constructor(null);
         if(pass == 2) {
             directive(".method public static main([Ljava/lang/String;)V");
@@ -185,7 +185,7 @@ public class AssemblerVisitor implements Visitor{
         load_class_output(n.i.s);
         directive(".class "+convert_classname(n.fullName()));
         directive(".super "+convert_classname(n.parent_name())+"\n");
-        line(n.line_number);
+
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
         }
@@ -201,12 +201,10 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(VarDecl n) {
-        line(n.line_number);
         directive(n.i.sym.access.declare());
     }
 
     public void visit(MethodDecl n) {
-        line(n.line_number);
         if(pass == 1) {
             current_max_stack_size = 0;
             current_stack_size = 0;
@@ -214,6 +212,8 @@ public class AssemblerVisitor implements Visitor{
             directive(".method public "+n.frame.procEntry());
             directive(".limit locals "+(n.frame.numberOfLocals()+n.frame.numberOfFormals()+1));
             directive(".limit stack "+stack_size.get(n));
+            
+            line(n.line_number);
             directive(".var 0 is <this> L"+convert_classname(n.cls.fullName())+";");
         }
         
@@ -227,7 +227,6 @@ public class AssemblerVisitor implements Visitor{
             s.accept(this);
         }
 
-        line(n.e.line_number);
         n.e.accept(this);
         
         if(pass == 2) {
