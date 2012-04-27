@@ -127,7 +127,7 @@ public class AssemblerVisitor implements Visitor{
         next_label = 0;
         try {
             current_output = new PrintWriter(current_file);
-            directive(".source "+src);
+            directive(".source '"+src+"'");
         } catch (FileNotFoundException ex) {
             System.out.println("Failed to open output: "+ex);
             System.exit(1);
