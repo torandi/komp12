@@ -3,7 +3,7 @@
 
 class MainClass {
 	public static void main(String[] args) {
-		System.out.println( new A().doStuff(-100)[0] );
+		System.out.println( new A().doStuff(0-100)[0] );
 		System.out.println( new A().doStuff( 100)[0] );
 	}
 }

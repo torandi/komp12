@@ -9,7 +9,7 @@ public class BasicStatement extends Statement {
 	private ArrayList<Statement> statements = new ArrayList<Statement>();
 	
 	public BasicStatement(int line) {
-		super(line);
+		super(line); 
 	}
 
 	public ArrayList<Variable> getVariables() {
