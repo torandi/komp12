@@ -60,7 +60,12 @@ public class JVMMain {
             output_dir += "/";
         }
         
-        JVMMain main = new JVMMain();
+        if(srcfile == null) {
+            System.out.println("No source file specified");
+            System.exit(1);
+        }
+        
+        JVMMain main = new JVMMain(srcfile);
         frameFactory = new jvm.Factory();
         if(!main.begin(srcfile, output_dir)) {
             System.out.println("Compilation failed: "+srcfile);
@@ -70,8 +75,8 @@ public class JVMMain {
         }
     }
 
-    public JVMMain() {
-        error = new ErrorMsg(System.err);
+    public JVMMain(String src) {
+        error = new ErrorMsg(System.err, src);
     }
 
     public boolean begin(String file, String output_dir)  {
@@ -128,11 +133,10 @@ public class JVMMain {
 
             return true;
         } catch (FileNotFoundException ex) {
-            error.complain(ex.getMessage());
+            error.complain(ex.getMessage(),-1);
             return false;
         } catch (ParseException ex) {
-            error.complain("Parse exception in line "+ex.currentToken.beginLine+": "+ex);
-            ex.printStackTrace();
+            error.complain("Parse error: Found "+ex.currentToken.image+", expected "+ex.expectedTokenSequences, ex.currentToken.beginLine);
             return false;
         }
     }

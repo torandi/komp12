@@ -1,13 +1,15 @@
 package basic_tree;
 
+import parse.Token;
+
 
 public class CustomType extends Type {
 
 	private String id;
 
-	public CustomType(String id) {
-		super();
-		this.id = id;
+	public CustomType(Token t) {
+		super(t.beginLine);
+		this.id = t.image;
 	}
 
 	public String getId() {

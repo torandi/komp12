@@ -1,6 +1,7 @@
 package basic_tree;
 
 import java.util.ArrayList;
+import parse.Token;
 
 
 public 
@@ -10,8 +11,10 @@ class Class{
 	private ArrayList<Variable> variables = new ArrayList<Variable>();
 	private ArrayList<Method> methods = new ArrayList<Method>();
 	
-	public Class(String name) {
-		this.name = name;
+        public int line_number;
+        
+	public Class(Token t) {
+		this.name = t.image;
 	}
        
         public void setSuper(String s) {

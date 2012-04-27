@@ -45,11 +45,14 @@ public class AbstractTree {
         basic_tree.Class mainClass = basicTree.getMainClass();
 
         basic_tree.Method m = mainClass.getMethods().get(0);
+       
         
         i1=id(mainClass.getName());
         i2=id(m.getParameters().get(0).getName());
         
         MainClass mc = new MainClass(i1,i2);
+        
+        mc.line_number = mainClass.line_number;
 
         for(Variable v : m.getVariables()) {
             mc.vl.addElement(variable(v));
@@ -88,6 +91,9 @@ public class AbstractTree {
         } else {
             cd = new ClassDeclSimple(id(in.getName()),vdl, mdl);
         }
+        
+        cd.line_number = in.line_number;
+        
         return cd;
 
     }
@@ -109,10 +115,14 @@ public class AbstractTree {
             sl.addElement(statement(s));
         }
 
-        return new MethodDecl(type(in.getReturnType()),
+        MethodDecl md = new MethodDecl(type(in.getReturnType()),
                 id(in.getName()),
                 fl,vdl,sl,
                 exp(in.getReturnExpression()));
+        
+        md.line_number = in.line_number;
+        
+        return md;
     }
 
     private Identifier id(String s) {
@@ -155,32 +165,38 @@ public class AbstractTree {
             ret = new Assign(id(sfs.getId()), exp(sfs.getExpression()));
         } else if(in instanceof basic_tree.SetIndexStatement) {
             basic_tree.SetIndexStatement sfs = (basic_tree.SetIndexStatement)in;
-            ret = new ArrayAssign(id(sfs.getId()), exp(sfs.getBracketExpression()),exp(sfs.getExpression()));
+            ret = new ArrayAssign(id(sfs.getId()), exp(sfs.getBracketExpression()),exp(sfs.getExpression()), in.line_number);
         }
+        
+        ret.set_line_number(in.line_number);
 
         return ret;
     }
 
     private Type type(basic_tree.Type in) {
         if(in instanceof basic_tree.IntegerType) {
-            return new IntegerType();
+            return new IntegerType(in.line_number);
         } else if(in instanceof basic_tree.IntegerArrayType) {
-            return new IntArrayType();
+            return new IntArrayType(in.line_number);
         } else if(in instanceof basic_tree.BooleanType) {
-            return new BooleanType();
+            return new BooleanType(in.line_number);
         } else if(in instanceof basic_tree.CustomType) {
-            return new IdentifierType(((basic_tree.CustomType)in).getId());
+            return new IdentifierType(((basic_tree.CustomType)in).getId(), in.line_number);
         } else { //VoidType
             return null;
         }
     }
 
     private VarDecl variable(basic_tree.Variable in) {
-        return new VarDecl(type(in.getType()),id(in.getName()));
+        VarDecl vd = new VarDecl(type(in.getType()),id(in.getName()));
+        vd.line_number = in.line_number;
+        return vd;
     }
 
     private Formal formal(basic_tree.Variable in) {
-        return new Formal(type(in.getType()), id(in.getName()));
+        Formal f =  new Formal(type(in.getType()), id(in.getName()));
+        f.line_number = in.line_number;
+        return f;
     }
 
     /*
@@ -192,7 +208,9 @@ public class AbstractTree {
         for(AndOperand op : in.getOperands()) {
             el.addElement(and(op));
         }
-        return buildAnd(el);
+        Exp e = buildAnd(el);
+        e.line_number = in.line_number;
+        return e;
     }
     private Exp buildAnd(ExpList el) {
         if(el.size()>1) {
@@ -235,7 +253,7 @@ public class AbstractTree {
             case ParserConstants.NEQ:
                 return Compare.Operator.NEQ;
             default:
-                error.complain("Invalid comparison operator");
+                error.complain("Parser error: Invalid comparison operator "+t.image,t.beginLine);
                 return null;
         }
     }   
@@ -291,53 +309,70 @@ public class AbstractTree {
 
     private Exp sufix(Exp cur, Sufix in) {
         if(in instanceof LengthSufix) {
-            return new ArrayLength(cur);
+            return new ArrayLength(cur, in.line_number());
         } else if(in instanceof IndexSufix) {
-            return new ArrayLookup(cur,exp(((IndexSufix)in).getExpression()));
+            return new ArrayLookup(cur,exp(((IndexSufix)in).getExpression()), in.line_number());
         } else if(in instanceof MethodSufix) {
             MethodSufix ms= (MethodSufix) in;
             ExpList el=new ExpList();
             for(Expression e : ms.getParameters()) {
                 el.addElement(exp(e));
             }
-            return new Call(cur,id(ms.getMethodName()),el);
+            return new Call(cur,id(ms.getMethodName()),el, in.line_number());
         }
-        error.complain("Internal error: Unknown sufix!");
+        error.complain("Internal error: Unknown sufix!",in.line_number());
         return null;
     }
 
     private Exp primary(basic_tree.Primary in) {
+        Exp e;
         if(in instanceof IntPrimary) {
             IntPrimary ip = (IntPrimary) in;
-            return new IntegerLiteral(ip.getInt());
+            e = new IntegerLiteral(ip.getInt());
         } else if(in instanceof IdPrimary) {
             IdPrimary ip = (IdPrimary) in;
             if(ip.getId().equals("this")) {
-                return new This();
+                e = new This();
             } else {
-                return new IdentifierExp(ip.getId());
+                e = new IdentifierExp(ip.getId());
             }
         } else if(in instanceof BooleanPrimary) {
             BooleanPrimary bp = (BooleanPrimary) in;
             if(bp.getBoolean()) {
-                return new True();
+                e = new True();
             } else {
-                return new False();
+                e = new False();
             }
         } else if(in instanceof NewIntPrimary) {
             NewIntPrimary ip = (NewIntPrimary) in;
-            return new NewArray(exp(ip.getExpression()));
+            e = new NewArray(exp(ip.getExpression()));
         } else if(in instanceof NewPrimary) {
             NewPrimary ip = (NewPrimary) in;
-            return new NewObject(id(ip.getId()));
+            e = new NewObject(id(ip.getId()));
         } else if(in instanceof NotExpressionPrimary) {
             NotExpressionPrimary nep = (NotExpressionPrimary) in;
-            return new Not(and(nep.getOperand()));
+            e = new Not(and(nep.getOperand()));
         } else if(in instanceof ExpressionPrimary) {
             ExpressionPrimary ep = (ExpressionPrimary) in;
-            return exp(ep.getExpression());
+            e = exp(ep.getExpression());
+        } else {
+            error.complain("Internal error: Unknown primary "+in+"!", in.line_number);
+            return null;
         }
-        error.complain("Internal error: Unknown primary "+in+"!");
-        return null;
+        e.line_number = in.line_number;
+        return e;
+    }
+    
+    protected static int interpolate_line_number(Exp e1, Exp e2) {
+        if(e1.line_number == e2.line_number)
+            return e1.line_number;
+        
+        if(e1.line_number == -1)
+            return e2.line_number;
+        
+        if(e2.line_number == -1)
+            return e1.line_number;
+        
+        return (e1.line_number+e2.line_number)/2;
     }
 }

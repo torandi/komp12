@@ -25,7 +25,7 @@ public class TypeDefVisitor implements Visitor{
 
         for(ClassDecl c :  n.cl.getList()) {
             if(!n.addClass(c.i, c)) {
-                error.complain("Class "+c.i+" is already defined.");
+                error.complain("Class "+c.i+" is already defined.", c.line_number);
             }
             c.accept(this);
         }
@@ -54,7 +54,7 @@ public class TypeDefVisitor implements Visitor{
 
         for(MethodDecl m : n.ml.getList()) {
             if(!n.addMethod(m.i, m.fl.getTypeList(), m)) {
-                error.complain("Method "+m.t+" "+m.i+m.fl+" already defined in class "+n);
+                error.complain(n.toString(),"Method "+m.t+" "+m.i+m.fl+" already defined in class "+n,m.line_number);
             }
             m.accept(this);
         }
@@ -69,7 +69,7 @@ public class TypeDefVisitor implements Visitor{
     public void visit(VarDecl n) {
         n.i.sym = new Symbol(n.t);
         if(!st.addVariable(n.i,n.i.sym)) {
-            error.complain(n.i+" is already defined in current scope ("+st+")");
+            error.complain(n.i+" is already defined in current scope ("+st+")",n.line_number);
         }
     }
 
@@ -92,7 +92,7 @@ public class TypeDefVisitor implements Visitor{
     public void visit(Formal n) {
         n.i.sym = new Symbol(n.t);
         if(!st.addVariable(n.i,n.i.sym)) {
-            error.complain(n.i+" in formal list is already defined in current scope ("+st+")");
+            error.complain(n.i+" in formal list is already defined in current scope ("+st+")",n.line_number);
         }
     }
     

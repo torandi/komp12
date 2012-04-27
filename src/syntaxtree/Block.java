@@ -30,4 +30,9 @@ public class Block extends Scope implements Statement {
     public int line_number() {
         return line_number;
     }
+    
+    @Override
+    public void set_line_number(int line) {
+        line_number = line;
+    }
 }

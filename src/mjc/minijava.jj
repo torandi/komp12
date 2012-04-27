@@ -122,8 +122,9 @@ basic_tree.Class MainClass () throws ParseException:
 		if( !method.image.equals("main") || !type.image.equals("String")) {
 			throw new ParseException("Expected method public static void main (String[] id)");
 		}
-		mainClass = new basic_tree.Class(className.image);
-		Method main=new Method(method,new VoidType());
+		mainClass = new basic_tree.Class(className);
+
+		Method main=new Method(method,new VoidType(className.beginLine));
 		main.addParameter(new Variable(id,null));
 		mainClass.addMethod(main);
 	}
@@ -223,7 +224,7 @@ basic_tree.Class ClassDecl () throws ParseException:
 {
 	<CLASS>
 	className = <ID>
-	{ c = new basic_tree.Class(className.image); }
+	{ c = new basic_tree.Class(className); }
 	(
 		<EXTENDS>
 		superClassName = <ID>
@@ -313,20 +314,20 @@ Type Type () throws ParseException:
 }
 {
 	(
-		<KWINT>
-		{ t = new IntegerType(); }
+		id = <KWINT>
+		{ t = new IntegerType(id.beginLine); }
 		(
 			<OSB>
 			<CSB>
-			{ t = new IntegerArrayType(); }
+			{ t = new IntegerArrayType(id.beginLine); }
 		)?
 	|
-		<KWBOOL>
-		{ t = new BooleanType(); }
+		id = <KWBOOL>
+		{ t = new BooleanType(id.beginLine); }
 	|
 		id=<ID>
 		{
-			t = new CustomType(id.image);
+			t = new CustomType(id);
 		}
 	)
 	{ return t; }
@@ -458,17 +459,17 @@ Sufix Sufix() throws ParseException:
 		<OSB>
 		{ Expression e; }
 		e = Expression()
-		<CSB>
-		{ s = new IndexSufix(e); }
+		id=<CSB>
+		{ s = new IndexSufix(e,id.beginLine); }
 	|
 		<DOT>
 		(
-			<LENGTH>
-			{ s = new LengthSufix(); }
+			id=<LENGTH>
+			{ s = new LengthSufix(id.beginLine); }
 		|
 			id=<ID>
 			<OPAR>
-			{ MethodSufix ms = new MethodSufix(id.image); }
+			{ MethodSufix ms = new MethodSufix(id); }
 			ExpList(ms)
 			<CPAR>
 			{ s = ms; }

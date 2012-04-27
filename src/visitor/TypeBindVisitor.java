@@ -72,7 +72,7 @@ public class TypeBindVisitor implements TypeVisitor{
         for(MethodDecl m : n.ml.getList()) {
             m.frame = JVMMain.frameFactory.newFrame(m.i.s, m.fl, m.t);
             curFrame = m.frame;
-            curFrame.allocLocal("<this>", new IdentifierType(n));
+            curFrame.allocLocal("<this>", new IdentifierType(n,n.line_number));
             m.accept(this);
         }
         curFrame = null;
@@ -127,7 +127,7 @@ public class TypeBindVisitor implements TypeVisitor{
         //return statement
         Type ret_type = n.e.accept(this);
         if(!ret_type.equals(n.t)) {
-            error.complain("In "+st+": returning "+ret_type+" in method declared as "+n.t);
+            error.complain(st.toString(),"returning "+ret_type+" in method declared as "+n.t, n.e.line_number);
         }
         st.popScope();
         return n.t.accept(this);
@@ -153,7 +153,7 @@ public class TypeBindVisitor implements TypeVisitor{
     public Type visit(IdentifierType n) {
         n.c=curProgram.findClass(n.s);
         if(n.c==null) {
-            error.complain("In "+st+": Unknown type \""+n.s+"\"");
+            error.complain(st.toString(),"Unknown type \""+n.s+"\"", n.line_number);
             //Prevent nullpointerexceptions:
             n.c=new ClassDeclSimple(new Identifier(n.s), new VarDeclList(), new MethodDeclList());
         }
@@ -175,7 +175,7 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(If n) {
         if(!(n.e.accept(this) instanceof BooleanType)) {
-            error.complain("In "+st+" if statement requires expression to return boolean");
+            error.complain(st.toString(),"If statement requires expression to return boolean",n.line_number);
         }
         n.s1.accept(this);
         n.s2.accept(this);
@@ -184,7 +184,7 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(While n) {
         if(!(n.e.accept(this) instanceof BooleanType)) {
-            error.complain("In "+st+" while statement requires expression to return boolean");
+            error.complain(st.toString(),"While statement requires expression to return boolean",n.line_number);
         }
         n.s.accept(this);
         return null;
@@ -199,7 +199,7 @@ public class TypeBindVisitor implements TypeVisitor{
         Type t1 = n.i.accept(this);
         Type t2 = n.e.accept(this);
         if(!t1.equals(t2)) {
-            error.complain("In "+st+": Assigning variable of type "+t2+" to \""+n.i+"\", which is of type "+t1);
+            error.complain(st.toString(),"Assigning variable of type "+t2+" to \""+n.i+"\", which is of type "+t1,n.line_number);
         }
         return t1.accept(this);
     }
@@ -209,13 +209,13 @@ public class TypeBindVisitor implements TypeVisitor{
         Type t1=n.e1.accept(this);
         Type t2=n.e2.accept(this);
         if(!(t instanceof IntArrayType)) {
-             error.complain("In "+st+": Trying to assign a value to an index of non-array variable of type "+t);
+             error.complain(st.toString(),"Trying to assign a value to an index of non-array variable of type "+t,n.line_number);
         }
         if(!(t1 instanceof IntegerType)) {
-             error.complain("In "+st+": Expression for index of ("+n.i+") in "+st+" returned an "+t1+" but should return an integer");
+             error.complain(st.toString(),"Expression for index of ("+n.i+") in "+st+" returned an "+t1+" but should return an integer",n.line_number);
         }
         if(!(t2 instanceof IntegerType)) {
-            error.complain("In "+st+": Assigning "+t2+" to \""+n.i+"[...]\" which is of type int");
+            error.complain(st.toString(),"Assigning "+t2+" to \""+n.i+"[...]\" which is of type int",n.line_number);
         }
         return t.accept(this);
     }
@@ -224,9 +224,9 @@ public class TypeBindVisitor implements TypeVisitor{
         Type t1=n.e1.accept(this);
         Type t2=n.e2.accept(this);
         if(!(t1 instanceof BooleanType && t2 instanceof BooleanType)) {
-            error.complain("In "+st+": Operator && can not be applied to "+t1+", "+t2);
+            error.complain(st.toString(),"Operator && can not be applied to "+t1+", "+t2,n.line_number);
         }
-        return new BooleanType();
+        return new BooleanType(n.line_number);
     }
 
     public Type visit(Compare n) {
@@ -234,59 +234,59 @@ public class TypeBindVisitor implements TypeVisitor{
         Type t2=n.e2.accept(this);
         if(n.op != Compare.Operator.EQ && n.op != Compare.Operator.NEQ && !(
                 t1 instanceof IntegerType && t2 instanceof IntegerType)) {
-            error.complain("In "+st+": Operator "+Compare.op_to_str(n.op)+" can not be applied to "+t1+", "+t2);
+            error.complain(st.toString(),"Operator "+Compare.op_to_str(n.op)+" can not be applied to "+t1+", "+t2,n.line_number);
         } else if((n.op == Compare.Operator.EQ || n.op == Compare.Operator.NEQ) && !(
                 (t1 instanceof IntegerType || t1 instanceof BooleanType)
                 &&
                 (t2 instanceof IntegerType || t2 instanceof BooleanType))) {
-            error.complain("In "+st+": Operator "+Compare.op_to_str(n.op)+" can not be applied to "+t1+", "+t2);
+            error.complain(st.toString(),"Operator "+Compare.op_to_str(n.op)+" can not be applied to "+t1+", "+t2,n.line_number);
         }
-        return new BooleanType();
+        return new BooleanType(n.line_number);
     }
 
     public Type visit(Plus n) {
         Type t1=n.e1.accept(this);
         Type t2=n.e2.accept(this);
         if(!(t1 instanceof IntegerType && t2 instanceof IntegerType)) {
-            error.complain("In "+st+": Operator + can not be applied to "+t1+", "+t2);
+            error.complain(st.toString(),"Operator + can not be applied to "+t1+", "+t2,n.line_number);
         }
-        return new IntegerType();
+        return new IntegerType(n.line_number);
     }
 
     public Type visit(Minus n) {
         Type t1=n.e1.accept(this);
         Type t2=n.e2.accept(this);
         if(!(t1 instanceof IntegerType && t2 instanceof IntegerType)) {
-            error.complain("In "+st+": Operator - can not be applied to "+t1+", "+t2);
+            error.complain(st.toString(),"Operator - can not be applied to "+t1+", "+t2,n.line_number);
         }
-        return new IntegerType();
+        return new IntegerType(n.line_number);
     }
 
     public Type visit(Times n) {
         Type t1=n.e1.accept(this);
         Type t2=n.e2.accept(this);
         if(!(t1 instanceof IntegerType && t2 instanceof IntegerType)) {
-            error.complain("In "+st+": Operator * can not be applied to "+t1+", "+t2);
+            error.complain(st.toString(),"Operator * can not be applied to "+t1+", "+t2,n.line_number);
         }
-        return new IntegerType();
+        return new IntegerType(n.line_number);
     }
 
     public Type visit(ArrayLookup n) {
         Type t=n.e1.accept(this);
         if(!(t instanceof IntArrayType)) {
-            error.complain("In "+st+": Can not look up index in type "+t);
+            error.complain(st.toString(), "Can not look up index in type "+t,n.line_number);
         }
         if(!(n.e2.accept(this) instanceof IntegerType)) {
-            error.complain("In "+st+": Index must be an integer");
+            error.complain(st.toString(), "Index must be an integer",n.line_number);
         }
-        return new IntegerType();
+        return new IntegerType(n.line_number);
     }
 
     public Type visit(ArrayLength n) {
         if(!(n.e.accept(this) instanceof IntArrayType)) {
-            error.complain("In "+st+": .length can only be applied to int[]");
+            error.complain(st.toString()," .length can only be applied to int[]",n.line_number);
         }
-        return new IntegerType();
+        return new IntegerType(n.line_number);
     }
 
     public Type visit(Call n) {
@@ -302,33 +302,33 @@ public class TypeBindVisitor implements TypeVisitor{
                 n.method = m;
                 return m.t.accept(this);
             } else {
-                error.complain("In "+st+": Unknown method "+c.i+"."+n.i+"("+typeListToString(tl)+")");
+                error.complain(st.toString(),"Unknown method "+c.i+"."+n.i+"("+typeListToString(tl)+")",n.line_number);
                 System.exit(-1); //Unrecoverable error
                 return null;
             }
         } else {
-            error.complain("In "+st+": Can not call method "+n.c+"(...) on non-object "+objectType);
+            error.complain(st.toString(), "Can not call method "+n.c+"(...) on non-object "+objectType,n.line_number);
             System.exit(-1); //Unrecoverable error
             return null;
         }
     }
 
     public Type visit(IntegerLiteral n) {
-        return new IntegerType();
+        return new IntegerType(n.line_number);
     }
 
     public Type visit(True n) {
-        return new BooleanType();
+        return new BooleanType(n.line_number);
     }
 
     public Type visit(False n) {
-        return new BooleanType();
+        return new BooleanType(n.line_number);
     }
 
     public Type visit(IdentifierExp n) {
         n.sym=st.lookup(n.s);
         if(n.sym==null) {
-            error.complain("In "+st+": Undeclared variable "+n.s);
+            error.complain(st.toString(), "Undeclared variable "+n.s,n.line_number);
             System.exit(-1); //Unrecoverable error
             return null;
         } else {
@@ -338,11 +338,11 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(This n) {
         if(curClass==null) {
-            error.complain("Calling this is not allowed in main method");
+            error.complain(st.toString(),"Calling this is not allowed in main method",n.line_number);
             System.exit(-1); //Unrecoverable error
             return null;
         } else {
-            IdentifierType it = new IdentifierType(curClass.i.s);
+            IdentifierType it = new IdentifierType(curClass.i.s, n.line_number);
             it.c=curClass;
             return it;
         }
@@ -350,19 +350,19 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(NewArray n) {
         if(!(n.e.accept(this) instanceof IntegerType)) {
-            error.complain("In "+st+": Size of array must be an integer");
+            error.complain(st.toString(), "Size of array must be an integer",n.line_number);
         }
-        return new IntArrayType();
+        return new IntArrayType(n.line_number);
     }
 
     public Type visit(NewObject n) {
         ClassDecl c = curProgram.findClass(n.i.s);
         if(c==null) {
-            error.complain("In "+st+": Can not create new object of unknown class "+n.i.s);
+            error.complain(st.toString(), "Can not create new object of unknown class "+n.i.s,n.line_number);
             System.exit(-1); //Unrecoverable error
             return null;
         } else {
-            IdentifierType it = new IdentifierType(c.i.s);
+            IdentifierType it = new IdentifierType(c.i.s, n.line_number);
             it.c=c;
             n.cls = c;
             return it;
@@ -372,15 +372,15 @@ public class TypeBindVisitor implements TypeVisitor{
     public Type visit(Not n) {
         Type t = n.e.accept(this);
         if(!( t instanceof BooleanType)) {
-            error.complain("In "+st+": Operator ! can not be applied to "+t);
+            error.complain(st.toString(), "Operator ! can not be applied to "+t,n.line_number);
         }
-        return new BooleanType();
+        return new BooleanType(n.line_number);
     }
 
     public Type visit(Identifier n) {
         n.sym=st.lookup(n.s);
         if(n.sym == null) {
-            error.complain("In "+st+": Undeclared variable "+n.s);
+            error.complain(st.toString(), "Undeclared variable "+n.s,-1);
             System.exit(-1); //Unrecoverable error
             return null;
         } else {
