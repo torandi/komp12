@@ -86,11 +86,19 @@ function test_extentions() {
 		echo -e "$txtylw IGNORE $txtrst"
 		return 1
 	else
-		_extentions=$(cat $_file | grep "//.*EXT" | sed -e 's/\/\/EXT:\(.*\)/\1/')
+		_extentions=$(cat $_file | grep -E "//.*EXT" | sed -re "s/\/\/.*EXT: *(!?[A-Z]{3}).*/\1/")
 		for ext in $_extentions; do
-			count=$(echo $extentions | grep $ext -cx)
-			if [[ $count == "0" ]]; then
-				echo -e "$txtylw EXT MISS $txtrst"
+			if [[ $ext =~ \!(.*) ]]; then
+				#Negative extention
+				negative=1
+				mext=${BASH_REMATCH[1]}
+			else
+				negative=0
+				mext=$ext
+			fi
+			count=$(echo "$extentions" | grep $mext -cx)
+			if [[ ( $count == "0" && $negative == 0 ) || ( $count != "0" && $negative == 1 ) ]]; then
+				echo -e "$txtylw EXT MISS: $ext $txtrst"
 				return 1
 			fi
 		done
