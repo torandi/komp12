@@ -145,14 +145,18 @@ public class TypeBindVisitor implements TypeVisitor{
     }
 
     public Type visit(If n) {
-        n.e.accept(this);
+        if(!(n.e.accept(this) instanceof BooleanType)) {
+            error.complain("In "+st+" if statement requires expression to return boolean");
+        }
         n.s1.accept(this);
         n.s2.accept(this);
         return null;
     }
 
     public Type visit(While n) {
-        n.e.accept(this);
+        if(!(n.e.accept(this) instanceof BooleanType)) {
+            error.complain("In "+st+" while statement requires expression to return boolean");
+        }
         n.s.accept(this);
         return null;
     }

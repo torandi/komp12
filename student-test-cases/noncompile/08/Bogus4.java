@@ -1,5 +1,3 @@
-//IGNORE
-
 class Bogus4 {
 	public   static  void  main    (String    [   ]   argv   )   {
 	A a;
