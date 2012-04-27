@@ -46,6 +46,7 @@ public class AbstractTree {
         Identifier i1,i2;
         basic_tree.Class mainClass = basicTree.getMainClass();
 
+        
         basic_tree.Method m = mainClass.getMethods().get(0);
        
         

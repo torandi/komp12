@@ -24,7 +24,7 @@ public class AssemblerVisitor implements Visitor{
     
     private int next_label = 0;
     
-    private int current_line = 0;
+    private int current_line = -1;
     
     private ArrayList<String> output_files;
     
@@ -52,7 +52,7 @@ public class AssemblerVisitor implements Visitor{
     
     private void line(int line) {
         if(debug_symbols) {
-            if(pass == 2 && line != -1 && line != current_line) {
+            if(pass == 2 && line > 0 && line != current_line) {
                 current_line = line;
                 directive(".line "+line);
             }
@@ -152,8 +152,8 @@ public class AssemblerVisitor implements Visitor{
     }
 
     public void visit(MainClass n) {
-        line(n.line_number);
         load_class_output(n.i1.s);
+        line(n.line_number);
         directive(".class "+convert_classname(n.i1.s));
         directive(".super java/lang/Object");
         create_constructor(null);

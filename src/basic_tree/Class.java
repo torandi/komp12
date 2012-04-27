@@ -15,6 +15,7 @@ class Class{
         
 	public Class(Token t) {
 		this.name = t.image;
+                line_number = t.beginLine;
 	}
        
         public void setSuper(String s) {
