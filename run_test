@@ -5,6 +5,7 @@ flags="-S -ast"
 output_dir="output"
 
 compile="java -cp mjc.jar mjc.JVMMain $flags" 
+javac="javac"
 jasmin="jasmin"
 build="ant"
 
@@ -89,6 +90,7 @@ function test_extentions() {
 		for ext in $_extentions; do
 			count=$(echo $extentions | grep $ext -cx)
 			if [[ $count == "0" ]]; then
+				echo -e "$txtylw EXT MISS $txtrst"
 				return 1
 			fi
 		done
@@ -114,7 +116,6 @@ function compile_ok() {
 			return 1
 		fi
 	else
-		echo "EXT MISS"
 		return 0
 	fi
 }
@@ -135,7 +136,6 @@ function compile_fail() {
 			return 1
 		fi
 	else
-		echo "EXT MISS"
 		return 0
 	fi
 }
@@ -160,23 +160,55 @@ function assemble() {
 			return 1
 		fi
 	else
-		echo "EXT MISS"
 		return 0
 	fi
 }
 
-# Get the output file for $1
-function output_file() {
+function find_main_class() {
+	cat $1 | grep "class " -m 1 | sed -r 's/class[ \t]+([a-zA-Z_][a-zA-Z0-9_]*)([ {].*)?/\1/'
+}
+
+function generate_output_file() {
+	_file=$1
+	_java_file="$_file.java"
+	_dirname=$(mkdirname $_java_file)
+	_out="$output_dir/$_dirname/javac_bin" 
+	mkdir -p $_out
+	_javac_out=`$javac -d "$_out" $_java_file 2>&1`
+	if [ $? -eq 0 ]; then
+		# Run the created program!
+		java -cp $_out $(find_main_class $_java_file) > "$_file.output" 2 >> "$_out/error.log"
+		if [ $? -eq 0]; then 
+			return 0
+		else
+			return 2
+		fi
+	else
+		echo "$javac -d \"$_out\" $_java_file 2>&1" > "$_out/error.log"
+		echo $_javac_out >> "$_out/error.log"
+		return 1;
+	fi
+}
+
+# Make sure file.output exists (or return 1)
+function get_output() {
 	_file=$(echo "$1" | sed 's/\.java//g')
+	echo "$_file.output"
 	if [ -f "$_file.out" ]; then
-		echo "$_file.out"
+		mv "$_file.out" "$_file.output"
 		return 0
 	else 
 		if [ -f "$_file.output" ]; then
-			echo "$_file.output" 
 			return 0
 		else
-			return 1
+			# We must generate it!
+			generate_output_file $_file
+			ex=$?
+			if [ $ex -eq 0 ]; then
+				return 0
+			else
+				return $ex # Generation failed
+			fi
 		fi
 	fi
 }
@@ -184,40 +216,51 @@ function output_file() {
 function execute_test() {
 	_file=$1
 	_dirname=$(mkdirname $_file)
-	out="$output_dir/$_dirname/bin" 
+	_out="$output_dir/$_dirname/bin" 
 
 	echo -en "Executing: $_file \t\t"
 	test_extentions $_file
 	
 	if [ $? -eq 0 ]; then
-		_res=$(java -cp $out Main)
+		_outfile=$(get_output $_file)
 		ex=$?
 		if [ $ex -eq 0 ]; then
-			_outfile=$(output_file $_file)
-			if [ $? -eq 0 ]; then
-				_diff=$(echo $_res | diff - "$_outfile")
+			_program_outfile="$output_dir/$_dirname/program.output"
+			java -cp $_out $(find_main_class $_file) > "$_program_outfile"
+			ex=$?
+			if [ $ex -eq 0 ]; then
+				_diff_file="$output_dir/$_dirname/output.diff"
+				echo "Diff (program output< >expected output):" > "$_diff_file"
+				diff --strip-trailing-cr -a -y --suppress-common-lines "$_program_outfile" "$_outfile" >> "$_diff_file"
 
 				if [ $? -eq 0 ]; then 
 					echo -e "$txtgrn OK $txtrst"
+					rm "$_diff_file"
 					return 0
 				else
 					echo -e "$txtred ERROR $txtrst"
-					echo "Diff (program output, expected output):"
-					echo -e "$_diff\n"
+					echo "Diff outputed to $_diff_file"
 					return 1
 				fi
 			else
-				echo -e "$txtylw NO OUTPUT DEFINED $txtrst"
-				return 0
+				echo -e "$txtred JVM ERROR $txtrst"
+				echo "JVM Output:"
+				echo -e "$_res\n"
+				return 1
 			fi
 		else
-			echo -e "$txtred JVM ERROR $txtrst"
-			echo "JVM Output:"
-			echo -e "$_res\n"
-			return 1
+			_javac_dir="$output_dir/$_dirname/javac_bin" 
+
+			if [ $ex -eq 1 ]; then
+				echo -e "$txtred COMPILE ERROR $txtrst"
+				echo "Couldn't compile the program with javac:"
+			else
+				echo -e "$txtred RUN ERROR $txtrst"
+				echo "Couldn't run the program that was compiled with javac:"
+			fi
+			cat "$_javac_dir/error.log"
 		fi
 	else
-		echo "EXT MISS"
 		return 0
 	fi
 }
@@ -235,56 +278,56 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-rm -rf $output_dir
-mkdir $output_dir
+#rm -rf $output_dir
+#mkdir $output_dir
 
-any_error=0
+#any_error=0
 
-# Start by compiling everything that should be compiled
-echo "Compling code"
-for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
-	compile_ok $file
-	if [ $? -ne 0 ]; then
-		any_error=1
-	fi
-done
+## Start by compiling everything that should be compiled
+#echo "Compling code"
+#for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
+	#compile_ok $file
+	#if [ $? -ne 0 ]; then
+		#any_error=1
+	#fi
+#done
 
-if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
-	exit 1
-fi
+#if [ $any_error -ne 0 ]; then
+	#echo "Previous test failed. Not continuing"
+	#exit 1
+#fi
 
-echo -e "\n====================================\n"
+#echo -e "\n====================================\n"
 
-echo "Compiling code that should fail"
+#echo "Compiling code that should fail"
 
-for file in $(ls $noncompile_tests); do
-	compile_fail $file
-	if [ $? -ne 0 ]; then
-		any_error=1
-	fi
-done
+#for file in $(ls $noncompile_tests); do
+	#compile_fail $file
+	#if [ $? -ne 0 ]; then
+		#any_error=1
+	#fi
+#done
 
-if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
-	exit 1
-fi
+#if [ $any_error -ne 0 ]; then
+	#echo "Previous test failed. Not continuing"
+	#exit 1
+#fi
 
-echo -e "\n====================================\n"
+#echo -e "\n====================================\n"
 
-echo "Assembling"
+#echo "Assembling"
 
-for file in $(ls $execute_tests $nonexecute_tests $compile_tests); do
-	assemble $file
-	if [ $? -ne 0 ]; then
-		any_error=1
-	fi
-done
+#for file in $(ls $execute_tests $nonexecute_tests $compile_tests); do
+	#assemble $file
+	#if [ $? -ne 0 ]; then
+		#any_error=1
+	#fi
+#done
 
-if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
-	exit 1
-fi
+#if [ $any_error -ne 0 ]; then
+	#echo "Previous test failed. Not continuing"
+	#exit 1
+#fi
 
 echo "Running execution test"
 for file in $(ls $execute_tests); do

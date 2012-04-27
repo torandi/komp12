@@ -1,4 +1,5 @@
 //EXT: ISC
+//EXT: ICG
 
 class Main
 {
