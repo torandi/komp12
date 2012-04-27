@@ -19,9 +19,9 @@ public class ErrorMsg
     public void complain(String msg, int line) {
 	anyErrors = true;
         if(line != -1)
-            out.println(src+":"+line+": "+msg);
+            out.println("\n"+src+":"+line+": "+msg);
         else
-            out.println(src+": "+msg);
+            out.println("\n"+src+": "+msg);
             
     }
 }

@@ -6,7 +6,7 @@ import visitor.TypeVisitor;
 public class IdentifierType extends Type {
 
     public String s;
-    public ClassDecl c = null;
+    public ClassDecl c;
 
     @Override
     public boolean equals(Type tp) {

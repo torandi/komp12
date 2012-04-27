@@ -19,7 +19,7 @@ public class TypeDefVisitor implements Visitor{
     public void visit(Program n) {
 
         //Add the main class as a class without methods or variables
-        n.addClass(n.m.i1, new ClassDeclSimple(n.m.i1, new VarDeclList(),new MethodDeclList()));
+        n.addClass(n.m.i1, new ClassDeclSimple(n, n.m.i1, new VarDeclList(),new MethodDeclList()));
 
         n.m.accept(this);
 

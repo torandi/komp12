@@ -1,49 +1,68 @@
 package syntaxtree;
+
 import java.util.ArrayList;
 import symbol.Scope;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
 public class MethodDecl extends Scope {
-  public Type t;
-  public Identifier i;
-  public FormalList fl;
-  public VarDeclList vl;
-  public StatementList sl;
-  public Exp e; //return statement
-  public frame.VMFrame frame;
-  public ClassDecl cls; //Class this method belongs to
 
-  public MethodDecl(Type at, Identifier ai, FormalList afl, VarDeclList avl, 
-                    StatementList asl, Exp ae) {
-    t=at; i=ai; fl=afl; vl=avl; sl=asl; e=ae;
-  }
- 
-  public void accept(Visitor v) {
-    v.visit(this);
-  }
+    public Type t;
+    public Identifier i;
+    public FormalList fl;
+    public VarDeclList vl;
+    public StatementList sl;
+    public Exp e; //return statement
+    public frame.VMFrame frame;
+    public ClassDecl cls; //Class this method belongs to
 
-  public Type accept(TypeVisitor v) {
-    return v.visit(this);
-  }
+    public MethodDecl(Type at, Identifier ai, FormalList afl, VarDeclList avl,
+            StatementList asl, Exp ae) {
+        t = at;
+        i = ai;
+        fl = afl;
+        vl = avl;
+        sl = asl;
+        e = ae;
+    }
 
-  public boolean compareParameters(ArrayList<Type> tl) {
-      if(tl.size()!=fl.size()) {
-          return false;
-      }
-      for(int i=0;i<tl.size();++i) {
-          if(!tl.get(i).equals(fl.getTypeList().get(i))) {
-              return false;
-          }
-      }
-      return true;
-  }
-  
-  public String fullName() {
-      return cls.fullName()+"."+i.s;
-  }
+    public void accept(Visitor v) {
+        v.visit(this);
+    }
 
-  public String toString() {
-      return i.s;
-  }
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    public boolean compareParameters(ArrayList<Type> tl) {
+        if (tl.size() != fl.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < tl.size(); ++i) {
+            Type arg_type = tl.get(i);
+            Type formal_type = fl.getTypeList().get(i);
+            if (!arg_type.equals(formal_type)) {
+                if (arg_type instanceof IdentifierType && 
+                        formal_type instanceof IdentifierType) {
+                    IdentifierType argi = (IdentifierType) arg_type;
+                    IdentifierType formli = (IdentifierType) formal_type;
+                    if(!cls.program.findClass(argi.s).hasParent(formli.s)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public String fullName() {
+        return cls.fullName() + "." + i.s;
+    }
+
+    public String toString() {
+        return i.s;
+    }
 }

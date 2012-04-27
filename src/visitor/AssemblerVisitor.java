@@ -91,7 +91,7 @@ public class AssemblerVisitor implements Visitor{
     private void create_constructor(ClassDecl c) {
         String superclass = null;
         if(c != null) {
-            superclass = convert_classname(c.parent());
+            superclass = convert_classname(c.parent_name());
         } else {
             superclass = convert_classname("java.lang.Object");
         }
@@ -185,7 +185,7 @@ public class AssemblerVisitor implements Visitor{
         line(n.line_number);
         load_class_output(n.i.s);
         directive(".class "+convert_classname(n.fullName()));
-        directive(".super "+convert_classname(n.parent())+"\n");
+        directive(".super "+convert_classname(n.parent_name())+"\n");
         for(VarDecl v : n.vl.getList()) {
             v.accept(this);
         }

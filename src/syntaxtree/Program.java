@@ -9,9 +9,7 @@ public class Program {
 
   public HashMap<String,ClassDecl> classes = new HashMap<String, ClassDecl>();
 
-  public Program(MainClass am, ClassDeclList acl) {
-    m=am; cl=acl;
-  }
+  public Program() {  }
 
   public void accept(Visitor v) {
     v.visit(this);

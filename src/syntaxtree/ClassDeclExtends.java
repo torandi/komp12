@@ -7,10 +7,11 @@ import visitor.TypeVisitor;
 public class ClassDeclExtends extends ClassDecl {
 
     public Identifier parent_id; //Parent
-    public ClassDecl parent;
+    private ClassDecl parent;
 
-    public ClassDeclExtends(Identifier ai, Identifier aj,
+    public ClassDeclExtends(Program p, Identifier ai, Identifier aj,
             VarDeclList avl, MethodDeclList aml) {
+        super(p);
         i = ai;
         parent_id = aj;
         vl = avl;
@@ -27,16 +28,22 @@ public class ClassDeclExtends extends ClassDecl {
         return v.visit(this);
     }
 
-    @Override
-    public String parent() {
-        return parent.fullName();
+    public String parent_name() {
+        return parent().fullName();
+    }
+    
+    public ClassDecl parent() {
+        if(parent == null) {
+            parent = program.findClass(parent_id.s);
+        }
+        return parent;
     }
 
     @Override
     public MethodDecl findMethod(Identifier id, ArrayList<Type> tl) {
         MethodDecl md = super.findMethod(id, tl);
         if(md == null)
-            md = parent.findMethod(id, tl);
+            md = parent().findMethod(id, tl);
         
         return md;
     }

@@ -37,7 +37,9 @@ public class AbstractTree {
 
 
     public void build() {
-        program = new Program(buildMainClass(),buildClassDeclList());
+        program = new Program();
+        program.m = buildMainClass();
+        program.cl = buildClassDeclList();
     }
 
     private MainClass buildMainClass() {
@@ -87,9 +89,9 @@ public class AbstractTree {
         }
         
         if(in.hasSuperClass()) {
-            cd = new ClassDeclExtends(id(in.getName()),id(in.getSuperClass()),vdl, mdl);
+            cd = new ClassDeclExtends(program,id(in.getName()),id(in.getSuperClass()),vdl, mdl);
         } else {
-            cd = new ClassDeclSimple(id(in.getName()),vdl, mdl);
+            cd = new ClassDeclSimple(program,id(in.getName()),vdl, mdl);
         }
         
         cd.line_number = in.line_number;

@@ -8,6 +8,8 @@ import visitor.TypeVisitor;
 
 public abstract class ClassDecl extends Scope {
 
+    public Program program;
+    
     public Identifier i;
     public VarDeclList vl;
     public MethodDeclList ml;
@@ -15,6 +17,10 @@ public abstract class ClassDecl extends Scope {
     public HashMap<String, ArrayList<MethodDecl>> methods =
             new HashMap<String, ArrayList<MethodDecl>>();
 
+    public ClassDecl(Program p) {
+        program = p;
+    }
+    
     public abstract void accept(Visitor v);
 
     public abstract Type accept(TypeVisitor v);
@@ -68,10 +74,27 @@ public abstract class ClassDecl extends Scope {
     /**
      * Return name of superclass
      */
-    public abstract String parent();
+    public abstract String parent_name();
 
     public String fullName() {
         //Add package name here if packages are to be used
         return i.s;
+    }
+    
+    /**
+     * Return true if this class has a parent (any steps down in the chain)
+     * of type c
+     * @param c
+     * @return 
+     */
+    public boolean hasParent(String cls_name) {
+        if(cls_name.equals(toString())) {
+            return true;
+        } else if(this instanceof ClassDeclExtends){
+            ClassDeclExtends cde = (ClassDeclExtends)this;
+            return cde.parent().hasParent(cls_name);
+        } else {
+            return false;
+        }
     }
 }

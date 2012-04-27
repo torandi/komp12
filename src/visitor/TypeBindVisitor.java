@@ -81,16 +81,12 @@ public class TypeBindVisitor implements TypeVisitor{
 
     public Type visit(ClassDeclExtends n) {
         int num_pushes = 0;
-        n.parent = curProgram.findClass(n.parent_id.toString());
-        ClassDecl parent = n.parent;
+        ClassDecl parent = n.parent();
         while(parent instanceof ClassDeclExtends) {
             ClassDeclExtends p = (ClassDeclExtends) parent;
             ++num_pushes;
             st.pushScope(parent);
-            if(p.parent == null) {
-                p.parent = curProgram.findClass(p.parent_id.toString());
-            }
-            parent = p.parent;
+            parent = p.parent();
         }
         num_pushes+=2;
         st.pushScope(parent);
@@ -155,7 +151,7 @@ public class TypeBindVisitor implements TypeVisitor{
         if(n.c==null) {
             error.complain(st.toString(),"Unknown type \""+n.s+"\"", n.line_number);
             //Prevent nullpointerexceptions:
-            n.c=new ClassDeclSimple(new Identifier(n.s), new VarDeclList(), new MethodDeclList());
+            n.c=new ClassDeclSimple(curProgram,new Identifier(n.s), new VarDeclList(), new MethodDeclList());
         }
         return n;
     }
