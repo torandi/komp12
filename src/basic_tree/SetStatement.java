@@ -1,5 +1,7 @@
 package basic_tree;
 
+import parse.Token;
+
 
 public class SetStatement extends Statement {
 
@@ -11,10 +13,10 @@ public class SetStatement extends Statement {
 	 * @param id
 	 * @param expression
 	 */
-	public SetStatement(String id, Expression expression) {
-		super();
-		this.id = id;
-		this.expression = expression;
+	public SetStatement(Token t, Expression expression) {
+            super(t.beginLine);
+            this.id = t.image;
+            this.expression = expression;
 	}
 
 	public String getId() {

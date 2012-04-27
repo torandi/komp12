@@ -9,10 +9,11 @@ public class IfStatement extends Statement {
 	private Statement ifStatement;
 	private Statement elseStatement = null;
 	
-	public IfStatement(Expression expression, Statement ifStatement) {
+	public IfStatement(Expression expression, Statement ifStatement, int line) {
 		//list.add(new ElseIf(e, b));
-		this.expression = expression;
-		this.ifStatement = ifStatement;
+            super(line);
+            this.expression = expression;
+            this.ifStatement = ifStatement;
 	}
 	
 	public void addElseStatement(Statement elseStatement) {

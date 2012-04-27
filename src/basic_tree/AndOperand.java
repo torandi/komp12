@@ -5,9 +5,11 @@ import parse.Token;
 
 public class AndOperand {
     private ArrayList<LessOperand> operands = new ArrayList<LessOperand>();
-    private Token operator; 
+    private Token operator;
+    int line_number;
 
     public AndOperand(LessOperand op) {
+        line_number = op.getOperands().get(0).getOperands().get(0).getPrimary().line_number;
         operands.add(op);
     }
 

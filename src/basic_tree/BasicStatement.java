@@ -8,8 +8,8 @@ public class BasicStatement extends Statement {
 	private ArrayList<Variable> variables = new ArrayList<Variable>();
 	private ArrayList<Statement> statements = new ArrayList<Statement>();
 	
-	public BasicStatement() {
-		
+	public BasicStatement(int line) {
+		super(line);
 	}
 
 	public ArrayList<Variable> getVariables() {

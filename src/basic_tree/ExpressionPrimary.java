@@ -5,8 +5,8 @@ public class ExpressionPrimary extends Primary {
 
 	private Expression expression;
 
-	public ExpressionPrimary(Expression expression) {
-		super();
+	public ExpressionPrimary(Expression expression, int line) {
+		super(line);
 		this.expression = expression;
 	}
 

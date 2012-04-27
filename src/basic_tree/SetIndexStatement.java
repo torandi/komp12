@@ -1,5 +1,7 @@
 package basic_tree;
 
+import parse.Token;
+
 
 public class SetIndexStatement extends Statement{
 
@@ -13,10 +15,11 @@ public class SetIndexStatement extends Statement{
 	 * @param expression1 the expression in brackets
 	 * @param expression2 
 	 */
-	public SetIndexStatement(String id, Expression expression1, Expression expression2) {
-		this.id = id;
-		this.bracketExpression = expression1;
-		this.expression = expression2;
+	public SetIndexStatement(Token t, Expression expression1, Expression expression2) {
+            super(t.beginLine);
+            this.id = t.image;
+            this.bracketExpression = expression1;
+            this.expression = expression2;
 	}
 	
 

@@ -1,13 +1,15 @@
 package basic_tree;
 
+import parse.Token;
+
 
 public class IdPrimary extends Primary {
 
 	private String id;
 
-	public IdPrimary(String s) {
-		super();
-		id = s;
+	public IdPrimary(Token t) {
+		super(t.beginLine);
+		id = t.image;
 	}
 
 	public String getId() {

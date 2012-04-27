@@ -1,6 +1,7 @@
 package basic_tree;
 
 import java.util.ArrayList;
+import parse.Token;
 
 public class Method {
 	
@@ -11,8 +12,11 @@ public class Method {
 	private ArrayList<Variable> variables = new ArrayList<Variable>();
 	private ArrayList<Statement> statements = new ArrayList<Statement>();
 	
-	public Method(String name, Type returnType) {
-		this.name = name;
+        public int line_number;
+        
+	public Method(Token t, Type returnType) {
+		this.name = t.image;
+                line_number = t.beginLine;
 		this.returnType = returnType;
 	}
 

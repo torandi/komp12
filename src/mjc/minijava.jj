@@ -123,8 +123,8 @@ basic_tree.Class MainClass () throws ParseException:
 			throw new ParseException("Expected method public static void main (String[] id)");
 		}
 		mainClass = new basic_tree.Class(className.image);
-		Method main=new Method("main",new VoidType());
-		main.addParameter(new Variable(id.image,null));
+		Method main=new Method(method,new VoidType());
+		main.addParameter(new Variable(id,null));
 		mainClass.addMethod(main);
 	}
 	( 
@@ -143,7 +143,7 @@ basic_tree.Class MainClass () throws ParseException:
 
 Statement Statement () throws ParseException:
 { 
-	Token id;
+	Token id, t;
 	Statement statement;
 	Expression e;
 	Statement s;
@@ -151,8 +151,8 @@ Statement Statement () throws ParseException:
 }
 {
 	(
-		<OBRACE>
-		{ BasicStatement bs = new BasicStatement(); }
+		t = <OBRACE>
+		{ BasicStatement bs = new BasicStatement(t.beginLine); }
 		( 
 			LOOKAHEAD(2)
 			var = VarDecl()
@@ -165,12 +165,12 @@ Statement Statement () throws ParseException:
 		<CBRACE>
 		{ statement = bs; }
 	|
-		<IF>
+		t = <IF>
 		<OPAR>
 		e = Expression()
 		<CPAR>
 		s = Statement()
-		{ IfStatement ifs = new IfStatement(e,s); }
+		{ IfStatement ifs = new IfStatement(e,s,t.beginLine); }
 	//	( 
 			<ELSE>
 			s = Statement()
@@ -178,26 +178,26 @@ Statement Statement () throws ParseException:
 	//	)?
 		{ statement = ifs; }
 	|
-		<WHILE>
+		t = <WHILE>
 		<OPAR>
 		e = Expression()
 		<CPAR>
 		s = Statement()
-		{ statement = new WhileStatement(e,s); }
+		{ statement = new WhileStatement(e,s,t.beginLine); }
 	|
-		<SOPL>
+		t=<SOPL>
 		<OPAR>
 		e=Expression()
 		<CPAR>
 		<SCL>
-		{ statement = new SOPLStatement(e); }
+		{ statement = new SOPLStatement(e,t.beginLine); }
 	|
 		id=<ID>
 		(
 			<SET>
 			e = Expression()
 			<SCL>
-			{ statement = new SetStatement(id.image,e); }
+			{ statement = new SetStatement(id,e); }
 		|
 			{ Expression e2; }
 			<OSB>
@@ -206,7 +206,7 @@ Statement Statement () throws ParseException:
 			<SET>
 			e2 = Expression()
 			<SCL>
-			{ statement = new SetIndexStatement(id.image,e,e2); }
+			{ statement = new SetIndexStatement(id,e,e2); }
 		)
 	)
 	{ return statement; }
@@ -251,7 +251,7 @@ Variable VarDecl() throws ParseException:
 	t = Type()
 	id = <ID>
 	<SCL>
-	{ return new Variable(id.image,t); }
+	{ return new Variable(id,t); }
 }
 
 Method MethodDecl() throws ParseException:
@@ -268,7 +268,7 @@ Method MethodDecl() throws ParseException:
 	t = Type()
 	id = <ID>
 	<OPAR>
-	{ m = new Method(id.image,t); }
+	{ m = new Method(id,t); }
 	( FormalList(m) )?
 	<CPAR>
 	<OBRACE>
@@ -297,12 +297,12 @@ void FormalList(Method m) throws ParseException:
 {
 	t = Type()
 	id = <ID>
-	{ m.addParameter(new Variable(id.image,t)); }
+	{ m.addParameter(new Variable(id,t)); }
 	(
 		<COMMA>
 		t = Type()
 		id = <ID>
-		{ m.addParameter(new Variable(id.image,t)); }
+		{ m.addParameter(new Variable(id,t)); }
 	)*
 }
 
@@ -487,36 +487,36 @@ Primary Primary() throws ParseException:
 {
 	(
 		v = <INT>
-		{ p = new IntPrimary(v.image); }
+		{ p = new IntPrimary(v); }
 	|
 		v = <BOOL>
-		{ p = new BooleanPrimary(v.image); }
+		{ p = new BooleanPrimary(v); }
 	|
 		v=<ID>
-		{ p = new IdPrimary(v.image); }
+		{ p = new IdPrimary(v); }
 	|
 		<NEW>
 		(
-			<KWINT>
+			v = <KWINT>
 			<OSB>
 			e = Expression()
 			<CSB>
-			{ p = new NewIntPrimary(e); }
+			{ p = new NewIntPrimary(e,v.beginLine); }
 		|
 			v=<ID>
 			<OPAR>
 			<CPAR>
-			{ p = new NewPrimary(v.image); }
+			{ p = new NewPrimary(v); }
 		)
 	|
-		<EXCL>
+		v=<EXCL>
 		ao = AndOperand()
-		{ p = new NotExpressionPrimary(ao); }
+		{ p = new NotExpressionPrimary(ao,v.beginLine); }
 	|
-		<OPAR>
+		v=<OPAR>
 		e = Expression()
 		<CPAR>
-		{ p = new ExpressionPrimary(e); }
+		{ p = new ExpressionPrimary(e,v.beginLine); }
 	)
 	{ return p; }
 }
