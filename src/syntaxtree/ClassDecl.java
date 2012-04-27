@@ -82,17 +82,16 @@ public abstract class ClassDecl extends Scope {
     }
     
     /**
-     * Return true if this class has a parent (any steps down in the chain)
-     * of type c
-     * @param c
-     * @return 
+     * Return true if this class has a parent named cls_name (any steps down in the chain)
      */
     public boolean hasParent(String cls_name) {
-        if(cls_name.equals(toString())) {
-            return true;
-        } else if(this instanceof ClassDeclExtends){
+        if(this instanceof ClassDeclExtends){
             ClassDeclExtends cde = (ClassDeclExtends)this;
-            return cde.parent().hasParent(cls_name);
+            if(cde.parent().toString().equals(cls_name)) {
+                return true;
+            } else {
+                return cde.parent().hasParent(cls_name);
+            }
         } else {
             return false;
         }

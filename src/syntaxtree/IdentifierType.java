@@ -21,7 +21,11 @@ public class IdentifierType extends Type {
         }
 
         IdentifierType itp = (IdentifierType) tp;
-        return c.hasParent(itp.s);
+        if(itp.s.equals(s)) {
+            return true;
+        } else {
+            return c.hasParent(itp.s);
+        }
     }
 
     public IdentifierType(Program p, String as, int line) {

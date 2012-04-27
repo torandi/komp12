@@ -82,23 +82,26 @@ public class TypeBindVisitor implements TypeVisitor {
 
     public Type visit(ClassDeclExtends n) {
         int num_pushes = 0;
-        ClassDecl parent = n.parent();
-        while (parent instanceof ClassDeclExtends) {
-            ClassDeclExtends p = (ClassDeclExtends) parent;
-            ++num_pushes;
+        if(n.hasParent(n.toString())) {
+            error.complain(n.toString()+" has cyclic inheritance",n.line_number);
+        } else {
+            ClassDecl parent = n.parent();
+            while (parent instanceof ClassDeclExtends) {
+                ClassDeclExtends p = (ClassDeclExtends) parent;
+                ++num_pushes;
+                st.pushScope(parent);
+                parent = p.parent();
+            }
+            num_pushes += 2;
             st.pushScope(parent);
-            parent = p.parent();
+            st.pushScope(n);
+
+            class_decl_visit(n);
+
+            for (int i = 0; i < num_pushes; ++i) {
+                st.popScope();
+            }
         }
-        num_pushes += 2;
-        st.pushScope(parent);
-        st.pushScope(n);
-
-        class_decl_visit(n);
-
-        for (int i = 0; i < num_pushes; ++i) {
-            st.popScope();
-        }
-
         return null;
     }
 

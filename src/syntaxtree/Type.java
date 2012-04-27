@@ -9,12 +9,6 @@ public abstract class Type {
         line_number = line;
     }
     
-    /**
-     * This method assumes that the left hand argument is trying to be fit into
-     * the right hand argument
-     * @param tp
-     * @return 
-     */
     public  boolean equals(Type tp)
     {
 	return getClass().equals(tp.getClass());
