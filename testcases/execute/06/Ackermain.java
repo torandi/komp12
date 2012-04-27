@@ -11,11 +11,6 @@ class Ackermann{
 
 		{}{}{}{{{}}}
 
-		while(false){
-			m = 0;
-			n = 999;
-		}
-
 		if(m < 1){
 			ret = n+1;
 		}else{

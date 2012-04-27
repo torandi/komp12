@@ -11,6 +11,7 @@ mjc: src/
 clean:
 	ant clean
 	rm -rf tigris
+	rm testcases/execute/*/*.output
 
 tigris.tar.gz: clean src/ report.pdf DESC lib/ build.xml
 	tar -czf tigris.tar.gz src/ lib/ DESC report.pdf build.xml

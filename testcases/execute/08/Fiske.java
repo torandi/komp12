@@ -1,5 +1,4 @@
-class Fiske
-{
+class Fiske {
 	public static void main(String[] argv){
 		System.out.println(new Fisk().start());
 	}
