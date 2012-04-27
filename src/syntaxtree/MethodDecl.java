@@ -1,11 +1,10 @@
 package syntaxtree;
 import java.util.ArrayList;
-import java.util.HashSet;
 import symbol.Scope;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class MethodDecl extends Scope{
+public class MethodDecl extends Scope {
   public Type t;
   public Identifier i;
   public FormalList fl;

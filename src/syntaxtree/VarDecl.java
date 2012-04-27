@@ -2,7 +2,7 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class VarDecl {
+public class VarDecl extends Syntax {
   public Type t;
   public Identifier i;
   

@@ -2,7 +2,7 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class Formal {
+public class Formal extends Syntax {
   public Type t;
   public Identifier i;
  

@@ -2,11 +2,10 @@ package syntaxtree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import symbol.Scope;
-import visitor.TypeBindVisitor;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public abstract class ClassDecl extends Scope{
+public abstract class ClassDecl extends Scope {
   public Identifier i;
   public VarDeclList vl;
   public MethodDeclList ml;

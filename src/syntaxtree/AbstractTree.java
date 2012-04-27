@@ -21,8 +21,6 @@ import basic_tree.Term;
 import basic_tree.Variable;
 
 import error.ErrorMsg;
-import java.io.PrintWriter;
-import javax.swing.text.html.HTMLEditorKit.Parser;
 import parse.ParserConstants;
 import parse.Token;
 

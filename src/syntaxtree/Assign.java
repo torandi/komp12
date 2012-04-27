@@ -1,21 +1,28 @@
 package syntaxtree;
+
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class Assign implements Statement {
-  public Identifier i;
-  public Exp e;
+public class Assign extends Syntax implements Statement {
 
-  public Assign(Identifier ai, Exp ae) {
-    i=ai; e=ae; 
-  }
+    public Identifier i;
+    public Exp e;
 
-  public void accept(Visitor v) {
-    v.visit(this);
-  }
+    public Assign(Identifier ai, Exp ae) {
+        i = ai;
+        e = ae;
+    }
 
-  public Type accept(TypeVisitor v) {
-    return v.visit(this);
-  }
+    public void accept(Visitor v) {
+        v.visit(this);
+    }
+
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public int line_number() {
+        return line_number;
+    }
 }
-

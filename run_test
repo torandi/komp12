@@ -344,4 +344,8 @@ for file in $(ls $execute_tests); do
 	fi
 done
 
+echo -e "\n====================================\n"
+
+echo -e "$txtgrn All tests completed $txtrst"
+
 fi

@@ -86,10 +86,10 @@ public class JVMMain {
             if(error.anyErrors)
                return false;
 
-            //Build abstract tree
-            PrintWriter pw = new PrintWriter (output_dir+basename+".ast");
             
             if(print_ast) {
+                //Build abstract tree
+                PrintWriter pw = new PrintWriter (output_dir+basename+".ast");
                 ASTPrintVisitor pv = new ASTPrintVisitor(pw);
                 pv.visit(abstractTree.program);
                 pw.close();

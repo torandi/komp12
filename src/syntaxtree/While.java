@@ -1,21 +1,28 @@
 package syntaxtree;
+
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class While implements Statement {
-  public Exp e;
-  public Statement s;
+public class While extends Syntax implements Statement {
 
-  public While(Exp ae, Statement as) {
-    e=ae; s=as; 
-  }
+    public Exp e;
+    public Statement s;
 
-  public void accept(Visitor v) {
-    v.visit(this);
-  }
+    public While(Exp ae, Statement as) {
+        e = ae;
+        s = as;
+    }
 
-  public Type accept(TypeVisitor v) {
-    return v.visit(this);
-  }
+    public void accept(Visitor v) {
+        v.visit(this);
+    }
+
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public int line_number() {
+        return line_number;
+    }
 }
-

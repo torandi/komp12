@@ -1,19 +1,26 @@
 package syntaxtree;
+
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class Print implements Statement {
-  public Exp e;
+public class Print extends Syntax implements Statement {
 
-  public Print(Exp ae) {
-    e=ae; 
-  }
+    public Exp e;
 
-  public void accept(Visitor v) {
-    v.visit(this);
-  }
+    public Print(Exp ae) {
+        e = ae;
+    }
 
-  public Type accept(TypeVisitor v) {
-    return v.visit(this);
-  }
+    public void accept(Visitor v) {
+        v.visit(this);
+    }
+
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public int line_number() {
+        return line_number;
+    }
 }

@@ -98,8 +98,8 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(ClassDeclExtends n) {
 	stream.print("ClassDeclExtends(");
 	n.i.accept(this);
-	stream.print(", ");
-	n.j.accept(this);
+	stream.print(" {extends} ");
+	n.parent_id.accept(this);
 	stream.print(", (");
 	for ( int i = 0; i < n.vl.size(); i++ ) {
 	    n.vl.elementAt(i).accept(this);

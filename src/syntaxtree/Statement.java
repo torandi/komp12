@@ -1,8 +1,12 @@
 package syntaxtree;
-import visitor.Visitor;
+
 import visitor.TypeVisitor;
+import visitor.Visitor;
 
 public interface Statement {
-  public void accept(Visitor v);
-  public Type accept(TypeVisitor v);
+    
+    public int line_number();
+    
+    public abstract void accept(Visitor v);
+    public abstract Type accept(TypeVisitor v);
 }

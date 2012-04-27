@@ -3,12 +3,12 @@ import visitor.Visitor;
 import visitor.TypeVisitor;
 
 public class ClassDeclExtends extends ClassDecl {
-  public Identifier j; //Parent
+  public Identifier parent_id; //Parent
   public ClassDecl parent;
  
   public ClassDeclExtends(Identifier ai, Identifier aj, 
                   VarDeclList avl, MethodDeclList aml) {
-    i=ai; j=aj; vl=avl; ml=aml;
+    i=ai; parent_id=aj; vl=avl; ml=aml;
   }
 
   public void accept(Visitor v) {

@@ -2,8 +2,9 @@ package symbol;
 
 import java.util.HashMap;
 import syntaxtree.Identifier;
+import syntaxtree.Syntax;
 
-public abstract class Scope {
+public abstract class Scope extends Syntax {
     private HashMap<String,Symbol> variables = new HashMap<String,Symbol>();
     /**
      * Finds the specified identifier in this scope
