@@ -388,4 +388,14 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(Identifier n) {
 	stream.print("Identifier(" + n.s + ")");
     }
+
+    @Override
+    public void visit(LongType n) {
+	stream.print("LongType()");
+    }
+
+    @Override
+    public void visit(LongLiteral n) {
+        stream.print("LongLiteral(" + n.i + ")");
+    }
 }

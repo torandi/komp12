@@ -45,6 +45,8 @@ public interface TypeVisitor {
 
     public Type visit(IntegerType n);
 
+    public Type visit(LongType n);
+    
     // String s;
     public Type visit(IdentifierType n);
 
@@ -100,6 +102,9 @@ public interface TypeVisitor {
     // int i;
     public Type visit(IntegerLiteral n);
 
+    // int l;
+    public Type visit(LongLiteral n);
+    
     public Type visit(True n);
 
     public Type visit(False n);

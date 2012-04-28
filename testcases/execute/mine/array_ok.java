@@ -19,11 +19,20 @@ class AT {
 
 		while(c[4] != true) {
 			a[i] = i;
-			//b[i] = 5L*2L;
+			b[i] = 5L*2L;
 			c[i] = true;
 			System.out.println(i);
 			i = i + 1;
 		}
+
+		i = 0; 
+		while(i < 5) {
+			i = i + 1;
+			if(b[i] != 10L) {
+				return 1;
+			}
+		}
+
 		return 0;
 	}
 }

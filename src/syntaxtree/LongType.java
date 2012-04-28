@@ -3,9 +3,9 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class IntegerType extends NumericType {
+public class LongType extends NumericType {
 
-    public IntegerType(int line) {
+    public LongType(int line) {
         super(line);
     }
 
@@ -19,10 +19,10 @@ public class IntegerType extends NumericType {
 
     @Override
     public int hashCode() {
-        return "int".hashCode();
+        return "long".hashCode();
     }
 
     public String toString() {
-        return "int";
+        return "long";
     }
 }

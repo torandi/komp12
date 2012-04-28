@@ -41,4 +41,9 @@ public class ObjectInFrame implements frame.VMAccess
     private int o;
     private String n;
     private String s;
+
+    @Override
+    public int words() {
+        return 1;
+    }
 }

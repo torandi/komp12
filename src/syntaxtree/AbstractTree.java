@@ -12,6 +12,7 @@ import basic_tree.IdPrimary;
 import basic_tree.IndexSufix;
 import basic_tree.IntPrimary;
 import basic_tree.LengthSufix;
+import basic_tree.LongPrimary;
 import basic_tree.MethodSufix;
 import basic_tree.NewArrayPrimary;
 import basic_tree.NewPrimary;
@@ -186,6 +187,8 @@ public class AbstractTree {
     private Type type(basic_tree.Type in) {
         if (in instanceof basic_tree.IntegerType) {
             return new IntegerType(in.line_number);
+        } else if (in instanceof basic_tree.LongType) {
+            return new LongType(in.line_number);
         } else if (in instanceof basic_tree.ArrayType) {
             basic_tree.ArrayType at = (basic_tree.ArrayType)in;
             if(!at.valid())
@@ -347,6 +350,9 @@ public class AbstractTree {
         if (in instanceof IntPrimary) {
             IntPrimary ip = (IntPrimary) in;
             e = new IntegerLiteral(ip.getInt());
+        } else if( in instanceof LongPrimary) {
+            LongPrimary lp = (LongPrimary) in;
+            e = new LongLiteral(lp.getLong());
         } else if (in instanceof IdPrimary) {
             IdPrimary ip = (IdPrimary) in;
             if (ip.getId().equals("this")) {

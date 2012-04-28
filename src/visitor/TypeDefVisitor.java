@@ -139,6 +139,7 @@ public class TypeDefVisitor implements Visitor {
     public void visit(ArrayType n) {}
     public void visit(BooleanType n) {}
     public void visit(IntegerType n) {}
+    public void visit(LongType n) {}
     public void visit(IdentifierType n) {}
     public void visit(Print n) {}
     public void visit(Assign n) { }
@@ -152,6 +153,7 @@ public class TypeDefVisitor implements Visitor {
     public void visit(ArrayLength n) { }
     public void visit(Call n) { }
     public void visit(IntegerLiteral n) { }
+    public void visit(LongLiteral n) { }
     public void visit(True n) {}
     public void visit(False n) {}
     public void visit(IdentifierExp n) {}

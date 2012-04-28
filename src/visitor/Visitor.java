@@ -53,6 +53,8 @@ public interface Visitor {
 
     public void visit(IntegerType n);
 
+    public void visit(LongType n);
+    
     // String s;
     public void visit(IdentifierType n);
 
@@ -107,6 +109,9 @@ public interface Visitor {
 
     // int i;
     public void visit(IntegerLiteral n);
+    
+    //long l;
+    public void visit(LongLiteral n);
 
     public void visit(True n);
 

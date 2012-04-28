@@ -34,4 +34,9 @@ public class OnHeap implements frame.VMAccess
     private String c;
     private String f;
     private String s;
+
+    @Override
+    public int words() {
+        return 1;
+    }
 }

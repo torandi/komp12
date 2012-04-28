@@ -7,6 +7,7 @@ public class Not extends Exp {
   
   public Not(Exp ae) {
     e=ae; 
+    type = new BooleanType(-1);
   }
 
   public void accept(Visitor v) {

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import jvm.Hardware;
 import jvm.Label;
+import mjc.JVMMain;
 import syntaxtree.*;
 
 /**
@@ -233,6 +234,8 @@ public class AssemblerVisitor implements Visitor {
             if (n.t != null) {
                 if (n.t instanceof IntegerType || n.t instanceof BooleanType) {
                     instr("ireturn");
+                } else if(n.t instanceof LongType) {
+                    instr("lreturn");
                 } else {
                     instr("areturn");
                 }
@@ -274,7 +277,7 @@ public class AssemblerVisitor implements Visitor {
             compare.e1.accept(this);
             compare.e2.accept(this);
             line(n.line_number);
-            compare_instruction(compare.op, l_true);
+            compare_instruction(compare.op, l_true, compare.e1.type);
         } else {
             n.e.accept(this);
             line(n.line_number);
@@ -310,17 +313,15 @@ public class AssemblerVisitor implements Visitor {
         label(l_end.declare() + " ; end while");
     }
 
-    public void visit(ArrayType n) {
-    }
+    public void visit(ArrayType n) {}
 
-    public void visit(BooleanType n) {
-    }
+    public void visit(BooleanType n) {}
 
-    public void visit(IntegerType n) {
-    }
+    public void visit(IntegerType n) {}
 
-    public void visit(IdentifierType n) {
-    }
+    public void visit(LongType n) {}
+    
+    public void visit(IdentifierType n) {}
 
     public void visit(Print n) {
         line(n.line_number);
@@ -328,8 +329,10 @@ public class AssemblerVisitor implements Visitor {
         push();
         n.e.accept(this);
         line(n.line_number);
-        instr("invokevirtual java/io/PrintStream/println(I)V");
+        instr("invokevirtual java/io/PrintStream/println("+Hardware.signature(n.e.type)+")V");
         pop(2);
+        if(n.e.type instanceof LongType)
+            pop();
     }
 
     public void visit(Assign n) {
@@ -337,6 +340,11 @@ public class AssemblerVisitor implements Visitor {
         n.e.accept(this);
         line(n.line_number);
         instr(n.i.sym.access.store());
+        if(n.i.sym.type instanceof LongType) {
+            pop(2);
+        } else {
+            pop();
+        }
     }
 
     public void visit(ArrayAssign n) {
@@ -346,8 +354,17 @@ public class AssemblerVisitor implements Visitor {
         n.e1.accept(this);
         n.e2.accept(this);
         line(n.line_number);
-        instr("iastore");
-        pop(3);
+        ArrayType t = (ArrayType)n.i.sym.type; 
+        if(t.base_type instanceof LongType) {
+            instr("lastore");
+            pop(4);
+        } else if(t.base_type instanceof IdentifierType) {
+            instr("aastore");
+            pop(3);
+        } else {
+            instr("iastore");
+            pop(3);
+        }
     }
 
     //Set label l_true to null to fall through on true
@@ -379,32 +396,57 @@ public class AssemblerVisitor implements Visitor {
         push();
     }
 
-    private void compare_instruction(Compare.Operator op, Label label) {
-        switch (op) {
-            case LT:
-                instr("if_icmplt " + label.name());
-                pop(2);
-                break;
-            case LTEQ:
-                instr("if_icmple " + label.name());
-                pop(2);
-                break;
-            case GT:
-                instr("if_icmpgt " + label.name());
-                pop(2);
-                break;
-            case GTEQ:
-                instr("if_icmpge " + label.name());
-                pop(2);
-                break;
-            case EQ:
-                instr("if_icmpeq " + label.name());
-                pop(2);
-                break;
-            case NEQ:
-                instr("if_icmpne " + label.name());
-                pop(2);
-                break;
+    private void compare_instruction(Compare.Operator op, Label label, Type type) {
+        if(!(type instanceof LongType)) {
+            switch (op) {
+                case LT:
+                    instr("if_icmplt " + label.name());
+                    break;
+                case LTEQ:
+                    instr("if_icmple " + label.name());
+                    break;
+                case GT:
+                    instr("if_icmpgt " + label.name());
+                    break;
+                case GTEQ:
+                    instr("if_icmpge " + label.name());
+                    break;
+                case EQ:
+                    instr("if_icmpeq " + label.name());
+                    break;
+                case NEQ:
+                    instr("if_icmpne " + label.name());
+                    break;
+                default:
+                    throw new InternalError("Unknown comparison operator "+op);
+            }
+            pop(2);
+        } else {
+            //Long need special treatment
+            instr("lcmp");
+            switch (op) {
+                 case LT:
+                    instr("iflt " + label.name());
+                    break;
+                case LTEQ:
+                    instr("ifle " + label.name());
+                    break;
+                case GT:
+                    instr("ifgt " + label.name());
+                    break;
+                case GTEQ:
+                    instr("ifge " + label.name());
+                    break;
+                case EQ:
+                    instr("ifeq " + label.name());
+                    break;
+                case NEQ:
+                    instr("ifne " + label.name());
+                    break;
+                default:
+                    throw new InternalError("Unknown comparison operator "+op);
+            }
+            pop(2);
         }
     }
 
@@ -420,7 +462,7 @@ public class AssemblerVisitor implements Visitor {
 
         line(n.line_number);
 
-        compare_instruction(n.op, l_true);
+        compare_instruction(n.op, l_true,n.e1.type);
 
         instr("iconst_0");
         instr("goto " + l_end.name());
@@ -435,8 +477,13 @@ public class AssemblerVisitor implements Visitor {
         n.e1.accept(this);
         n.e2.accept(this);
         line(n.line_number);
-        instr("iadd");
-        pop();
+        if(n.type instanceof LongType) {
+            instr("ladd");
+            pop(2);
+        } else {
+            instr("iadd");
+            pop();
+        }
     }
 
     public void visit(Minus n) {
@@ -444,8 +491,13 @@ public class AssemblerVisitor implements Visitor {
         n.e1.accept(this);
         n.e2.accept(this);
         line(n.line_number);
-        instr("isub");
-        pop();
+        if(n.type instanceof LongType) {
+            instr("lsub");
+            pop(2);
+        } else {
+            instr("isub");
+            pop();
+        }
     }
 
     public void visit(Times n) {
@@ -453,8 +505,13 @@ public class AssemblerVisitor implements Visitor {
         n.e1.accept(this);
         n.e2.accept(this);
         line(n.line_number);
-        instr("imul");
-        pop();
+        if(n.type instanceof LongType) {
+            instr("lmul");
+            pop(2);
+        } else {
+            instr("imul");
+            pop();
+        }
     }
 
     public void visit(ArrayLookup n) {
@@ -462,7 +519,15 @@ public class AssemblerVisitor implements Visitor {
         n.e1.accept(this);
         n.e2.accept(this);
         line(n.line_number);
-        instr("iaload");
+        
+        ArrayType t = (ArrayType)n.type; 
+        if(t.base_type instanceof LongType) {
+            instr("laload");
+        } else if(t.base_type instanceof IdentifierType) {
+            instr("aload");
+        } else {
+            instr("iaload");
+        }
         pop();
     }
 
@@ -501,6 +566,16 @@ public class AssemblerVisitor implements Visitor {
         }
         push();
     }
+    
+    public void visit(LongLiteral n) {
+        line(n.line_number);
+        if (n.i > -1 && n.i < 2) {
+            instr("lconst_" + n.i);
+        } else {
+            instr("ldc2_w " + n.i);
+        }
+        push(2);
+    }
 
     public void visit(True n) {
         line(n.line_number);
@@ -517,7 +592,10 @@ public class AssemblerVisitor implements Visitor {
     public void visit(IdentifierExp n) {
         line(n.line_number);
         instr(n.sym.access.load());
-        push();
+        if(n.sym.type instanceof LongType)
+            push(2);
+        else
+            push();
     }
 
     public void visit(This n) {
@@ -530,7 +608,12 @@ public class AssemblerVisitor implements Visitor {
         line(n.line_number);
         n.e.accept(this);
         line(n.line_number);
-        instr("newarray int");
+        if(!(n.base_type instanceof IdentifierType)) {
+            instr("newarray "+n.base_type.toString());
+        } else {
+            IdentifierType it = (IdentifierType)n.base_type;
+            instr("anewarray "+convert_classname(it.get_class().fullName()));
+        }
     }
 
     public void visit(NewObject n) {
@@ -551,6 +634,5 @@ public class AssemblerVisitor implements Visitor {
         instr("ixor ; boolean not");
     }
 
-    public void visit(Identifier n) {
-    } //Never called in this visitor
+    public void visit(Identifier n) {} //Never called in this visitor
 }

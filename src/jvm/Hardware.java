@@ -1,5 +1,6 @@
 package jvm;
 
+import syntaxtree.LongType;
 import syntaxtree.BooleanType;
 import syntaxtree.FormalList;
 import syntaxtree.IdentifierType;
@@ -11,13 +12,19 @@ public class Hardware
 {
     public static String signature(Type t) {
 	if(t instanceof BooleanType) {
-	    return "B";
+	    return "Z";
 	}
 	else if(t instanceof IntegerType) {
 	    return "I";
 	}
-	else if(t instanceof ArrayType) {
-	    return "[I";
+	else if(t instanceof LongType) {
+	    return "J";
+	}
+        else if(t instanceof ArrayType) {
+	    return "["+signature(((ArrayType)t).base_type);
+	}
+	else if(t instanceof IdentifierType) {
+	    return "L" + t.toString() + ";";
 	}
 	else if(t instanceof IdentifierType) {
 	    return "L" + t.toString() + ";";

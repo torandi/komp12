@@ -25,4 +25,9 @@ public interface VMAccess
        topmost value on the stack into the variable.
     */
     public String store();
+  
+    /**
+     * @return The number of words this access uses
+     */
+    public int words();
 }

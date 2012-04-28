@@ -12,6 +12,7 @@ public class Frame implements frame.VMFrame
 {
     private int formals = 0;
     private int locals = 0;
+    private int offset = 0;
     private String name;
     private String sig;
 
@@ -25,13 +26,15 @@ public class Frame implements frame.VMFrame
     }
 
     public frame.VMAccess allocFormal(String id, Type type) {
-	formals++;
-	return alloc(id, Hardware.signature(type));
+	frame.VMAccess access = alloc(id, Hardware.signature(type));
+        formals += access.words();
+        return access;
     }
 
     public frame.VMAccess allocLocal(String id, Type type) {
-	locals++;
-	return alloc(id, Hardware.signature(type));
+	frame.VMAccess access = alloc(id, Hardware.signature(type));
+        locals += access.words();
+        return access;
     }
 
     public int numberOfFormals() {
@@ -53,10 +56,13 @@ public class Frame implements frame.VMFrame
 	// in IntegerInFrame and ObjectInFrame, but it comes in
 	// handy here, too, since we need to find out what kind
 	// of VMAccess object to return.
-	if(signature.equals("B") || signature.equals("I"))
-	    return new IntegerInFrame(id, formals + locals - 1, signature);
+        frame.VMAccess access;
+	if(signature.equals("Z") || signature.equals("I"))
+	    return new IntegerInFrame(id, formals+locals, signature);
+        else if(signature.equals("J"))
+	    return new LongInFrame(id, formals+locals, signature);
 	else
-	    return new ObjectInFrame(id, formals + locals - 1, signature);
+	    return new ObjectInFrame(id, formals+locals, signature);
     }
 
 }

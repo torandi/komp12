@@ -497,6 +497,9 @@ Primary Primary() throws ParseException:
 		v = <INT>
 		{ p = new IntPrimary(v); }
 	|
+		v = <LONG>
+		{ p = new LongPrimary(v); }
+	|
 		v = <BOOL>
 		{ p = new BooleanPrimary(v); }
 	|

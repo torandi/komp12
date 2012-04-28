@@ -3,13 +3,13 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class IntegerLiteral extends Exp {
+public class LongLiteral extends Exp {
 
-    public int i;
+    public long i;
 
-    public IntegerLiteral(int ai) {
+    public LongLiteral(long ai) {
         i = ai;
-        type = new IntegerType(-1);
+        type = new LongType(-1);
     }
 
     public void accept(Visitor v) {
