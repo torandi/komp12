@@ -53,6 +53,8 @@ public interface Visitor {
 
     public void visit(IntegerType n);
 
+    public void visit(VoidType n);
+    
     public void visit(LongType n);
     
     // String s;
@@ -60,6 +62,9 @@ public interface Visitor {
 
     // StatementList sl;
     public void visit(Block n);
+    
+    public void visit(ExpressionStatement n);
+    
     // Exp e;
     // Statement s1;
     public void visit(If n);

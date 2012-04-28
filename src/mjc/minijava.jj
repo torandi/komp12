@@ -196,21 +196,28 @@ Statement Statement () throws ParseException:
 		<SCL>
 		{ statement = new SOPLStatement(e,t.beginLine); }
 	|
-		id=<ID>
 		(
-			<SET>
-			e = Expression()
-			<SCL>
-			{ statement = new SetStatement(id,e); }
+			LOOKAHEAD( <ID> ( <OSB> Expression() <CSB> )? <SET>  )
+			id=<ID>
+			(
+				<SET>
+				e = Expression()
+				<SCL>
+				{ statement = new SetStatement(id,e); }
+			|
+				{ Expression e2; }
+				<OSB>
+				e = Expression()
+				<CSB>
+				<SET>
+				e2 = Expression()
+				<SCL>
+				{ statement = new SetIndexStatement(id,e,e2); }
+			)
 		|
-			{ Expression e2; }
-			<OSB>
 			e = Expression()
-			<CSB>
-			<SET>
-			e2 = Expression()
 			<SCL>
-			{ statement = new SetIndexStatement(id,e,e2); }
+			{ statement = new ExpressionStatement(e); }
 		)
 	)
 	{ return statement; }
@@ -285,9 +292,13 @@ Method MethodDecl() throws ParseException:
 		s = Statement()
 		{ m.addStatement(s); }
 	)*
-	<RETURN>
-	e = Expression()
-	{ m.setReturnExpression(e); }
+	(
+		<RETURN>
+		(
+			e = Expression() 
+			{ m.setReturnExpression(e); }
+		)?
+	)?
 	<SCL>
 	<CBRACE>
 	{ return m; }
@@ -325,6 +336,9 @@ Type Type () throws ParseException:
 	|
 		id = <KWBOOL>
 		{ t = new BooleanType(id.beginLine); }
+	|
+		id = <VOID>
+		{ t = new VoidType(id.beginLine); }
 	|
 		id=<ID>
 		{

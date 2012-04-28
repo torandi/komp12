@@ -174,6 +174,8 @@ public class AbstractTree {
             } else if (in instanceof basic_tree.SetIndexStatement) {
                 basic_tree.SetIndexStatement sfs = (basic_tree.SetIndexStatement) in;
                 ret = new ArrayAssign(id(sfs.getId()), exp(sfs.getBracketExpression()), exp(sfs.getExpression()), in.line_number);
+            } else {
+                throw new InternalError("Encountered unknown statment: "+in.getClass().getName());
             }
 
             ret.set_line_number(in.line_number);

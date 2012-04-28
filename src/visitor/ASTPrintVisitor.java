@@ -181,7 +181,11 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(IntegerType n) {
 	stream.print("IntegerType()");
     }
-
+    
+    public void visit(VoidType n) {
+	stream.print("VoidType()");
+    }
+    
     // String s;
     public void visit(IdentifierType n) {
 	stream.print("IdentifierType(" + n.s + ")");
@@ -199,6 +203,14 @@ public class ASTPrintVisitor implements Visitor {
         stream.println();
         stream.del_tab();
 	stream.println("))");
+    }
+    
+    public void visit(ExpressionStatement n) {
+        stream.println("ExpressionStatement(");
+        stream.add_tab();
+        n.exp.accept(this);
+        stream.del_tab();
+        stream.println(")");
     }
     
     // Exp e;

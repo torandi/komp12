@@ -3,6 +3,8 @@ package error;
 public class ErrorMsg
 {
     public boolean anyErrors;
+    public boolean showWarnings = false;
+    
     private java.io.PrintStream out;
     private String src;
 
@@ -19,9 +21,23 @@ public class ErrorMsg
     public void complain(String msg, int line) {
 	anyErrors = true;
         if(line != -1)
-            out.println("\n"+src+":"+line+": "+msg);
+            out.println("\nError: "+src+":"+line+": "+msg);
         else
-            out.println("\n"+src+": "+msg);
+            out.println("\nError: "+src+": "+msg);
+            
+    }
+    
+    public void warn(String context, String msg, int line) {
+        warn(msg+"\ncontext: "+context, line);
+    }
+    
+    public void warn(String msg, int line) {
+        if(showWarnings) {
+            if(line != -1)
+                out.println("\nWarning: "+src+":"+line+": "+msg);
+            else
+                out.println("\nWarning: "+src+": "+msg);
+        }
             
     }
 }

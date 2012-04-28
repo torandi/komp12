@@ -150,6 +150,10 @@ public class TypeBindVisitor implements TypeVisitor {
         return n;
     }
 
+    public Type visit(VoidType n) {
+        return n;
+    }
+    
     public Type visit(LongType n) {
         return n;
     }
@@ -173,6 +177,14 @@ public class TypeBindVisitor implements TypeVisitor {
             s.accept(this);
         }
         st.popScope();
+        return null;
+    }
+    
+    public Type visit(ExpressionStatement n) {
+        Type t = n.exp.accept(this);
+        if(! (t instanceof VoidType) ) {
+            error.warn("Ignoring return value of method returning non-void",n.line_number);
+        }
         return null;
     }
 

@@ -24,6 +24,7 @@ public class JVMMain {
     public static boolean print_ast = false;
     public static boolean debug_symbols = true;
     public static boolean debug = false;
+    public static boolean warnings = false;
     
     ErrorMsg error;
 
@@ -47,6 +48,7 @@ public class JVMMain {
                         + "-o : set output directory\n"
                         + "-nd : don't generate debug symbols\n"
                         + "-d : Turn on compiler debuging\n"
+                        + "-w : show warnings\n"
                         + "-h : this help\n");
             } else if(args[i].equals("-fno-array-bounds-checks")) {
                 //tigris uses this flag in performance tests, so turn of debug flags:
@@ -55,7 +57,9 @@ public class JVMMain {
                 debug_symbols = false;
             } else if(args[i].equals(("-d"))) {
                 debug = true;
-                   
+            } else if(args[i].equals(("-w"))) {
+                warnings = true;
+                                
             } else if(args[i].equals("-ast")) {
                 print_ast = true;
             } else {
@@ -91,6 +95,7 @@ public class JVMMain {
             String basename = new File(file).getName();
             
             error = new ErrorMsg(System.err, basename);
+            error.showWarnings = warnings;
             
             Reader r = new FileReader(file);
             System.out.println("Building from "+file);

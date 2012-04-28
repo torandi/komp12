@@ -122,6 +122,10 @@ public class TypeDefVisitor implements Visitor {
         }
         st.popScope();
     }
+    
+    public void visit(ExpressionStatement n) {
+        n.exp.accept(this);
+    }
 
     public void visit(If n) {
         n.s1.accept(this);
@@ -139,6 +143,7 @@ public class TypeDefVisitor implements Visitor {
     public void visit(ArrayType n) {}
     public void visit(BooleanType n) {}
     public void visit(IntegerType n) {}
+    public void visit(VoidType n) {}
     public void visit(LongType n) {}
     public void visit(IdentifierType n) {}
     public void visit(Print n) {}

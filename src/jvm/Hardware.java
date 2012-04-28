@@ -1,5 +1,6 @@
 package jvm;
 
+import syntaxtree.VoidType;
 import syntaxtree.LongType;
 import syntaxtree.BooleanType;
 import syntaxtree.FormalList;
@@ -26,8 +27,8 @@ public class Hardware
 	else if(t instanceof IdentifierType) {
 	    return "L" + t.toString() + ";";
 	}
-	else if(t instanceof IdentifierType) {
-	    return "L" + t.toString() + ";";
+	else if(t instanceof VoidType) {
+	    return "V";
 	}
 	else {
 	    throw new InternalError("Unknown type " + t);

@@ -267,6 +267,19 @@ public class AssemblerVisitor implements Visitor {
             s.accept(this);
         }
     }
+    
+    public void visit(ExpressionStatement n) {
+        n.accept(this);
+        //Check if the expression pushed something
+        //If it did we must undo it
+        if(n.exp.type instanceof LongType) {
+            instr("pop2");
+            pop(2);
+        } else if(! (n.exp.type instanceof VoidType)) {
+            instr("pop");
+            pop();
+        }
+    }
 
     public void visit(IfElse n) {
         visit((If)n);
@@ -324,7 +337,9 @@ public class AssemblerVisitor implements Visitor {
     public void visit(BooleanType n) {}
 
     public void visit(IntegerType n) {}
-
+    
+    public void visit(VoidType n) {}
+    
     public void visit(LongType n) {}
     
     public void visit(IdentifierType n) {}
@@ -634,4 +649,5 @@ public class AssemblerVisitor implements Visitor {
     }
 
     public void visit(Identifier n) {} //Never called in this visitor
+
 }

@@ -44,6 +44,8 @@ public interface TypeVisitor {
     public Type visit(BooleanType n);
 
     public Type visit(IntegerType n);
+    
+    public Type visit(VoidType n);
 
     public Type visit(LongType n);
     
@@ -52,6 +54,9 @@ public interface TypeVisitor {
 
     // StatementList sl;
     public Type visit(Block n);
+    
+    public Type visit(ExpressionStatement n);
+    
     // Exp e;
     // Statement s1,s2;
     public Type visit(If n);

@@ -1,4 +1,6 @@
 //EXT: GEA
+//EXT: VOID
+//EXT: EXS
 
 class ArrayTest {
 
@@ -18,7 +20,7 @@ class AT {
 		bar = new Foo[10];
 		while(i < 10) {	
 			bar[i] = new Foo();
-			System.out.println(bar[i].init(i, 10*i));
+			bar[i].init(i, 10*i);
 			i = i + 1;
 		}
 	
@@ -38,10 +40,10 @@ class Foo {
 	int x;
 	int y;
 
-	public int init(int x1, int y1) {
+	public void init(int x1, int y1) {
 		x = x1;
 		y = y1;
-		return 0;
+		return;
 	}
 
 	public int getX() {
