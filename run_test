@@ -1,6 +1,6 @@
 #!/bin/bash
 
-flags="-S -ast -d"
+flags="-S -ast"
 
 output_dir="output"
 
@@ -86,7 +86,7 @@ function test_extentions() {
 		echo -e "$txtylw IGNORE $txtrst"
 		return 1
 	else
-		_extentions=$(cat $_file | grep -E "//.*EXT" | sed -re "s/\/\/.*EXT: *(!?[A-Z]{3}).*/\1/")
+		_extentions=$(cat $_file | grep -E "//.*EXT" | sed -re "s/\/\/.*EXT: *(!?[A-Z]{3,4}).*/\1/")
 		for ext in $_extentions; do
 			if [[ $ext =~ \!(.*) ]]; then
 				#Negative extention

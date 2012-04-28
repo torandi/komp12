@@ -69,12 +69,18 @@ public class AssemblerVisitor implements Visitor {
         if (current_stack_size > current_max_stack_size) {
             current_max_stack_size = current_stack_size;
         }
+        if(JVMMain.debug && pass == 2) {
+            directive("; push("+num_vars+")");
+        }
     }
 
     private void pop(int num_vars) {
         current_stack_size -= num_vars;
         if (current_stack_size < 0) {
             System.out.println("Warning, stack poped below 0");
+        }
+        if(JVMMain.debug && pass == 2) {
+            directive("; pop("+num_vars+")");
         }
     }
 
@@ -339,18 +345,15 @@ public class AssemblerVisitor implements Visitor {
         line(n.line_number);
         n.e.accept(this);
         line(n.line_number);
+        push();
         instr(n.i.sym.access.store());
-        if(n.i.sym.type instanceof LongType) {
-            pop(2);
-        } else {
-            pop();
-        }
+        pop(1+n.i.sym.access.words());
     }
 
     public void visit(ArrayAssign n) {
         line(n.line_number);
         instr(n.i.sym.access.load());
-        push();
+        push(n.i.sym.access.words());
         n.e1.accept(this);
         n.e2.accept(this);
         line(n.line_number);
@@ -520,11 +523,10 @@ public class AssemblerVisitor implements Visitor {
         n.e2.accept(this);
         line(n.line_number);
         
-        ArrayType t = (ArrayType)n.type; 
-        if(t.base_type instanceof LongType) {
+        if(n.type instanceof LongType) {
             instr("laload");
-        } else if(t.base_type instanceof IdentifierType) {
-            instr("aload");
+        } else if(n.type instanceof IdentifierType) {
+            instr("aaload");
         } else {
             instr("iaload");
         }
@@ -592,10 +594,7 @@ public class AssemblerVisitor implements Visitor {
     public void visit(IdentifierExp n) {
         line(n.line_number);
         instr(n.sym.access.load());
-        if(n.sym.type instanceof LongType)
-            push(2);
-        else
-            push();
+        push(n.sym.access.words());
     }
 
     public void visit(This n) {

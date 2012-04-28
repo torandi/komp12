@@ -191,8 +191,6 @@ public class AbstractTree {
             return new LongType(in.line_number);
         } else if (in instanceof basic_tree.ArrayType) {
             basic_tree.ArrayType at = (basic_tree.ArrayType)in;
-            if(!at.valid())
-                error.complain("Invalid base type for array ("+at.getBaseType().toString()+") in array declaration.", in.line_number);
             return new ArrayType(type(at.getBaseType()),in.line_number);
         } else if (in instanceof basic_tree.BooleanType) {
             return new BooleanType(in.line_number);
@@ -369,9 +367,7 @@ public class AbstractTree {
             }
         } else if (in instanceof NewArrayPrimary) {
             NewArrayPrimary ip = (NewArrayPrimary) in;
-            if(!ip.valid())
-                error.complain("Invalid base type for array ("+ip.getBaseType().toString()+") in new array-expression.", in.line_number);
-            e = new NewArray(type(ip.getBaseType()),exp(ip.getExpression()));
+             e = new NewArray(type(ip.getBaseType()),exp(ip.getExpression()));
         } else if (in instanceof NewPrimary) {
             NewPrimary ip = (NewPrimary) in;
             e = new NewObject(id(ip.getId()));

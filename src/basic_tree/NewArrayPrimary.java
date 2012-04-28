@@ -18,8 +18,4 @@ public class NewArrayPrimary extends Primary {
     public Type getBaseType() {
         return base_type;
     }
-
-    public boolean valid() {
-        return ArrayType.validate_base_type(base_type);
-    }
 }

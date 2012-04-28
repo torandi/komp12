@@ -6,4 +6,8 @@ public abstract class Type {
     protected Type(int line) {
         line_number = line;
     }
+    
+    public String toString() {
+        return getClass().getName();
+    }
 }

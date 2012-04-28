@@ -1,3 +1,6 @@
+//EXT: LONG
+//EXT: GEA
+
 class ArrayTest {
 	public static void main(String[] args) {
 		System.out.println(new AT().run());
@@ -27,10 +30,10 @@ class AT {
 
 		i = 0; 
 		while(i < 5) {
-			i = i + 1;
 			if(b[i] != 10L) {
-				return 1;
+					System.out.println(999999);
 			}
+			i = i + 1;
 		}
 
 		return 0;
