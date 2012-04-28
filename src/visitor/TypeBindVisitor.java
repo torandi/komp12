@@ -177,10 +177,15 @@ public class TypeBindVisitor implements TypeVisitor {
             error.complain(st.toString(), "If statement requires expression to return boolean", n.line_number);
         }
         n.s1.accept(this);
-        n.s2.accept(this);
         return null;
     }
 
+    public Type visit(IfElse n) {
+        visit((If)n);
+        n.else_statement.accept(this);
+        return null;
+    }
+    
     public Type visit(While n) {
         if (!(n.e.accept(this) instanceof BooleanType)) {
             error.complain(st.toString(), "While statement requires expression to return boolean", n.line_number);

@@ -172,11 +172,12 @@ Statement Statement () throws ParseException:
 		<CPAR>
 		s = Statement()
 		{ IfStatement ifs = new IfStatement(e,s,t.beginLine); }
-	//	( 
+		( 
+			LOOKAHEAD(2)
 			<ELSE>
 			s = Statement()
 			{ ifs.addElseStatement(s); }
-	//	)?
+		)?
 		{ statement = ifs; }
 	|
 		t = <WHILE>

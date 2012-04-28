@@ -125,7 +125,11 @@ public class TypeDefVisitor implements Visitor {
 
     public void visit(If n) {
         n.s1.accept(this);
-        n.s2.accept(this);
+    }
+    
+    public void visit(IfElse n) {
+        n.s1.accept(this);
+        n.else_statement.accept(this);
     }
 
     public void visit(While n) {

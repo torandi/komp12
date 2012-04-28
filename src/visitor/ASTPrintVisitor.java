@@ -200,19 +200,29 @@ public class ASTPrintVisitor implements Visitor {
         stream.del_tab();
 	stream.println("))");
     }
-
+    
     // Exp e;
     // Statement s1,s2;
+    public void visit(IfElse n) {
+	stream.print("IfElse(");
+	n.e.accept(this);
+	stream.println(",");
+	n.s1.accept(this);
+	stream.println(",");
+	n.else_statement.accept(this);
+	stream.print(")");
+    }
+
+    // Exp e;
+    // Statement s1;
     public void visit(If n) {
 	stream.print("If(");
 	n.e.accept(this);
 	stream.println(",");
 	n.s1.accept(this);
-	stream.println(",");
-	n.s2.accept(this);
 	stream.print(")");
     }
-
+    
     // Exp e;
     // Statement s;
     public void visit(While n) {

@@ -59,8 +59,10 @@ public interface Visitor {
     // StatementList sl;
     public void visit(Block n);
     // Exp e;
-    // Statement s1,s2;
+    // Statement s1;
     public void visit(If n);
+    
+    public void visit(IfElse n);
 
     // Exp e;
     // Statement s;

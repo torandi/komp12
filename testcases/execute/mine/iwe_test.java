@@ -1,4 +1,11 @@
-class CmpTest {
+//EXT: IWE
+//EXT: CLE
+//EXT: CGT
+//EXT: CGE
+//EXT: CEQ
+//EXT: CNE
+
+class IweTest  {
 	public static void main(String[] a) {
 		System.out.println(new CT().run());
 	}
@@ -16,21 +23,21 @@ class CT {
 			System.out.println(1);
 			errors = errors + 1;
 		}*/
-		if(10 == 10) {
-		} else {
+		if(10 != 10) {
 			System.out.println(2);
 			errors = errors + 1;
 		}
+
 		if(11 == 10) {
 			System.out.println(3);
 			errors = errors + 1;
-		} else {
 		}
+
 		if(10 != 10) {
 			System.out.println(4);
 			errors = errors + 1;
-		} else {
 		}
+
 		if(11 != 10) {
 		} else {
 			System.out.println(5);
@@ -40,13 +47,11 @@ class CT {
 
 		a = 0;
 		if(false && this.setA()) {
-		} else {
 		}
 
 		if(a == 1) {
 			System.out.println(6);
 			errors = errors + 1;
-		} else {
 		}
 		/*
 		a = 0;
@@ -56,13 +61,11 @@ class CT {
 		if(a == 1) {
 			System.out.println(7);
 			errors = errors + 1;
-		} else {
 		}
 
 		if(this.equal(1, 0)) {
 			System.out.println(8);
 			errors = errors + 1;
-		} else {
 		}
 
 		if(this.equal(1, 1)) {
@@ -74,7 +77,6 @@ class CT {
 		if(this.equal(0, 1)) {
 			System.out.println(10);
 			errors = errors + 1;
-		} else {
 		}
 
 		return errors; 

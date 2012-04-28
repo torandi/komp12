@@ -53,6 +53,8 @@ public interface TypeVisitor {
     // Exp e;
     // Statement s1,s2;
     public Type visit(If n);
+    
+    public Type visit(IfElse n);
 
     // Exp e;
     // Statement s;

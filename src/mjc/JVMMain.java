@@ -22,7 +22,7 @@ public class JVMMain {
     public static frame.VMFactory frameFactory;
     public static boolean assemble = true;
     public static boolean print_ast = false;
-    public static boolean debug_symbols = true;
+    public static boolean debug_symbols = false;
     
     ErrorMsg error;
 
