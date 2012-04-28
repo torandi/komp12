@@ -83,6 +83,9 @@ public class TypeDefVisitor implements Visitor {
     }
 
     public void visit(VarDecl n) {
+        if(n.t instanceof VoidType) {
+            error.complain("Can't declare a variable as void", n.line_number);
+        }
         n.i.sym = new Symbol(n.t);
         if (!st.addVariable(n.i, n.i.sym)) {
             error.complain(n.i + " is already defined in current scope (" + st + ")", n.line_number);

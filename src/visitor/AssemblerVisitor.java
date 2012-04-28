@@ -379,9 +379,13 @@ public class AssemblerVisitor implements Visitor {
         } else if(t.base_type instanceof IdentifierType) {
             instr("aastore");
             pop(3);
-        } else {
+        } else if(t.base_type instanceof IntegerType) {
             instr("iastore");
             pop(3);
+        } else if(t.base_type instanceof BooleanType) {
+            instr("bastore");
+        } else {
+            throw new InternalError("Unhandled type in array assignment on line "+n.line_number);
         }
     }
 
@@ -542,10 +546,16 @@ public class AssemblerVisitor implements Visitor {
             instr("laload");
         } else if(n.type instanceof IdentifierType) {
             instr("aaload");
-        } else {
+            pop();
+        } else if(n.type instanceof IntegerType) {
             instr("iaload");
+            pop();
+        } else if(n.type instanceof BooleanType) {
+            instr("baload");
+            pop();
+        } else {
+            throw new InternalError("Unhandled type in array assignment on line "+n.line_number);
         }
-        pop();
     }
 
     public void visit(ArrayLength n) {

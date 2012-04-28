@@ -1,7 +1,10 @@
 package jvm;
 
+import syntaxtree.Type;
+
 public class IntegerInFrame implements frame.VMAccess
 {
+    
     public IntegerInFrame(String name, int offset, String signature) {
 	n = name;
 	o = offset;
