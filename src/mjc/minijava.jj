@@ -35,7 +35,8 @@ SKIP : {
 
 SKIP: { < "//" (~["\n"])* "\n" > }
 
-TOKEN: { <INT: (["0"-"9"])+ > }
+TOKEN: { <INT: "0"|(["1"-"9"](["0"-"9"])*) > }
+TOKEN: { <LONG: ("0"["l","L"])|(["1"-"9"](["0"-"9"])*["l","L"]) > }
 TOKEN: { <PLUS: "+" > }
 TOKEN: {	<MINUS: "-" > }
 TOKEN: {	<MULT: "*" > }
@@ -318,6 +319,9 @@ Type Type () throws ParseException:
 	(
 		id = <KWINT>
 		{ t = new IntegerType(id.beginLine); }
+	|
+		id = <KWLONG>
+		{ t = new LongType(id.beginLine); }
 	|
 		id = <KWBOOL>
 		{ t = new BooleanType(id.beginLine); }

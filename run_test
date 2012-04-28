@@ -292,19 +292,22 @@ any_error=0
 
 compile_files=$(ls $compile_tests $execute_tests $nonexecute_tests)
 noncompile_files=$(ls $noncompile_tests)
-execute_files=$(ls $execute_tests $nonexecute_tests $compile_tests)
-
+assembly_files=$(ls $execute_tests $nonexecute_tests $compile_tests)
+execute_files=$(ls $execute_tests)
 # Run single test
 if [ $# -eq 1 ]; then
 	compile_files=""
 	noncompile_files=""
+	assembly_files=""
 	execute_files=""
 	if [[ $(echo $1 | grep "noncompile" -c ) == "1" ]]; then
 		noncompile_files="$1"
 	elif [[ $(echo $1 | grep "compile" -c ) == "1" ]]; then
 		compile_files="$1"
+		assembly_files="$1"
 	elif [[ $(echo $1 | grep "execute" -c ) == "1" ]]; then
 		compile_files="$1"
+		assembly_files="$1"
 		execute_files="$1"
 	fi
 fi
@@ -343,7 +346,7 @@ echo -e "\n====================================\n"
 
 echo "Assembling"
 
-for file in $execute_files; do
+for file in $assembly_files; do
 	assemble $file
 	if [ $? -ne 0 ]; then
 		any_error=1
@@ -356,7 +359,7 @@ if [ $any_error -ne 0 ]; then
 fi
 
 echo "Running execution test"
-for file in $(ls $execute_tests); do
+for file in $execute_files; do
 	execute_test $file
 	if [ $? -ne 0 ]; then
 		any_error=1

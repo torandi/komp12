@@ -1,11 +1,12 @@
+//IGNORE
 class ArrayTest {
 	public static void main(String[] args) {
-		new AT().run();
+		System.out.println(new AT().run());
 	}
 }
 
 class AT {
-	public void run() {
+	public int run() {
 		int[] a;
 		long[] b;
 		boolean[] c;
