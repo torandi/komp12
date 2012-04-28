@@ -136,7 +136,7 @@ public class TypeDefVisitor implements Visitor {
         n.s.accept(this);
     }
 
-    public void visit(IntArrayType n) {}
+    public void visit(ArrayType n) {}
     public void visit(BooleanType n) {}
     public void visit(IntegerType n) {}
     public void visit(IdentifierType n) {}

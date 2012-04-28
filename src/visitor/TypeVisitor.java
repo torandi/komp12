@@ -39,7 +39,7 @@ public interface TypeVisitor {
     // Identifier i;
     public Type visit(Formal n);
 
-    public Type visit(IntArrayType n);
+    public Type visit(ArrayType n);
 
     public Type visit(BooleanType n);
 

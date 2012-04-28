@@ -47,7 +47,7 @@ public interface Visitor {
     // Identifier i;
     public void visit(Formal n);
 
-    public void visit(IntArrayType n);
+    public void visit(ArrayType n);
 
     public void visit(BooleanType n);
 

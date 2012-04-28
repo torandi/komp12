@@ -10,7 +10,7 @@ import jvm.Label;
 import syntaxtree.*;
 
 /**
- * A visitor that converts the syntax tree (with bound records, formals an accessess)
+ * A visitor that converts the syntax tree (with bound records, formals and accesses)
  * to jasmin assembler code
  */
 public class AssemblerVisitor implements Visitor {
@@ -310,7 +310,7 @@ public class AssemblerVisitor implements Visitor {
         label(l_end.declare() + " ; end while");
     }
 
-    public void visit(IntArrayType n) {
+    public void visit(ArrayType n) {
     }
 
     public void visit(BooleanType n) {

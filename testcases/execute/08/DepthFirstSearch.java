@@ -10,7 +10,7 @@ class DepthFirstSearch {
 							new Node().init0(89,15),
 							new Node().init0(3904,16),
 							new Node().init1(
-								new Node().init0(0-2147483647,17),
+								new Node().init0(2147483647,17),
 								1994,12
 							),
 							13,11

@@ -13,7 +13,7 @@ import basic_tree.IndexSufix;
 import basic_tree.IntPrimary;
 import basic_tree.LengthSufix;
 import basic_tree.MethodSufix;
-import basic_tree.NewIntPrimary;
+import basic_tree.NewArrayPrimary;
 import basic_tree.NewPrimary;
 import basic_tree.NotExpressionPrimary;
 import basic_tree.Sufix;
@@ -186,8 +186,11 @@ public class AbstractTree {
     private Type type(basic_tree.Type in) {
         if (in instanceof basic_tree.IntegerType) {
             return new IntegerType(in.line_number);
-        } else if (in instanceof basic_tree.IntegerArrayType) {
-            return new IntArrayType(in.line_number);
+        } else if (in instanceof basic_tree.ArrayType) {
+            basic_tree.ArrayType at = (basic_tree.ArrayType)in;
+            if(!at.valid())
+                error.complain("Invalid base type for array ("+at.getBaseType().toString()+") in array declaration.", in.line_number);
+            return new ArrayType(type(at.getBaseType()),in.line_number);
         } else if (in instanceof basic_tree.BooleanType) {
             return new BooleanType(in.line_number);
         } else if (in instanceof basic_tree.CustomType) {
@@ -358,9 +361,11 @@ public class AbstractTree {
             } else {
                 e = new False();
             }
-        } else if (in instanceof NewIntPrimary) {
-            NewIntPrimary ip = (NewIntPrimary) in;
-            e = new NewArray(exp(ip.getExpression()));
+        } else if (in instanceof NewArrayPrimary) {
+            NewArrayPrimary ip = (NewArrayPrimary) in;
+            if(!ip.valid())
+                error.complain("Invalid base type for array ("+ip.getBaseType().toString()+") in new array-expression.", in.line_number);
+            e = new NewArray(type(ip.getBaseType()),exp(ip.getExpression()));
         } else if (in instanceof NewPrimary) {
             NewPrimary ip = (NewPrimary) in;
             e = new NewObject(id(ip.getId()));

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-flags="-S -ast"
+flags="-S -ast -d"
 
 output_dir="output"
 
@@ -290,9 +290,28 @@ mkdir $output_dir
 
 any_error=0
 
+compile_files=$(ls $compile_tests $execute_tests $nonexecute_tests)
+noncompile_files=$(ls $noncompile_tests)
+execute_files=$(ls $execute_tests $nonexecute_tests $compile_tests)
+
+# Run single test
+if [ $# -eq 1 ]; then
+	compile_files=""
+	noncompile_files=""
+	execute_files=""
+	if [[ $(echo $1 | grep "noncompile" -c ) == "1" ]]; then
+		noncompile_files="$1"
+	elif [[ $(echo $1 | grep "compile" -c ) == "1" ]]; then
+		compile_files="$1"
+	elif [[ $(echo $1 | grep "execute" -c ) == "1" ]]; then
+		compile_files="$1"
+		execute_files="$1"
+	fi
+fi
+
 # Start by compiling everything that should be compiled
 echo "Compling code"
-for file in $(ls $compile_tests $execute_tests $nonexecute_tests); do
+for file in $compile_files; do
 	compile_ok $file
 	if [ $? -ne 0 ]; then
 		any_error=1
@@ -308,7 +327,7 @@ echo -e "\n====================================\n"
 
 echo "Compiling code that should fail"
 
-for file in $(ls $noncompile_tests); do
+for file in $noncompile_files; do
 	compile_fail $file
 	if [ $? -ne 0 ]; then
 		any_error=1
@@ -324,7 +343,7 @@ echo -e "\n====================================\n"
 
 echo "Assembling"
 
-for file in $(ls $execute_tests $nonexecute_tests $compile_tests); do
+for file in $execute_files; do
 	assemble $file
 	if [ $? -ne 0 ]; then
 		any_error=1

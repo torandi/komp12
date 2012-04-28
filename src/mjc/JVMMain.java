@@ -22,7 +22,8 @@ public class JVMMain {
     public static frame.VMFactory frameFactory;
     public static boolean assemble = true;
     public static boolean print_ast = false;
-    public static boolean debug_symbols = false;
+    public static boolean debug_symbols = true;
+    public static boolean debug = false;
     
     ErrorMsg error;
 
@@ -45,13 +46,16 @@ public class JVMMain {
                         + "-S : do not run jasmin (only output assembler)\n"
                         + "-o : set output directory\n"
                         + "-nd : don't generate debug symbols\n"
+                        + "-d : Turn on compiler debuging\n"
                         + "-h : this help\n");
             } else if(args[i].equals("-fno-array-bounds-checks")) {
                 //tigris uses this flag in performance tests, so turn of debug flags:
                 debug_symbols = false;
             } else if(args[i].equals(("-nd"))) {
                 debug_symbols = false;
-                
+            } else if(args[i].equals(("-d"))) {
+                debug = true;
+                   
             } else if(args[i].equals("-ast")) {
                 print_ast = true;
             } else {
@@ -143,7 +147,7 @@ public class JVMMain {
             error.complain(ex.getMessage(),-1);
             return false;
         } catch (ParseException ex) {
-            error.complain("Parse error: Found "+ex.currentToken.image+", expected "+ex.expectedTokenSequences, ex.currentToken.beginLine);
+            error.complain(ex.getMessage(), ex.currentToken.endLine);
             return false;
         }
     }

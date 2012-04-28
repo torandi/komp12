@@ -170,8 +170,8 @@ public class ASTPrintVisitor implements Visitor {
 	stream.print(")");
     }
 
-    public void visit(IntArrayType n) {
-	stream.print("IntArrayType()");
+    public void visit(ArrayType n) {
+	stream.print("ArrayType("+n.base_type+")");
     }
 
     public void visit(BooleanType n) {

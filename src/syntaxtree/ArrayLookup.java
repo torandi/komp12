@@ -7,7 +7,7 @@ public class ArrayLookup extends Exp {
 
   /**
    *
-   * @param ae1 Expression that should evaluate to an IntArray
+   * @param ae1 Expression that should evaluate to an ArrayType
    * @param ae2 Expression in []
    */
   public ArrayLookup(Exp ae1, Exp ae2, int line) { 

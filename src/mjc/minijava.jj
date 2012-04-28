@@ -56,6 +56,7 @@ TOKEN: {	<CBRACE: "}">}
 TOKEN: {	<EXCL: "!">}
 TOKEN: { <SCL: ";"> }
 TOKEN: { <KWINT: "int"> }
+TOKEN: { <KWLONG: "long"> }
 TOKEN: { <KWBOOL : "boolean"> }
 TOKEN: { <SOPL : "System.out.println"> }
 TOKEN: { <BOOL: "true"|"false"> }
@@ -317,11 +318,6 @@ Type Type () throws ParseException:
 	(
 		id = <KWINT>
 		{ t = new IntegerType(id.beginLine); }
-		(
-			<OSB>
-			<CSB>
-			{ t = new IntegerArrayType(id.beginLine); }
-		)?
 	|
 		id = <KWBOOL>
 		{ t = new BooleanType(id.beginLine); }
@@ -331,6 +327,11 @@ Type Type () throws ParseException:
 			t = new CustomType(id);
 		}
 	)
+	(
+		<OSB>
+		<CSB>
+		{ t = new ArrayType(t,id.beginLine); }
+	)?
 	{ return t; }
 }
 
@@ -485,6 +486,7 @@ Primary Primary() throws ParseException:
 	Token v;
 	Expression e;
 	AndOperand ao;
+	Type t;
 }
 {
 	(
@@ -499,11 +501,24 @@ Primary Primary() throws ParseException:
 	|
 		<NEW>
 		(
-			v = <KWINT>
+			LOOKAHEAD(2)
+			(
+				v = <KWINT>
+				{ t = new IntegerType(v.beginLine); }
+			|
+				v = <KWBOOL>
+				{ t = new BooleanType(v.beginLine); }
+			|
+				v = <KWLONG>
+				{ t = new LongType(v.beginLine); }
+			|
+				v = <ID>
+				{ t = new CustomType(v); }
+			)
 			<OSB>
 			e = Expression()
 			<CSB>
-			{ p = new NewIntPrimary(e,v.beginLine); }
+			{ p = new NewArrayPrimary(t, e, v.beginLine); }
 		|
 			v=<ID>
 			<OPAR>

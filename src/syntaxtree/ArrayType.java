@@ -3,10 +3,12 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class IntArrayType extends Type {
-
-    public IntArrayType(int line) {
+public class ArrayType extends Type {
+    public Type base_type;
+    
+    public ArrayType(Type base_type, int line) {
         super(line);
+        this.base_type = base_type;
     }
 
     public void accept(Visitor v) {
@@ -18,10 +20,10 @@ public class IntArrayType extends Type {
     }
 
     public int hashCode() {
-        return "int[]".hashCode();
+        return (base_type.toString()+"[]").hashCode();
     }
 
     public String toString() {
-        return "int[]";
+        return base_type.toString()+"[]";
     }
 }

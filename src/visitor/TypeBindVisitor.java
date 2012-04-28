@@ -138,7 +138,7 @@ public class TypeBindVisitor implements TypeVisitor {
         return n.t.accept(this);
     }
 
-    public Type visit(IntArrayType n) {
+    public Type visit(ArrayType n) {
         return n;
     }
 
@@ -212,19 +212,20 @@ public class TypeBindVisitor implements TypeVisitor {
     }
 
     public Type visit(ArrayAssign n) {
-        Type t = n.i.accept(this);
-        Type t1 = n.e1.accept(this);
-        Type t2 = n.e2.accept(this);
-        if (!(t instanceof IntArrayType)) {
-            error.complain(st.toString(), "Trying to assign a value to an index of non-array variable of type " + t, n.line_number);
+        Type var_type = n.i.accept(this);
+        Type index_type = n.e1.accept(this);
+        Type value_type = n.e2.accept(this);
+        if (!(var_type instanceof ArrayType)) {
+            error.complain(st.toString(), "Trying to assign a value to an index of non-array variable of type " + var_type, n.line_number);
         }
-        if (!(t1 instanceof IntegerType)) {
-            error.complain(st.toString(), "Expression for index of (" + n.i + ") in " + st + " returned an " + t1 + " but should return an integer", n.line_number);
+        if (!(index_type instanceof IntegerType)) {
+            error.complain(st.toString(), "Expression for index of " + n.i + " returned an " + index_type + " but should return an integer", n.line_number);
         }
-        if (!(t2 instanceof IntegerType)) {
-            error.complain(st.toString(), "Assigning " + t2 + " to \"" + n.i + "[...]\" which is of type int", n.line_number);
+        ArrayType a_var_type = (ArrayType)var_type;
+        if (!value_type.equals(a_var_type.base_type)) {
+            error.complain(st.toString(), "Assigning " + value_type + " to \"" + n.i + "[...]\" which is of type "+a_var_type.base_type, n.line_number);
         }
-        return t.accept(this);
+        return null;
     }
 
     public Type visit(And n) {
@@ -277,18 +278,19 @@ public class TypeBindVisitor implements TypeVisitor {
 
     public Type visit(ArrayLookup n) {
         Type t = n.e1.accept(this);
-        if (!(t instanceof IntArrayType)) {
+        if (!(t instanceof ArrayType)) {
             error.complain(st.toString(), "Can not look up index in type " + t, n.line_number);
         }
         if (!(n.e2.accept(this) instanceof IntegerType)) {
             error.complain(st.toString(), "Index must be an integer", n.line_number);
         }
-        return new IntegerType(n.line_number);
+        ArrayType at = (ArrayType)t;
+        return at.base_type;
     }
 
     public Type visit(ArrayLength n) {
-        if (!(n.e.accept(this) instanceof IntArrayType)) {
-            error.complain(st.toString(), " .length can only be applied to int[]", n.line_number);
+        if (!(n.e.accept(this) instanceof ArrayType)) {
+            error.complain(st.toString(), " .length can only be applied to arrays", n.line_number);
         }
         return new IntegerType(n.line_number);
     }
@@ -355,7 +357,7 @@ public class TypeBindVisitor implements TypeVisitor {
         if (!(n.e.accept(this) instanceof IntegerType)) {
             error.complain(st.toString(), "Size of array must be an integer", n.line_number);
         }
-        return new IntArrayType(n.line_number);
+        return new ArrayType(n.base_type,n.line_number);
     }
 
     public Type visit(NewObject n) {

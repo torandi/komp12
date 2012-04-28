@@ -3,7 +3,7 @@ package jvm;
 import syntaxtree.BooleanType;
 import syntaxtree.FormalList;
 import syntaxtree.IdentifierType;
-import syntaxtree.IntArrayType;
+import syntaxtree.ArrayType;
 import syntaxtree.IntegerType;
 import syntaxtree.Type;
 
@@ -16,7 +16,7 @@ public class Hardware
 	else if(t instanceof IntegerType) {
 	    return "I";
 	}
-	else if(t instanceof IntArrayType) {
+	else if(t instanceof ArrayType) {
 	    return "[I";
 	}
 	else if(t instanceof IdentifierType) {
