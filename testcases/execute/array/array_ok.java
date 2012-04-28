@@ -1,4 +1,3 @@
-//IGNORE
 class ArrayTest {
 	public static void main(String[] args) {
 		System.out.println(new AT().run());
@@ -25,5 +24,6 @@ class AT {
 			System.out.println(i);
 			i = i + 1;
 		}
+		return 0;
 	}
 }

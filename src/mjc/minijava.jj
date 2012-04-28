@@ -131,7 +131,7 @@ basic_tree.Class MainClass () throws ParseException:
 		mainClass.addMethod(main);
 	}
 	( 
-		LOOKAHEAD(2)
+		LOOKAHEAD(3) //Make a 3 lookahead to not match foo[bar] as <id>[]
 		v = VarDecl()
 		{ main.addVariable(v); }
 	)*
@@ -157,7 +157,7 @@ Statement Statement () throws ParseException:
 		t = <OBRACE>
 		{ BasicStatement bs = new BasicStatement(t.beginLine); }
 		( 
-			LOOKAHEAD(2)
+			LOOKAHEAD(3) //Make a 3 lookahead to not match foo[bar] as <id>[]
 			var = VarDecl()
 			{ bs.addVariable(var); }
 		)*
@@ -277,7 +277,7 @@ Method MethodDecl() throws ParseException:
 	<CPAR>
 	<OBRACE>
 	( 
-		LOOKAHEAD(2)
+		LOOKAHEAD(3) //Make a 3 lookahead to not match foo[bar] as <id>[]
 		v = VarDecl()
 		{ m.addVariable(v); }
 	)*

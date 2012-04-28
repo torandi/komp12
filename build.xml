@@ -13,7 +13,7 @@
  </target>
 
  <target name="parser" depends="init">
-	 <javacc javacchome="lib/javacc" target="${src}/mjc/minijava.jj" outputdirectory="${src}/parse"/>
+	 <javacc javacchome="lib/javacc" target="${src}/mjc/minijava.jj" outputdirectory="${src}/parse" debugparser="true" debuglookahead="true"/>
  </target>
 
   <target name="compile" depends=" parser"
