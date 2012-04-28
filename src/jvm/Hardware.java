@@ -43,12 +43,7 @@ public class Hardware
 	    }
 	}
 	sig = sig + ")";
-	if(returnType != null) {
-	    sig = sig + Hardware.signature(returnType);
-	}
-	else {
-	    sig = sig + "V";
-	}
+	sig = sig + Hardware.signature(returnType);
 	return sig;
     }
 }

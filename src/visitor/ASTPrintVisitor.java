@@ -156,7 +156,11 @@ public class ASTPrintVisitor implements Visitor {
 	}
         stream.del_tab();
 	stream.println("), Return: ");
-	n.e.accept(this);
+        if(! (n.t instanceof VoidType) ) {
+            n.e.accept(this);
+        } else {
+            stream.println("Void");
+        }
 	stream.println(")");
     }
 

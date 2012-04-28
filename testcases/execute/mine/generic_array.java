@@ -23,6 +23,7 @@ class AT {
 			bar[i].init(i, 10*i);
 			i = i + 1;
 		}
+		bar[0].getX();
 	
 		i = 0;
 		while(i < 10) {
@@ -43,7 +44,6 @@ class Foo {
 	public void init(int x1, int y1) {
 		x = x1;
 		y = y1;
-		return;
 	}
 
 	public int getX() {

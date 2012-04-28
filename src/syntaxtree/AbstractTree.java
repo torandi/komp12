@@ -118,10 +118,30 @@ public class AbstractTree {
             sl.addElement(statement(s));
         }
 
-        MethodDecl md = new MethodDecl(type(in.getReturnType()),
+        
+        Exp return_expression = null;
+        if(in.hasReturn() && in.getReturnExpression() != null) {
+            return_expression = exp(in.getReturnExpression());
+        }
+        
+        Type method_type = type(in.getReturnType());
+        
+        if(! ( method_type instanceof VoidType) ) {
+            if(!in.hasReturn()) {
+                error.complain(in.getName(), "Missing return statement in method declared as "+method_type.toString(),in.last_line);
+            } else if(return_expression == null) {
+                error.complain(in.getName(), "Returning void in method declared as "+method_type.toString(),in.last_line);
+            }
+        } else {
+            if(return_expression != null) {
+                error.complain(in.getName(), "Returning non-void in void method", in.last_line);
+            }
+        }
+        
+        MethodDecl md = new MethodDecl(method_type,
                 id(in.getName()),
                 fl, vdl, sl,
-                exp(in.getReturnExpression()));
+                return_expression);
 
         md.line_number = in.line_number;
 
@@ -174,6 +194,9 @@ public class AbstractTree {
             } else if (in instanceof basic_tree.SetIndexStatement) {
                 basic_tree.SetIndexStatement sfs = (basic_tree.SetIndexStatement) in;
                 ret = new ArrayAssign(id(sfs.getId()), exp(sfs.getBracketExpression()), exp(sfs.getExpression()), in.line_number);
+            } else if (in instanceof basic_tree.ExpressionStatement) {
+                basic_tree.ExpressionStatement exs = (basic_tree.ExpressionStatement) in;
+                ret = new ExpressionStatement(exp(exs.getExpression()));
             } else {
                 throw new InternalError("Encountered unknown statment: "+in.getClass().getName());
             }
@@ -198,8 +221,10 @@ public class AbstractTree {
             return new BooleanType(in.line_number);
         } else if (in instanceof basic_tree.CustomType) {
             return new IdentifierType(program, ((basic_tree.CustomType) in).getId(), in.line_number);
-        } else { //VoidType
-            return null;
+        } else if (in instanceof basic_tree.VoidType) {
+            return new VoidType(in.line_number);
+        } else {
+            throw new InternalError("Encountered unknown type "+in.toString()+" in line "+in.line_number);
         }
     }
 

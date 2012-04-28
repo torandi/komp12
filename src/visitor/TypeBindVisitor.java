@@ -25,7 +25,7 @@ public class TypeBindVisitor implements TypeVisitor {
         curProgram = n;
         //Main class
         n.m.record = JVMMain.frameFactory.newRecord(n.m.i1.s);
-        n.m.mainMethodFrame = JVMMain.frameFactory.newFrame("main", new FormalList(), null);
+        n.m.mainMethodFrame = JVMMain.frameFactory.newFrame("main", new FormalList(), new VoidType(-1));
         curFrame = n.m.mainMethodFrame;
         n.m.accept(this);
         curFrame = null;
@@ -125,9 +125,11 @@ public class TypeBindVisitor implements TypeVisitor {
             s.accept(this);
         }
         //return statement
-        Type ret_type = n.e.accept(this);
-        if (!ret_type.equals(n.t)) {
-            error.complain(st.toString(), "returning " + ret_type + " in method declared as " + n.t, n.e.line_number);
+        if(! (n.t instanceof VoidType) ) {
+            Type ret_type = n.e.accept(this);
+            if (!ret_type.equals(n.t)) {
+                error.complain(st.toString(), "returning " + ret_type + " in method declared as " + n.t, n.e.line_number);
+            }
         }
         st.popScope();
         return n.t.accept(this);
@@ -183,7 +185,7 @@ public class TypeBindVisitor implements TypeVisitor {
     public Type visit(ExpressionStatement n) {
         Type t = n.exp.accept(this);
         if(! (t instanceof VoidType) ) {
-            error.warn("Ignoring return value of method returning non-void",n.line_number);
+            error.warn("Ignoring return value of expression returning non-void",n.line_number);
         }
         return null;
     }

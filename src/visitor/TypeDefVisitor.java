@@ -101,7 +101,9 @@ public class TypeDefVisitor implements Visitor {
             s.accept(this);
         }
         //return statement
-        n.e.accept(this);
+        if(! (n.t instanceof VoidType)) {
+            n.e.accept(this);
+        }
         st.popScope();
     }
 

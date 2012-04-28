@@ -267,7 +267,7 @@ Variable VarDecl() throws ParseException:
 
 Method MethodDecl() throws ParseException:
 {	
-	Token id;
+	Token id, token;
 	Type t;
 	Method m;
 	Variable v;
@@ -294,14 +294,18 @@ Method MethodDecl() throws ParseException:
 	)*
 	(
 		<RETURN>
+		{ m.setHasReturn(); }
 		(
 			e = Expression() 
 			{ m.setReturnExpression(e); }
 		)?
+		<SCL>
 	)?
-	<SCL>
-	<CBRACE>
-	{ return m; }
+	token = <CBRACE>
+	{ 
+		m.last_line = token.endLine;
+		return m;
+	}
 }
 
 void FormalList(Method m) throws ParseException:

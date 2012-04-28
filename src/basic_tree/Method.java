@@ -8,11 +8,14 @@ public class Method {
 	private String name;
 	private Type returnType;
 	private Expression returnExpression;
+        private boolean hasReturn = false;
 	private ArrayList<Variable> parameters = new ArrayList<Variable>();
 	private ArrayList<Variable> variables = new ArrayList<Variable>();
 	private ArrayList<Statement> statements = new ArrayList<Statement>();
 	
         public int line_number;
+        
+        public int last_line;
         
 	public Method(Token t, Type returnType) {
 		this.name = t.image;
@@ -29,8 +32,17 @@ public class Method {
 	}
 
 	public void setReturnExpression(Expression returnExpression) {
-		this.returnExpression = returnExpression;
+            hasReturn = true;
+            this.returnExpression = returnExpression;
 	}
+        
+        public void setHasReturn() {
+            hasReturn = true;
+        }
+        
+        public boolean hasReturn() {
+            return hasReturn;
+        }
 
 	public ArrayList<Variable> getParameters() {
 		return parameters;

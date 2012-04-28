@@ -234,19 +234,19 @@ public class AssemblerVisitor implements Visitor {
             s.accept(this);
         }
 
-        n.e.accept(this);
+        if(! (n.t instanceof VoidType) ) {
+            n.e.accept(this);
+        }
 
         if (pass == 2) {
-            if (n.t != null) {
-                if (n.t instanceof IntegerType || n.t instanceof BooleanType) {
-                    instr("ireturn");
-                } else if(n.t instanceof LongType) {
-                    instr("lreturn");
-                } else {
-                    instr("areturn");
-                }
-            } else {
+            if (n.t instanceof IntegerType || n.t instanceof BooleanType) {
+                instr("ireturn");
+            } else if(n.t instanceof LongType) {
+                instr("lreturn");
+            } else if(n.t instanceof VoidType) {
                 instr("return");
+            } else {
+                instr("areturn");
             }
             directive(".end method\n");
         } else {
@@ -269,7 +269,7 @@ public class AssemblerVisitor implements Visitor {
     }
     
     public void visit(ExpressionStatement n) {
-        n.accept(this);
+        n.exp.accept(this);
         //Check if the expression pushed something
         //If it did we must undo it
         if(n.exp.type instanceof LongType) {
