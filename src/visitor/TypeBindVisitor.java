@@ -390,6 +390,12 @@ public class TypeBindVisitor implements TypeVisitor {
         if (!(n.e.accept(this) instanceof IntegerType)) {
             error.complain(st.toString(), "Size of array must be an integer", n.line_number);
         }
+        if(n.base_type instanceof IdentifierType) {
+            IdentifierType it = (IdentifierType) n.base_type;
+            if(it.get_class() == null) {
+                error.complain(st.toString(),"Can't create new array of unknown class "+it.s,n.line_number);
+            }
+        }
         return (n.type=new ArrayType(n.base_type,n.line_number));
     }
 

@@ -158,7 +158,7 @@ function assemble() {
 	
 	if [ $? -eq 0 ]; then
 		_res=$($jasmin -d "$out" $output_dir/$_dirname/*.j 2>&1)
-		if [ -z "$_res" ]; then
+		if [ $? -eq 0 ]; then
 			echo -e "$txtgrn OK $txtrst"
 			return 0
 		else

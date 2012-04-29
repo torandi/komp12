@@ -101,7 +101,7 @@ public class AssemblerVisitor implements Visitor {
         }
         directive(".method public <init>()V");
         instr("aload_0");
-        instr("invokespecial " + superclass + "/<init>()V");
+        instr("invokespecial '" + superclass + "/<init>()V'");
         instr("return");
         directive(".end method\n");
     }
@@ -159,7 +159,7 @@ public class AssemblerVisitor implements Visitor {
 
     public void visit(MainClass n) {
         load_class_output(n.i1.s);
-        directive(".class " + convert_classname(n.i1.s));
+        directive(".class '" + convert_classname(n.i1.s)+"'");
         directive(".super java/lang/Object");
 
         create_constructor(null);
@@ -190,8 +190,8 @@ public class AssemblerVisitor implements Visitor {
 
     public void class_decl_visit(ClassDecl n) {
         load_class_output(n.i.s);
-        directive(".class " + convert_classname(n.fullName()));
-        directive(".super " + convert_classname(n.parent_name()) + "\n");
+        directive(".class '" + convert_classname(n.fullName())+"'");
+        directive(".super '" + convert_classname(n.parent_name()) + "'\n");
 
         for (VarDecl v : n.vl.getList()) {
             v.accept(this);
@@ -574,7 +574,7 @@ public class AssemblerVisitor implements Visitor {
             e.accept(this);
         }
         line(n.line_number);
-        instr("invokevirtual " + convert_classname(n.method.fullName()) + Hardware.methodSignature(n.method.fl, n.method.t));
+        instr("invokevirtual '" + convert_classname(n.method.fullName()) + Hardware.methodSignature(n.method.fl, n.method.t)+"'");
         pop(n.method.fl.size()); //pop(1+fl.size()); push(1) (result)
     }
 
@@ -636,16 +636,16 @@ public class AssemblerVisitor implements Visitor {
             instr("newarray "+n.base_type.toString());
         } else {
             IdentifierType it = (IdentifierType)n.base_type;
-            instr("anewarray "+convert_classname(it.get_class().fullName()));
+            instr("anewarray '"+convert_classname(it.get_class().fullName())+"'");
         }
     }
 
     public void visit(NewObject n) {
         line(n.line_number);
-        instr("new " + convert_classname(n.cls.fullName()));
+        instr("new '" + convert_classname(n.cls.fullName())+"'");
         instr("dup");
         push(2);
-        instr("invokespecial " + convert_classname(n.cls.fullName()) + "/<init>()V");
+        instr("invokespecial '" + convert_classname(n.cls.fullName()) + "/<init>()V'");
         pop();
     }
 
