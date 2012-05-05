@@ -1,6 +1,6 @@
 #!/bin/bash
 
-flags="-S -w"
+flags="-S -w -d"
 
 output_dir="output"
 

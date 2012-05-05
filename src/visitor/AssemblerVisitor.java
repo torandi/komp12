@@ -686,7 +686,9 @@ public class AssemblerVisitor implements Visitor {
         n.e.accept(this);
         line(n.line_number);
         instr("iconst_1");
+        push();
         instr("ixor ; boolean not");
+        pop();
     }
     
     private char type_to_char(Type t) {
