@@ -414,4 +414,13 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(LongLiteral n) {
         stream.print("LongLiteral(" + n.i + ")");
     }
+
+    @Override
+    public void visit(TypeCast n) {
+        stream.println("TypeCast(to:"+n.target_type+", exp:");
+        stream.add_tab();
+        n.exp.accept(this);
+        stream.del_tab();
+        stream.print(")");
+    }
 }

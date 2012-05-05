@@ -657,6 +657,37 @@ public class AssemblerVisitor implements Visitor {
         instr("iconst_1");
         instr("ixor ; boolean not");
     }
+    
+    private char type_to_char(Type t) {
+        if(t instanceof BooleanType) {
+            return 'b';
+        } else if(t instanceof IntegerType) {
+            return 'i';
+        } else if(t instanceof LongType) {
+            return 'l';
+        } else {
+            return 0;
+        }
+    }
+    
+    public void visit(TypeCast n) {
+        n.exp.accept(this);
+        if(n.target_type instanceof IdentifierType) {
+            instr("checkcast "+n.target_type.toString());
+        } else {
+            char t1=type_to_char(n.exp.type);
+            char t2=type_to_char(n.target_type);
+            if(t1 == 0 || t2 == 0) {
+                throw new InternalError("Caught invalid cast when assembling! ("+n.exp.type+" to "+n.target_type+")");
+            } else if(t1 != t2) {
+                instr(t1+"2"+t2);
+                if(t1 == 'l') 
+                    pop();
+                else if(t2 == 'l')
+                    push();
+            }
+        }
+    }
 
     public void visit(Identifier n) {} //Never called in this visitor
 

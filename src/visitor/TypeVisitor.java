@@ -130,4 +130,6 @@ public interface TypeVisitor {
 
     // String s;
     public Type visit(Identifier n);
+    
+    public Type visit(TypeCast n);
 }

@@ -43,23 +43,31 @@ public class ClassDeclExtends extends ClassDecl {
     }
 
     @Override
-    public MethodDecl findMethod(Identifier id, ArrayList<Type> tl) {
-        MethodDecl md = super.findMethod(id, tl);
+    public MethodDecl findMethod(Identifier id, ArrayList<Type> tl, boolean strict) {
+        MethodDecl md = super.findMethod(id, tl, strict);
         if(md == null)
-            md = parent().findMethod(id, tl);
+            md = parent().findMethod(id, tl, strict);
         
         return md;
     }
     
     
     @Override
-    public boolean addMethod(Identifier id, ArrayList<Type> tl, MethodDecl m) throws MethodOverrideException{
+    public boolean addMethod(Identifier id, ArrayList<Type> tl, MethodDecl m) throws MethodOverrideException {
         //For inheriting classes we must verify that no super class declare it, or 
         // that the return type match
-        MethodDecl parent_method = findMethod(id, tl);
-        if(parent_method == null || m.t.equals(parent_method.t)) {
+        MethodDecl parent_method = findMethod(id, tl, true);
+
+        if(parent_method == null) {
             return super.addMethod(id, tl, m);
         } else {
+            try {
+                if(m.t.equals(parent_method.t)) {
+                    return super.addMethod(id, tl, m);
+                }
+            } catch (TypeException e) {
+                
+            }
             throw new MethodOverrideException(parent_method, m.t.toString());
         }
     }

@@ -36,7 +36,7 @@ public abstract class ClassDecl extends Scope {
             container = new ArrayList<MethodDecl>();
             methods.put(id.s.intern(), container);
         }
-        if (findMethod(container, tl) == null) {
+        if (findMethod(container, tl, true) == null) {
             container.add(m);
             m.cls = this;
             return true;
@@ -48,10 +48,10 @@ public abstract class ClassDecl extends Scope {
     /**
      * @return The method or null if it doesn't exist
      */
-    public MethodDecl findMethod(Identifier id, ArrayList<Type> tl) {
+    public MethodDecl findMethod(Identifier id, ArrayList<Type> tl, boolean strict) {
         ArrayList<MethodDecl> container = methods.get(id.s.intern());
         if (container != null) {
-            return findMethod(container, tl);
+            return findMethod(container, tl, strict);
         } else {
             return null;
         }
@@ -62,10 +62,10 @@ public abstract class ClassDecl extends Scope {
         return i.s;
     }
 
-    private MethodDecl findMethod(ArrayList<MethodDecl> list, ArrayList<Type> tl) {
+    private MethodDecl findMethod(ArrayList<MethodDecl> list, ArrayList<Type> tl, boolean strict) {
 
         for (MethodDecl m : list) {
-            if (m.compareParameters(tl)) {
+            if (m.compareParameters(tl, strict)) {
                 return m;
             }
         }

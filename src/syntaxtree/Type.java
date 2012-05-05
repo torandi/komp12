@@ -9,8 +9,7 @@ public abstract class Type {
         line_number = line;
     }
     
-    public  boolean equals(Type tp)
-    {
+    public  boolean equals(Type tp) throws ImplicitCast, LossOfPrecision {
 	return getClass().equals(tp.getClass());
     }
     

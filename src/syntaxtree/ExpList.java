@@ -21,6 +21,10 @@ public class ExpList {
    public Exp elementAt(int i)  { 
       return list.get(i);
    }
+   
+   public void setElementAt(int i, Exp e) {
+       list.set(i, e);
+   }
 
    public int size() { 
       return list.size(); 

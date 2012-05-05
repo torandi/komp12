@@ -145,6 +145,11 @@ public class TypeDefVisitor implements Visitor {
         n.s.accept(this);
     }
 
+    public void visit(TypeCast n) {
+        n.exp.accept(this);
+        
+    }
+    
     public void visit(ArrayType n) {}
     public void visit(BooleanType n) {}
     public void visit(IntegerType n) {}

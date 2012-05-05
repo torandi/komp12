@@ -7,6 +7,9 @@ class LongTest {
 		long l3;
       int i1;
       int i2;
+      L lclass;
+
+      lclass = new L();
 
 		l = 1099511627776L;
 		l2 = 1099511627834L;
@@ -36,5 +39,14 @@ class LongTest {
       System.out.println(10L - 2);
       System.out.println(10L + 2);
       System.out.println(10L * 2);
+   
+      lclass.l(i1);
+
 	}
+}
+
+class L {
+   public int l(long l) {
+      return 0;
+   }
 }

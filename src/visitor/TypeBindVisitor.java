@@ -127,8 +127,15 @@ public class TypeBindVisitor implements TypeVisitor {
         //return statement
         if(! (n.t instanceof VoidType) ) {
             Type ret_type = n.e.accept(this);
-            if (!ret_type.equals(n.t)) {
-                error.complain(st.toString(), "returning " + ret_type + " in method declared as " + n.t, n.e.line_number);
+            try {
+                if (!ret_type.equals(n.t)) {
+                    error.complain(st.toString(), "returning " + ret_type + " in method declared as " + n.t, n.e.line_number);
+                }
+            } catch (LossOfPrecision e) {
+                error.complain(st.toString(), "Possible loss of precision in return statement",n.e.line_number);
+            } catch (ImplicitCast ic) {
+                TypeCast tc = new TypeCast(ic.cast_to, n.e, n.e.line_number);
+                n.e = tc;
             }
         }
         st.popScope();
@@ -225,16 +232,16 @@ public class TypeBindVisitor implements TypeVisitor {
         Type t1 = n.e.accept(this);
         Type t2 = n.i.accept(this);
 
-        if (!t1.equals(t2)) {
-            error.complain(st.toString(), "Assigning variable of type " + t1 + " to \"" + n.i + "\", which is of type " + t2, n.line_number);
+        try {
+            if (!t1.equals(t2)) {
+                error.complain(st.toString(), "Assigning variable of type " + t1 + " to \"" + n.i + "\", which is of type " + t2, n.line_number);
 
-        } else if(t1 instanceof NumericType) { //Then t2 is also numeric type
-            NumericType nt1, nt2;
-            nt1 = (NumericType) t1;
-            nt2 = (NumericType) t2;
-            if(nt1.precision() > nt2.precision()) {
-                error.complain(st.toString(), "Possible loss of precision when assigning variable of type "+t1 +" to \'"+n.i+ "\", which is of type " + t2, n.line_number);
             }
+        } catch (LossOfPrecision e) {
+            error.complain(st.toString(), "Possible loss of precision when assigning variable of type "+t1 +" to \""+n.i+ "\", which is of type " + t2, n.line_number);
+        } catch (ImplicitCast ic) {
+            TypeCast tc = new TypeCast(ic.cast_to, n.e, n.line_number);
+            n.e = tc;
         }
         
         return null;
@@ -251,15 +258,15 @@ public class TypeBindVisitor implements TypeVisitor {
             error.complain(st.toString(), "Expression for index of " + n.i + " returned an " + index_type + " but should return an integer", n.line_number);
         }
         ArrayType a_var_type = (ArrayType)var_type;
-        if (!value_type.equals(a_var_type.base_type)) {
-            error.complain(st.toString(), "Assigning " + value_type + " to \"" + n.i + "[...]\" which is of type "+a_var_type.base_type, n.line_number);
-        } else if(value_type instanceof NumericType) { //Then t2 is also numeric type
-            NumericType nt1, nt2;
-            nt1 = (NumericType) value_type;
-            nt2 = (NumericType) a_var_type.base_type;
-            if(nt1.precision() > nt2.precision()) {
-                error.complain(st.toString(), "Possible loss of precision when assigning " + value_type + " to \"" + n.i + "[...]\" which is of type "+a_var_type.base_type, n.line_number);
-            }
+        try {
+            if (!value_type.equals(a_var_type.base_type)) {
+                error.complain(st.toString(), "Assigning " + value_type + " to \"" + n.i + "[...]\" which is of type "+a_var_type.base_type, n.line_number);
+            } 
+        } catch (LossOfPrecision e) {
+            error.complain(st.toString(), "Possible loss of precision when assigning " + value_type + " to \"" + n.i + "[...]\" which is of type "+a_var_type.base_type, n.line_number);
+        } catch (ImplicitCast ic) {
+            TypeCast tc = new TypeCast(ic.cast_to, n.e2, n.line_number);
+            n.e2 = tc;
         }
         return null;
     }
@@ -277,11 +284,25 @@ public class TypeBindVisitor implements TypeVisitor {
     public Type visit(Compare n) {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
-        if (n.op != Compare.Operator.EQ && n.op != Compare.Operator.NEQ && !(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
-            error.complain(st.toString(), "Operator " + Compare.op_to_str(n.op) + " can not be applied to " + t1 + ", " + t2, n.line_number);
-        } else if ((n.op == Compare.Operator.EQ || n.op == Compare.Operator.NEQ) && !((t1 instanceof NumericType || t1 instanceof BooleanType)
-                && (t2 instanceof NumericType || t2 instanceof BooleanType) && t1.equals(t2))) {
-            error.complain(st.toString(), "Operator " + Compare.op_to_str(n.op) + " can not be applied to " + t1 + ", " + t2, n.line_number);
+        try {
+            if (n.op != Compare.Operator.EQ && n.op != Compare.Operator.NEQ && !(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
+                error.complain(st.toString(), "Operator " + Compare.op_to_str(n.op) + " can not be applied to " + t1 + ", " + t2, n.line_number);
+            } else if ((n.op == Compare.Operator.EQ || n.op == Compare.Operator.NEQ) && !((t1 instanceof NumericType || t1 instanceof BooleanType)
+                    && (t2 instanceof NumericType || t2 instanceof BooleanType) && t1.equals(t2))) {
+                error.complain(st.toString(), "Operator " + Compare.op_to_str(n.op) + " can not be applied to " + t1 + ", " + t2, n.line_number);
+            }
+        } catch (TypeException e) {
+            //In a compare operation both loss of precision and type cast is the same thing
+            //find the part with highest precision, and cast to that type:
+            NumericType nt1 = (NumericType) t1;
+            NumericType nt2 = (NumericType) t2;
+            if(nt1.precision() > nt2.precision()) {
+                TypeCast tc = new TypeCast(t1,n.e2, n.e2.line_number);
+                n.e2 = tc;
+            } else {
+                TypeCast tc = new TypeCast(t2,n.e1, n.e1.line_number);
+                n.e1 = tc;
+            }
         }
         n.type = new BooleanType(n.line_number);
         return n.type;
@@ -290,9 +311,25 @@ public class TypeBindVisitor implements TypeVisitor {
     public Type visit(Plus n) {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
-        if (!(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
-            error.complain(st.toString(), "Operator + can not be applied to " + t1 + ", " + t2, n.line_number);
+        try {
+            if (!(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
+                error.complain(st.toString(), "Operator + can not be applied to " + t1 + ", " + t2, n.line_number);
+            }
+        } catch (TypeException e) {
+            //In a add operation both loss of precision and type cast is the same thing
+            //find the part with highest precision, and cast to that type:
+            NumericType nt1 = (NumericType) t1;
+            NumericType nt2 = (NumericType) t2;
+            if(nt1.precision() > nt2.precision()) {
+                TypeCast tc = new TypeCast(t1,n.e2, n.e2.line_number);
+                n.e2 = tc;
+            } else {
+                TypeCast tc = new TypeCast(t2,n.e1, n.e1.line_number);
+                n.e1 = tc;
+                t1 = t2;
+            }
         }
+        
         n.type = t1;
         return t1;
     }
@@ -300,8 +337,23 @@ public class TypeBindVisitor implements TypeVisitor {
     public Type visit(Minus n) {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
-        if (!(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
-            error.complain(st.toString(), "Operator - can not be applied to " + t1 + ", " + t2, n.line_number);
+        try {
+            if (!(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
+                error.complain(st.toString(), "Operator - can not be applied to " + t1 + ", " + t2, n.line_number);
+            }
+        } catch (TypeException e) {
+            //In a add operation both loss of precision and type cast is the same thing
+            //find the part with highest precision, and cast to that type:
+            NumericType nt1 = (NumericType) t1;
+            NumericType nt2 = (NumericType) t2;
+            if(nt1.precision() > nt2.precision()) {
+                TypeCast tc = new TypeCast(t1,n.e2, n.e2.line_number);
+                n.e2 = tc;
+            } else {
+                TypeCast tc = new TypeCast(t2,n.e1, n.e1.line_number);
+                n.e1 = tc;
+                t1 = t2;
+            }
         }
         n.type = t1;
         return t1;
@@ -310,8 +362,23 @@ public class TypeBindVisitor implements TypeVisitor {
     public Type visit(Times n) {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
-        if (!(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
-            error.complain(st.toString(), "Operator * can not be applied to " + t1 + ", " + t2, n.line_number);
+        try {
+            if (!(t1 instanceof NumericType && t2 instanceof NumericType && t1.equals(t2))) {
+                error.complain(st.toString(), "Operator * can not be applied to " + t1 + ", " + t2, n.line_number);
+            }
+        } catch (TypeException e) {
+            //In a add operation both loss of precision and type cast is the same thing
+            //find the part with highest precision, and cast to that type:
+            NumericType nt1 = (NumericType) t1;
+            NumericType nt2 = (NumericType) t2;
+            if(nt1.precision() > nt2.precision()) {
+                TypeCast tc = new TypeCast(t1,n.e2, n.e2.line_number);
+                n.e2 = tc;
+            } else {
+                TypeCast tc = new TypeCast(t2,n.e1, n.e1.line_number);
+                n.e1 = tc;
+                t1 = t2;
+            }
         }
         n.type = t1;
         return t1;
@@ -346,10 +413,23 @@ public class TypeBindVisitor implements TypeVisitor {
             for (Exp e : n.el.getList()) {
                 tl.add(e.accept(this));
             }
-            MethodDecl m = c.findMethod(n.i, tl);
+            MethodDecl m = c.findMethod(n.i, tl, false);
             if (m != null) {
                 n.method = m;
                 n.type = m.t.accept(this);
+                
+                //Now we must check for implicit casts and loss of precision:
+                for(int i=0 ;i < m.fl.size(); ++i) {
+                    try {
+                        n.el.elementAt(i).type.equals(m.fl.elementAt(i).t);
+                    } catch (LossOfPrecision l) {
+                        error.complain(st.toString(),"Possible loss of precision for "+(i+1)+"th argument to "+m.toString()+", converting "+n.el.elementAt(i).type+" into "+m.fl.elementAt(i).t,n.line_number);
+                    } catch (ImplicitCast ic) {
+                        TypeCast tc = new TypeCast(ic.cast_to,n.el.elementAt(i), n.el.elementAt(i).line_number);
+                        n.el.setElementAt(i, tc);
+                    }
+                }
+                
                 return n.type;
             } else {
                 error.complain(st.toString(), "Unknown method " + c.i + "." + n.i + "(" + typeListToString(tl) + ")", n.line_number);
@@ -361,6 +441,24 @@ public class TypeBindVisitor implements TypeVisitor {
             System.exit(-1); //Unrecoverable error
             return null;
         }
+    }
+    
+    public Type visit(TypeCast n) {
+        Type exp_type = n.exp.accept(this);
+        
+        if(exp_type instanceof VoidType || n.target_type instanceof VoidType) {
+            error.complain(st.toString(), "Void can not be used in casts",n.line_number);
+        }
+        
+        try {
+            if(!(exp_type.equals(n.target_type) || n.target_type.equals(exp_type))) {
+                error.complain(st.toString(), "Inconvertible types: Can't convert "+exp_type+" into "+n.target_type,n.line_number);
+            } 
+        } catch (TypeException e) {
+            //We ignore implicit cast and loss of precision here, since that's what we're doing
+        }
+        
+        return n.target_type;
     }
 
     public Type visit(IntegerLiteral n) {

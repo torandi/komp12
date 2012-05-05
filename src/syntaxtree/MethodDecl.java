@@ -34,7 +34,7 @@ public class MethodDecl extends Scope {
         return v.visit(this);
     }
 
-    public boolean compareParameters(ArrayList<Type> tl) {
+    public boolean compareParameters(ArrayList<Type> tl, boolean strict)  {
         if (tl.size() != fl.size()) {
             return false;
         }
@@ -42,8 +42,15 @@ public class MethodDecl extends Scope {
         for (int i = 0; i < tl.size(); ++i) {
             Type arg_type = tl.get(i);
             Type formal_type = fl.getTypeList().get(i);
-            if (!arg_type.equals(formal_type)) {
+            try {
+                if (!arg_type.equals(formal_type)) {
+                    return false;
+                }
+            } catch (LossOfPrecision e) {
                 return false;
+            } catch (TypeException e) {
+                if(strict) 
+                    return false;
             }
         }
         return true;

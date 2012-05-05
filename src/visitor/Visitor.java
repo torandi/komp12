@@ -138,4 +138,6 @@ public interface Visitor {
 
     // String s;
     public void visit(Identifier n);
+    
+    public void visit(TypeCast n);
 }
