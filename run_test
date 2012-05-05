@@ -1,6 +1,6 @@
 #!/bin/bash
 
-flags="-S -d -w"
+flags="-S -w"
 
 output_dir="output"
 
@@ -322,7 +322,7 @@ for file in $compile_files; do
 done
 
 if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
+   echo -e "$txtred Previous test failed. Not continuing $txtrst "
 	exit 1
 fi
 
@@ -338,7 +338,7 @@ for file in $noncompile_files; do
 done
 
 if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
+   echo -e "$txtred Previous test failed. Not continuing $txtrst "
 	exit 1
 fi
 
@@ -354,7 +354,7 @@ for file in $assembly_files; do
 done
 
 if [ $any_error -ne 0 ]; then
-	echo "Previous test failed. Not continuing"
+	echo -e "$txtred Previous test failed. Not continuing $txtrst "
 	exit 1
 fi
 
@@ -368,6 +368,10 @@ done
 
 echo -e "\n====================================\n"
 
-echo -e "$txtgrn All tests completed $txtrst"
+if [ $any_error -ne 0 ]; then
+   echo -e "$txtred Previous test failed. $txtrst "
+else
+   echo -e "$txtgrn All tests completed $txtrst"
+fi
 
 fi
