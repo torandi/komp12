@@ -3,7 +3,7 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class VoidType extends NumericType {
+public class VoidType extends Type {
 
     public VoidType(int line) {
         super(line);

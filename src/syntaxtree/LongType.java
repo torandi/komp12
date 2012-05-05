@@ -25,4 +25,8 @@ public class LongType extends NumericType {
     public String toString() {
         return "long";
     }
+    
+    public int precision() {
+        return 8;
+    }
 }

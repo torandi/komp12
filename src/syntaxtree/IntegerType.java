@@ -25,4 +25,11 @@ public class IntegerType extends NumericType {
     public String toString() {
         return "int";
     }
+
+    @Override
+    public int precision() {
+        return 4;
+    }
+    
+    
 }

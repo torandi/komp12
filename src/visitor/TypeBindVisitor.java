@@ -220,6 +220,7 @@ public class TypeBindVisitor implements TypeVisitor {
         return null;
     }
 
+    //Asigning value n.e (t1) to identifier n.i (t2)
     public Type visit(Assign n) {
         Type t1 = n.e.accept(this);
         Type t2 = n.i.accept(this);
@@ -227,6 +228,13 @@ public class TypeBindVisitor implements TypeVisitor {
         if (!t1.equals(t2)) {
             error.complain(st.toString(), "Assigning variable of type " + t1 + " to \"" + n.i + "\", which is of type " + t2, n.line_number);
 
+        } else if(t1 instanceof NumericType) { //Then t2 is also numeric type
+            NumericType nt1, nt2;
+            nt1 = (NumericType) t1;
+            nt2 = (NumericType) t2;
+            if(nt1.precision() > nt2.precision()) {
+                error.complain(st.toString(), "Possible loss of precision when assigning variable of type "+t1 +" to \'"+n.i+ "\", which is of type " + t2, n.line_number);
+            }
         }
         
         return null;
@@ -245,6 +253,13 @@ public class TypeBindVisitor implements TypeVisitor {
         ArrayType a_var_type = (ArrayType)var_type;
         if (!value_type.equals(a_var_type.base_type)) {
             error.complain(st.toString(), "Assigning " + value_type + " to \"" + n.i + "[...]\" which is of type "+a_var_type.base_type, n.line_number);
+        } else if(value_type instanceof NumericType) { //Then t2 is also numeric type
+            NumericType nt1, nt2;
+            nt1 = (NumericType) value_type;
+            nt2 = (NumericType) a_var_type.base_type;
+            if(nt1.precision() > nt2.precision()) {
+                error.complain(st.toString(), "Possible loss of precision when assigning " + value_type + " to \"" + n.i + "[...]\" which is of type "+a_var_type.base_type, n.line_number);
+            }
         }
         return null;
     }

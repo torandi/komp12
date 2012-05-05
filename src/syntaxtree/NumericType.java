@@ -1,6 +1,7 @@
 package syntaxtree;
 
 public abstract class NumericType extends Type {
+    public abstract int precision();
     
     protected NumericType(int line) {
         super(line);

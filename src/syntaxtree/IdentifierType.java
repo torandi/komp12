@@ -3,7 +3,7 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class IdentifierType extends NumericType {
+public class IdentifierType extends Type {
 
     public String s;
     private ClassDecl c;
