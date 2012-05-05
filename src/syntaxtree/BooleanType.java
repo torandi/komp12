@@ -3,7 +3,7 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class BooleanType extends NumericType {
+public class BooleanType extends Type {
 
     public BooleanType(int line) {
         super(line);

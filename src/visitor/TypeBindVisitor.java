@@ -225,7 +225,7 @@ public class TypeBindVisitor implements TypeVisitor {
         Type t2 = n.i.accept(this);
 
         if (!t1.equals(t2)) {
-            error.complain(st.toString(), "Assigning variable of type " + t2 + " to \"" + n.i + "\", which is of type " + t1, n.line_number);
+            error.complain(st.toString(), "Assigning variable of type " + t1 + " to \"" + n.i + "\", which is of type " + t2, n.line_number);
 
         }
         

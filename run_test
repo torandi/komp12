@@ -185,18 +185,18 @@ function generate_output_file() {
 	_javac_out=`$javac -d "$_out" $_java_file 2>&1`
 	if [ $? -eq 0 ]; then
 		# Run the created program!
-		java -cp $_out $(find_main_class $_java_file) > "$_file.output" 2> "$_out/error.log"
+		java -cp $_out $(find_main_class $_java_file) > "$_file.out" 2> "$_out/error.log"
 		if [ $? -eq 0 ]; then 
 			return 0
 		else
 			echo "The executed command was:" >> "$_out/error.log"
 			echo "java -cp $_out $(find_main_class $_java_file)" >> "$_out/error.log" 
-			rm "$_file.output"
+			rm "$_file.out"
 			return 2
 		fi
 	else
-		echo "$javac -d \"$_out\" $_java_file 2>&1" > "$_out/error.log"
-		echo $_javac_out >> "$_out/error.log"
+		echo -e "$javac -d \"$_out\" $_java_file 2>&1" > "$_out/error.log"
+		echo -e "$_javac_out" >> "$_out/error.log"
 		return 1;
 	fi
 }
@@ -204,8 +204,8 @@ function generate_output_file() {
 # Make sure file.output exists (or return 1)
 function get_output() {
 	_file=$(echo "$1" | sed 's/\.java//g')
-	echo "$_file.output"
-	if [ -f "$_file.output" ]; then
+	echo "$_file.out"
+	if [ -f "$_file.out" ]; then
 		return 0
 	else
 		# We must generate it!

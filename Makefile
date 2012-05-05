@@ -12,7 +12,7 @@ clean:
 	ant clean
 	rm -rf tigris
 	rm -rf tigris_mail
-	rm -rf testcases/execute/*/*.output
+	rm -rf testcases/execute/*/*.out
 
 tigris.tar.gz: clean src/ report.pdf DESC lib/ build.xml
 	tar -czf tigris.tar.gz src/ lib/ DESC report.pdf build.xml
