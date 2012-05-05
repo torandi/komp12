@@ -13,6 +13,7 @@ clean:
 	rm -rf tigris
 	rm -rf tigris_mail
 	rm -rf testcases/execute/*/*.out
+	rm -rf student-tests-2012/execute/*/*.out
 
 tigris.tar.gz: clean src/ report.pdf DESC lib/ build.xml
 	tar -czf tigris.tar.gz src/ lib/ DESC report.pdf build.xml

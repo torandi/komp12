@@ -9,10 +9,10 @@ javac="javac"
 jasmin="jasmin"
 build="ant"
 
-compile_tests="testcases/compile/*/*.java"
-noncompile_tests="testcases/noncompile/*/*.java"
-execute_tests="testcases/execute/*/*.java"
-nonexecute_tests="testcases/nonexecute/*/*.java"
+compile_tests="testcases/compile/*/*.java student-tests-2012/compile/*/*.java"
+noncompile_tests="testcases/noncompile/*/*.java student-tests-2012/noncompile/*/*.java"
+execute_tests="testcases/execute/*/*.java student-tests-2012/execute/*/*.java"
+nonexecute_tests="testcases/nonexecute/*/*.java student-tests-2012/nonexecute/*/*.java"
 
 ###### COLORS
 txtblk='\e[0;30m' # Black - Regular
@@ -173,7 +173,7 @@ function assemble() {
 }
 
 function find_main_class() {
-	cat $1 | grep "class " -m 1 | sed -r 's/class[ \t]+([a-zA-Z_][a-zA-Z0-9_]*)([ {].*)?/\1/'
+	cat $1 | grep "class " -m 1 | sed -r 's/class[ \t]+([a-zA-Z_][a-zA-Z0-9_]*).*/\1/'
 }
 
 function generate_output_file() {
@@ -185,7 +185,7 @@ function generate_output_file() {
 	_javac_out=`$javac -d "$_out" $_java_file 2>&1`
 	if [ $? -eq 0 ]; then
 		# Run the created program!
-		java -cp $_out $(find_main_class $_java_file) > "$_file.out" 2> "$_out/error.log"
+		java -cp "$_out" $(find_main_class $_java_file) > "$_file.out" 2> "$_out/error.log"
 		if [ $? -eq 0 ]; then 
 			return 0
 		else
@@ -251,7 +251,6 @@ function execute_test() {
 				fi
 			else
 				echo -e "$txtred JVM ERROR $txtrst"
-				echo java -cp $_out $(find_main_class $_file) "> \"$_program_outfile\" 2>\"$_program_errfile\""
 				cat "$_program_errfile"
 				return 1
 			fi
