@@ -1,5 +1,6 @@
 package jvm;
 
+import syntaxtree.LongType;
 import syntaxtree.Type;
 
 /**
@@ -22,7 +23,11 @@ public class Record implements frame.VMRecord
 
     public frame.VMAccess allocField(String id, Type type) {
 	offset++;
-	return new OnHeap(name, id, Hardware.signature(type));
+        int num_words = 1;
+        if(type instanceof LongType) {
+            num_words = 2;
+        }
+	return new OnHeap(name, id, Hardware.signature(type), num_words);
     }
 
     public int numberOfFields() {

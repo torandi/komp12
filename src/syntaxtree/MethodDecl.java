@@ -67,4 +67,11 @@ public class MethodDecl extends Scope {
     public String signature() {
         return i.s+fl.toString();
     }
+
+    @Override
+    public int hashCode() {
+        return signature().intern().hashCode();
+    }
+    
+    
 }

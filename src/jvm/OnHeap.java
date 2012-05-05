@@ -2,10 +2,12 @@ package jvm;
 
 public class OnHeap implements frame.VMAccess
 {
-    public OnHeap(String className, String fieldName, String signature) {
+    int words;
+    public OnHeap(String className, String fieldName, String signature, int words) {
 	c = className;
 	f = fieldName;
 	s = signature;
+        this.words = words;
     }
 
     public String toString() {
@@ -22,13 +24,11 @@ public class OnHeap implements frame.VMAccess
 	    "\tgetfield '" + c + "/" + f + "' " + s;
     }
 
-    // We get one extra instruction here, since the arguments
-    // end up in wrong order on the stack.
+    // Before using this the following content must be on the stack:
+    // data (latest push)
+    // object
     public String store() {
-        return
-	    "aload_0 ; this\n" +
-	    "\tswap\n" +
-	    "\tputfield '" + c + "/" + f + "' " + s;
+        return "putfield '" + c + "/" + f + "' " + s;
     }
 
     private String c;
@@ -37,6 +37,6 @@ public class OnHeap implements frame.VMAccess
 
     @Override
     public int words() {
-        return 1;
+        return words;
     }
 }

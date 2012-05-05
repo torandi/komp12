@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import jvm.Hardware;
 import jvm.Label;
+import jvm.OnHeap;
 import mjc.JVMMain;
 import syntaxtree.*;
 
@@ -70,17 +71,17 @@ public class AssemblerVisitor implements Visitor {
             current_max_stack_size = current_stack_size;
         }
         if(JVMMain.debug && pass == 2) {
-            directive("; push("+num_vars+")");
+            directive("; push("+num_vars+", size: "+current_stack_size+", max: "+current_max_stack_size+")");
         }
     }
 
     private void pop(int num_vars) {
         current_stack_size -= num_vars;
-        if (current_stack_size < 0) {
+        if (current_stack_size < 0 && JVMMain.warnings) {
             System.out.println("Warning, stack poped below 0");
         }
         if(JVMMain.debug && pass == 2) {
-            directive("; pop("+num_vars+")");
+            directive("; pop("+num_vars+", size: "+current_stack_size+", max: "+current_max_stack_size+")");
         }
     }
 
@@ -212,17 +213,16 @@ public class AssemblerVisitor implements Visitor {
     }
 
     public void visit(MethodDecl n) {
-        if (pass == 1) {
-            current_max_stack_size = 0;
-            current_stack_size = 0;
-        } else {
-            directive(".method public " + n.frame.procEntry());
-            directive(".limit locals " + (n.frame.numberOfLocals() + n.frame.numberOfFormals() + 1));
-            directive(".limit stack " + stack_size.get(n));
+        current_max_stack_size = 0;
+        current_stack_size = 0;
+        
+        directive(".method public " + n.frame.procEntry());
+        directive(".limit locals " + (n.frame.numberOfLocals() + n.frame.numberOfFormals() + 1));
+        directive(".limit stack " + stack_size.get(n));
 
-            line(n.line_number);
-            directive(".var 0 is <this> L" + convert_classname(n.cls.fullName()) + ";");
-        }
+        line(n.line_number);
+        directive(".var 0 is <this> L" + convert_classname(n.cls.fullName()) + ";");
+
 
         for (Formal f : n.fl.getList()) {
             f.accept(this);
@@ -250,6 +250,7 @@ public class AssemblerVisitor implements Visitor {
             }
             directive(".end method\n");
         } else {
+            System.out.println(n.signature()+" stack limit: "+current_max_stack_size);
             stack_size.put(n, current_max_stack_size);
         }
 
@@ -357,16 +358,27 @@ public class AssemblerVisitor implements Visitor {
     }
 
     public void visit(Assign n) {
-        line(n.line_number);
+        if(n.i.sym.access instanceof OnHeap ) {
+            line(n.line_number);
+            instr("aload_0 ; this");
+            push();
+        }
+        
         n.e.accept(this);
         line(n.line_number);
-        push();
         instr(n.i.sym.access.store());
-        pop(1+n.i.sym.access.words());
+        
+        if(n.i.sym.access instanceof OnHeap) {
+            pop(); //Remove the extra push
+        }
+        
+        pop(n.i.sym.access.words());
     }
 
     public void visit(ArrayAssign n) {
         line(n.line_number);
+        if(n.i.sym.access instanceof OnHeap) 
+            push();
         instr(n.i.sym.access.load());
         push(n.i.sym.access.words());
         n.e1.accept(this);
@@ -387,6 +399,8 @@ public class AssemblerVisitor implements Visitor {
         } else {
             throw new InternalError("Unhandled type in array assignment on line "+n.line_number);
         }
+        if(n.i.sym.access instanceof OnHeap) 
+            pop();
     }
 
     //Set label l_true to null to fall through on true
@@ -575,7 +589,24 @@ public class AssemblerVisitor implements Visitor {
         }
         line(n.line_number);
         instr("invokevirtual '" + convert_classname(n.method.fullName()) + Hardware.methodSignature(n.method.fl, n.method.t)+"'");
-        pop(n.method.fl.size()); //pop(1+fl.size()); push(1) (result)
+        int stack_change = 1;
+        if(n.method.t instanceof LongType) {
+            stack_change += 1;
+        } else if(n.method.t instanceof VoidType) {
+            stack_change = 0;
+        }
+        for(Formal f : n.method.fl.getList()) {
+            if(f.t instanceof LongType ){
+                stack_change-=2;
+            } else {
+                --stack_change;
+            }
+        }
+        if(stack_change < 0) {
+            pop(Math.abs(stack_change));
+        } else if(stack_change > 0) {
+            push(stack_change);
+        }
     }
 
     public void visit(IntegerLiteral n) {

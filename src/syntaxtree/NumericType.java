@@ -7,6 +7,7 @@ public abstract class NumericType extends Type {
         super(line);
     }
     
+    @Override
     public boolean equals(Type t) throws ImplicitCast, LossOfPrecision {
         if(t instanceof NumericType) {
             NumericType nt = (NumericType) t;
