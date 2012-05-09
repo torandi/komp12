@@ -405,10 +405,10 @@ public class AssemblerVisitor implements Visitor {
     //Set label l_false to null to fall through on false
     public void create_or(Exp e1, Exp e2, Label l_true, Label l_false) {
         e1.accept(this);
-        instr("ifeq " + l_true.name());
+        instr("ifne " + l_true.name());
         pop();
         e2.accept(this);
-        instr("ifeq " + l_true.name());
+        instr("ifne " + l_true.name());
         pop();
         if (l_false != null) {
             instr("goto " + l_false.name());
@@ -434,7 +434,6 @@ public class AssemblerVisitor implements Visitor {
 
         line(n.line_number);
         create_or(n.e1, n.e2, l_true, null); //Null => fall through on false
-        line(n.line_number);
         instr("iconst_0");
         instr("goto " + l_end.name());
         label(l_true.declare());
@@ -450,7 +449,6 @@ public class AssemblerVisitor implements Visitor {
 
         line(n.line_number);
         create_and(n.e1, n.e2, null, l_false); //Null => fall through on true
-        line(n.line_number);
         instr("iconst_1");
         instr("goto " + l_end.name());
         label(l_false.declare());
