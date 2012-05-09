@@ -8,6 +8,9 @@ parser:
 mjc: src/
 	ant
 
+report.pdf: report.tex
+	xelatex report.tex
+
 clean:
 	ant clean
 	rm -rf tigris

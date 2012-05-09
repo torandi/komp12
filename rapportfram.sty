@@ -1,0 +1,44 @@
+% Framsida för rapport
+% Andreas Tarandi, taran@kth.se
+% Version 0.1, 2009-11-13
+\NeedsTeXFormat{LaTeX2e}[1998/12/01]
+\ProvidesPackage{rapportfram}[2009/11/13 v0.1 Rapportframsida]
+\usepackage{graphicx}
+\def\course#1{\gdef\@course{#1}}
+\def\titleextra#1{\gdef\@titleextra{#1}}
+\gdef\@titlepos{-68}
+\gdef\pagecmd{\clearpage\cleardoublepage}
+\def\compactmode{\gdef\@titlepos{-45}\gdef\pagecmd{\vspace{200pt}}}
+\def\@course{\@latex@warning{No course given}}
+\def\@titleextra{}
+%\newcommand{\addauthor}[2]{\def\tmp{\authorbox #1\\#2\\\vspace{1pt}} }
+\renewcommand{\maketitle}{
+  \setlength{\unitlength}{1mm}
+  \thispagestyle{empty}
+  \vglue-\headheight\vglue-\headsep\vglue-\topmargin\vglue-1in
+  \hglue-\oddsidemargin\hglue-1in\hglue-\parindent
+  \begin{picture}(0,0)
+    \put(30,-1){\makebox[0pt]{\parbox[t]{\textwidth}{
+      \begin{center}
+        {\textbf{\@course} \\ \vspace{2pt}
+		  \@author}
+      \end{center}} }}
+    \put(165,-30){\makebox[0pt][l]{
+      \vbox{
+        \hbox{
+			%\includegraphics{kth.jpg}
+			}}}}
+    \put(0,\@titlepos){\makebox[598pt]{\parbox[t]{\textwidth}{ %105
+      \begin{center}
+        {\LARGE \@title } 
+		  \vspace{4pt}\\
+		  { \large\textit{\@date}}
+      \end{center}}}}
+    \put(105,-80){\makebox[0pt]{\parbox[t]{\textwidth}{
+      \begin{center}
+			{\@titleextra}
+      \end{center}}}}
+  \end{picture}\par
+  \setcounter{page}{1}
+\pagecmd
+}
