@@ -28,6 +28,8 @@ import parse.Token;
 
 public class AbstractTree {
 
+    public static boolean allow_extended_syntax = true;
+    
     private ErrorMsg error;
     private Start basicTree;
     public Program program;
@@ -198,6 +200,9 @@ public class AbstractTree {
             } else if (in instanceof basic_tree.ExpressionStatement) {
                 basic_tree.ExpressionStatement exs = (basic_tree.ExpressionStatement) in;
                 ret = new ExpressionStatement(exp(exs.getExpression()));
+                if(!allow_extended_syntax) {
+                    error.complain("Expressions as statements are not allowed with limited syntax", in.line_number);
+                }
             } else {
                 throw new InternalError("Encountered unknown statment: "+in.getClass().getName());
             }

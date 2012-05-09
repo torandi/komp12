@@ -14,13 +14,13 @@ class Main {
       stack = new StackOperator();
       item = new Stackable();
       tmp = item.set(10L);
-      stack.init(item);
+      tmp = stack.init(item);
 
       item = new Stackable();
       tmp = item.set(100L);
-      stack.push(item);
+      tmp = stack.push(item);
 
-      stack.push(new AddOperator());
+      tmp = stack.push(new AddOperator());
 
       item = stack.exec();
       System.out.println(item.value());
@@ -32,18 +32,18 @@ class Main {
 
       item = new Stackable();
       tmp = item.set(100L);
-      stack.push(item);
+      tmp = stack.push(item);
 
       item = new Stackable();
       tmp = item.set(100L);
-      stack.push(item);
+      tmp = stack.push(item);
 
       item = new Stackable();
       tmp = item.set(100L);
-      stack.push(item);
+      tmp = stack.push(item);
 
-      stack.push(new AddOperator());
-      stack.push(new AddOperator());
+      tmp = stack.push(new AddOperator());
+      tmp = stack.push(new AddOperator());
 
       item = stack.exec();
       System.out.println(item.value());
@@ -68,7 +68,7 @@ class StackOperator {
       last_item = last_item.push(item);
       return true;
    }
-   
+
    public Stackable exec() {
       last_item = last_item.exec();
       return last_item;

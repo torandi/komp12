@@ -250,7 +250,6 @@ public class AssemblerVisitor implements Visitor {
             }
             directive(".end method\n");
         } else {
-            System.out.println(n.signature()+" stack limit: "+current_max_stack_size);
             stack_size.put(n, current_max_stack_size);
         }
 

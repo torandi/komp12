@@ -20,7 +20,6 @@ import visitor.TypeDefVisitor;
 
 public class JVMMain {
     public static frame.VMFactory frameFactory;
-    public static boolean assemble = true;
     public static boolean print_ast = false;
     public static boolean debug_symbols = true;
     public static boolean debug = false;
@@ -36,7 +35,7 @@ public class JVMMain {
         String srcfile = null;
         for(int i=0; i < args.length; ++i) {
             if(args[i].equals("-S")) {
-                assemble = false;
+                AbstractTree.allow_extended_syntax = false; //Hack to follow the limited grammar
             } else if(args[i].equals("-o")) {
                 if(args.length >= i+2) {
                     output_dir = args[++i];
@@ -45,7 +44,7 @@ public class JVMMain {
                 }
             } else if(args[i].equals("-h")) {
                 System.out.println("Flags:\n"
-                        + "-S : do not run jasmin (only output assembler)\n"
+                        + "-S : Disable extended syntax\n"
                         + "-o : set output directory\n"
                         + "-nd : don't generate debug symbols\n"
                         + "-d : Turn on compiler debuging\n"
@@ -133,16 +132,6 @@ public class JVMMain {
             
             ArrayList<String> asm_files = asmVisitor.run(abstractTree.program, output_dir, basename);
             System.out.println("Assembly outputed to "+asmVisitor.getOutputDir());
-            
-            if(assemble) {
-                for(String asm : asm_files) {
-                    try {
-                        Runtime.getRuntime().exec("jasmin \""+asm+"\" -d \""+output_dir+"\"");
-                    } catch (IOException ex) {
-                        System.out.println("Jasmin execution failed!");
-                    }
-                }
-            }
 
             return true;
         } catch (FileNotFoundException ex) {

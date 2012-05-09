@@ -40,7 +40,7 @@ class LongTest {
       System.out.println(10L + 2);
       System.out.println(10L * 2);
    
-      lclass.l(i1);
+      System.out.println(lclass.l(i1));
 
 	}
 }

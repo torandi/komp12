@@ -26,7 +26,9 @@ public class ErrorMsg
             out.println("\nError: "+src+":"+line+": "+msg);
         else
             out.println("\nError: "+src+": "+msg);
-        throw new InternalError("Error here");
+
+        if(throwException)
+            throw new InternalError("Compile error");
             
     }
     
