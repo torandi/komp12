@@ -90,6 +90,10 @@ public interface Visitor {
     public void visit(And n);
 
     // Exp e1,e2;
+    public void visit(Or n);
+
+    
+    // Exp e1,e2;
     public void visit(Compare n);
 
     // Exp e1,e2;

@@ -82,6 +82,9 @@ public interface TypeVisitor {
     public Type visit(And n);
 
     // Exp e1,e2;
+    public Type visit(Or n);
+    
+    // Exp e1,e2;
     public Type visit(Compare n);
 
     // Exp e1,e2;

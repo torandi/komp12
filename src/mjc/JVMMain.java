@@ -25,6 +25,7 @@ public class JVMMain {
     public static boolean debug_symbols = true;
     public static boolean debug = false;
     public static boolean warnings = false;
+    public static boolean error_throws_exception = false;
     
     ErrorMsg error;
 
@@ -49,6 +50,7 @@ public class JVMMain {
                         + "-nd : don't generate debug symbols\n"
                         + "-d : Turn on compiler debuging\n"
                         + "-w : show warnings\n"
+                        + "-ex : Error throws exception (compiler debugging)\n"
                         + "-h : this help\n");
             } else if(args[i].equals("-fno-array-bounds-checks")) {
                 //tigris uses this flag in performance tests, so turn of debug flags:
@@ -57,6 +59,8 @@ public class JVMMain {
                 debug_symbols = false;
             } else if(args[i].equals(("-d"))) {
                 debug = true;
+            } else if(args[i].equals(("-ex"))) {
+                error_throws_exception = true;
             } else if(args[i].equals(("-w"))) {
                 warnings = true;
                                 
@@ -94,7 +98,7 @@ public class JVMMain {
         try {
             String basename = new File(file).getName();
             
-            error = new ErrorMsg(System.err, basename);
+            error = new ErrorMsg(System.err, basename, error_throws_exception);
             error.showWarnings = warnings;
             
             Reader r = new FileReader(file);
@@ -103,10 +107,6 @@ public class JVMMain {
             abstractTree = new AbstractTree(basicTree,error);
             abstractTree.build();
 
-            if(error.anyErrors)
-               return false;
-
-            
             if(print_ast) {
                 //Build abstract tree
                 PrintWriter pw = new PrintWriter (output_dir+basename+".ast");
@@ -120,9 +120,6 @@ public class JVMMain {
             //Check syntax and bind types
             TypeDefVisitor tdv= new TypeDefVisitor(error);
             tdv.visit(abstractTree.program);
-
-            if(error.anyErrors)
-               return false;
             
             //Bind symbols and allocate records, frames and accesses
             TypeBindVisitor tbv= new TypeBindVisitor(error);

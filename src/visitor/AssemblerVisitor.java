@@ -403,6 +403,19 @@ public class AssemblerVisitor implements Visitor {
             pop();
     }
 
+    //Set label l_false to null to fall through on false
+    public void create_or(Exp e1, Exp e2, Label l_true, Label l_false) {
+        e1.accept(this);
+        instr("ifeq " + l_true.name());
+        pop();
+        e2.accept(this);
+        instr("ifeq " + l_true.name());
+        pop();
+        if (l_false != null) {
+            instr("goto " + l_false.name());
+        }
+    }
+    
     //Set label l_true to null to fall through on true
     public void create_and(Exp e1, Exp e2, Label l_true, Label l_false) {
         e1.accept(this);
@@ -416,6 +429,22 @@ public class AssemblerVisitor implements Visitor {
         }
     }
 
+    public void visit(Or n) {
+        Label l_true = create_label("or_true");
+        Label l_end = create_label("or_end");
+
+        line(n.line_number);
+        create_or(n.e1, n.e2, l_true, null); //Null => fall through on false
+        line(n.line_number);
+        instr("iconst_0");
+        instr("goto " + l_end.name());
+        label(l_true.declare());
+        instr("iconst_1");
+        label(l_end.declare());
+
+        push();
+    }
+    
     public void visit(And n) {
         Label l_false = create_label("and_false");
         Label l_end = create_label("and_end");

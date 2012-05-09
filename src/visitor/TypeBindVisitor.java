@@ -271,6 +271,16 @@ public class TypeBindVisitor implements TypeVisitor {
         return null;
     }
 
+    public Type visit(Or n) {
+        Type t1 = n.e1.accept(this);
+        Type t2 = n.e2.accept(this);
+        if (!(t1 instanceof BooleanType && t2 instanceof BooleanType)) {
+            error.complain(st.toString(), "Operator || can not be applied to " + t1 + ", " + t2, n.line_number);
+        }
+        n.type = new BooleanType(n.line_number);
+        return n.type;
+    }
+    
     public Type visit(And n) {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
@@ -388,6 +398,7 @@ public class TypeBindVisitor implements TypeVisitor {
         Type t = n.e1.accept(this);
         if (!(t instanceof ArrayType)) {
             error.complain(st.toString(), "Can not look up index in type " + t, n.line_number);
+            return t;
         }
         if (!(n.e2.accept(this) instanceof IntegerType)) {
             error.complain(st.toString(), "Index must be an integer", n.line_number);

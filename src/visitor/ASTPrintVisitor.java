@@ -288,6 +288,15 @@ public class ASTPrintVisitor implements Visitor {
     }
 
     // Exp e1,e2;
+    public void visit(Or n) {
+	stream.print("Or(");
+	n.e1.accept(this);
+	stream.print(", ");
+	n.e2.accept(this);
+	stream.print(")");
+    }
+    
+    // Exp e1,e2;
     public void visit(Compare n) {
 	stream.print("Compare(");
 	n.e1.accept(this);

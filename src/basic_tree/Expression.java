@@ -4,25 +4,25 @@ package basic_tree;
 import java.util.ArrayList;
 
 public class Expression {
-    private ArrayList<AndOperand> operands = new ArrayList<AndOperand>();
+    private ArrayList<OrOperand> operands = new ArrayList<OrOperand>();
     public int line_number=-1;
 
-    public Expression(AndOperand op) {
+    public Expression(OrOperand op) {
         operands.add(op);
         line_number = op.line_number;
     }
 
-	public ArrayList<AndOperand> getOperands() {
+	public ArrayList<OrOperand> getOperands() {
 		return operands;
 	}
 
-	public void addOperand(AndOperand op) {
+	public void addOperand(OrOperand op) {
 		operands.add(op);
 	}
 
     public String toString() {
         String ret="[Expression: ";
-        for(AndOperand op : operands) {
+        for(OrOperand op : operands) {
             ret+=op.toString()+" ";
         }
         ret+="]";

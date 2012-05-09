@@ -17,6 +17,7 @@ import basic_tree.MethodSufix;
 import basic_tree.NewArrayPrimary;
 import basic_tree.NewPrimary;
 import basic_tree.NotExpressionPrimary;
+import basic_tree.OrOperand;
 import basic_tree.Sufix;
 import basic_tree.Term;
 import basic_tree.Variable;
@@ -245,14 +246,22 @@ public class AbstractTree {
      */
     private Exp exp(basic_tree.Expression in) {
         ExpList el = new ExpList();
-        for (AndOperand op : in.getOperands()) {
-            el.addElement(and(op));
+        for (OrOperand op : in.getOperands()) {
+            el.addElement(or(op));
         }
-        Exp e = buildAnd(el);
+        Exp e = buildOr(el);
         e.line_number = in.line_number;
         return e;
     }
-
+    
+    private Exp buildOr(ExpList el) {
+        if (el.size() > 1) {
+            return new Or(el.elementAt(0), buildOr(el.sublist()));
+        } else {
+            return el.elementAt(0);
+        }
+    }
+    
     private Exp buildAnd(ExpList el) {
         if (el.size() > 1) {
             return new And(el.elementAt(0), buildAnd(el.sublist()));
@@ -260,7 +269,15 @@ public class AbstractTree {
             return el.elementAt(0);
         }
     }
-
+    
+    private Exp or(basic_tree.OrOperand in) {
+        ExpList el = new ExpList();
+        for (AndOperand op : in.getOperands()) {
+            el.addElement(and(op));
+        }
+        return buildAnd(el);
+    }
+    
     private Exp and(basic_tree.AndOperand in) {
         ExpList el = new ExpList();
         for (LessOperand op : in.getOperands()) {
@@ -296,8 +313,7 @@ public class AbstractTree {
             case ParserConstants.NEQ:
                 return Compare.Operator.NEQ;
             default:
-                error.complain("Parser error: Invalid comparison operator " + t.image, t.beginLine);
-                return null;
+                throw new InternalError("Parser error: Invalid comparison operator " + t.image +" in line "+ t.beginLine);
         }
     }
 
@@ -366,8 +382,7 @@ public class AbstractTree {
             }
             return new Call(cur, id(ms.getMethodName()), el, in.line_number());
         }
-        error.complain("Internal error: Unknown sufix!", in.line_number());
-        return null;
+        throw new InternalError("Unknown suffix: "+in.getClass().getName()+" in line "+ in.line_number());
     }
 
     private Exp primary(basic_tree.Primary in) {
@@ -405,8 +420,7 @@ public class AbstractTree {
             ExpressionPrimary ep = (ExpressionPrimary) in;
             e = exp(ep.getExpression());
         } else {
-            error.complain("Internal error: Unknown primary " + in + "!", in.line_number);
-            return null;
+            throw new InternalError("Unknown primary " + in + " in line "+ in.line_number);
         }
         e.line_number = in.line_number;
         return e;

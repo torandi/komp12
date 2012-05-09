@@ -159,6 +159,7 @@ public class TypeDefVisitor implements Visitor {
     public void visit(Print n) {}
     public void visit(Assign n) { }
     public void visit(ArrayAssign n) { }
+    public void visit(Or n) {}
     public void visit(And n) {}
     public void visit(Compare n) {}
     public void visit(Plus n) { }

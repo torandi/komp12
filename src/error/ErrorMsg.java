@@ -4,14 +4,16 @@ public class ErrorMsg
 {
     public boolean anyErrors;
     public boolean showWarnings = false;
+    public boolean throwException = false;
     
     private java.io.PrintStream out;
     private String src;
 
-    public ErrorMsg(java.io.PrintStream o, String src) {
+    public ErrorMsg(java.io.PrintStream o, String src, boolean throw_exception) {
 	anyErrors = false;
 	out = o;
         this.src = src;
+        throwException = throw_exception;
     }
 
     public void complain(String context, String msg, int line) {
@@ -24,6 +26,7 @@ public class ErrorMsg
             out.println("\nError: "+src+":"+line+": "+msg);
         else
             out.println("\nError: "+src+": "+msg);
+        throw new InternalError("Error here");
             
     }
     

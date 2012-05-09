@@ -48,6 +48,7 @@ TOKEN: {	<EQ: "==" > }
 TOKEN: {	<NEQ: "!=" > }
 TOKEN: {	<SET: "=" > }
 TOKEN: { <AND: "&&" > }
+TOKEN: { <OR: "||" > }
 TOKEN: { <OPAR: "("> }
 TOKEN: {	<CPAR: ")"> }
 TOKEN: {	<OSB: "[">}
@@ -360,18 +361,35 @@ Type Type () throws ParseException:
 Expression Expression() throws ParseException:
 {
 	Expression e;
-	AndOperand op;
+	OrOperand op;
 }
 {
-	op = AndOperand()
+	op = OrOperand()
 	{ e = new Expression(op); }
 	(
 		LOOKAHEAD(2)
-		<AND>
-		op = AndOperand()
+		<OR>
+		op = OrOperand()
 		{ e.addOperand(op); }
 	)* 
 	{ return e; }
+}
+
+OrOperand OrOperand() throws ParseException:
+{
+   OrOperand op;
+   AndOperand op2;
+}
+{
+   op2 = AndOperand()
+   { op = new OrOperand(op2); }
+   (
+      LOOKAHEAD(2)
+      <AND>
+      op2 = AndOperand()
+      { op.addOperand(op2); }
+   )* 
+   { return op; }
 }
 
 AndOperand AndOperand() throws ParseException:
@@ -461,19 +479,55 @@ Factor Factor() throws ParseException:
 	Factor f;
 	Primary p;
 	Sufix s;
+   boolean newarray=false;
 }
 {
-	p = Primary()
+   ( //New primary, handle separatly to be able to set newarray
+      {
+         Token v;
+         Type t;
+         Expression e;
+      }
+      <NEW>
+      (
+         LOOKAHEAD(2)
+         (
+            v = <KWINT>
+            { t = new IntegerType(v.beginLine); }
+         |
+            v = <KWBOOL>
+            { t = new BooleanType(v.beginLine); }
+         |
+            v = <KWLONG>
+            { t = new LongType(v.beginLine); }
+         |
+            v = <ID>
+            { t = new CustomType(v); }
+         )
+         <OSB>
+         e = Expression()
+         <CSB>
+         { p = new NewArrayPrimary(t, e, v.beginLine); newarray = true; }
+      |
+         v=<ID>
+         <OPAR>
+         <CPAR>
+         { p = new NewPrimary(v); }
+      )
+   |
+      p = Primary() //Other primary
+   )
+
 	{ f = new Factor(p); }
 	(
 		LOOKAHEAD(2)
-		s = Sufix()
+		s = Sufix(newarray)
 		{ f.addSufix(s); }
 	)*	
 	{ return f; }
 }
 
-Sufix Sufix() throws ParseException:
+Sufix Sufix(boolean newarray) throws ParseException:
 {
 	Sufix s;
 	Token id;
@@ -484,7 +538,15 @@ Sufix Sufix() throws ParseException:
 		{ Expression e; }
 		e = Expression()
 		id=<CSB>
-		{ s = new IndexSufix(e,id.beginLine); }
+		{
+         s = new IndexSufix(e,id.beginLine); 
+         if(newarray) {
+            //We don't allow new foo[1][0] constructs
+            ParseException parse_exception = new ParseException("Array lookup in new array construct is not allowed");
+            parse_exception.currentToken = id;
+            throw parse_exception;
+         }
+      }
 	|
 		<DOT>
 		(
@@ -523,33 +585,6 @@ Primary Primary() throws ParseException:
 	|
 		v=<ID>
 		{ p = new IdPrimary(v); }
-	|
-		<NEW>
-		(
-			LOOKAHEAD(2)
-			(
-				v = <KWINT>
-				{ t = new IntegerType(v.beginLine); }
-			|
-				v = <KWBOOL>
-				{ t = new BooleanType(v.beginLine); }
-			|
-				v = <KWLONG>
-				{ t = new LongType(v.beginLine); }
-			|
-				v = <ID>
-				{ t = new CustomType(v); }
-			)
-			<OSB>
-			e = Expression()
-			<CSB>
-			{ p = new NewArrayPrimary(t, e, v.beginLine); }
-		|
-			v=<ID>
-			<OPAR>
-			<CPAR>
-			{ p = new NewPrimary(v); }
-		)
 	|
 		v=<EXCL>
 		ao = AndOperand()
