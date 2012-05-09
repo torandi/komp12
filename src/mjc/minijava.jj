@@ -76,6 +76,7 @@ TOKEN: { <RETURN: "return"> }
 TOKEN: { <COMMA: ","> }
 TOKEN: { <VOID: "void"> }
 TOKEN: { <EXTENDS: "extends"> }
+TOKEN: { <THIS: "this"> }
 
 
 TOKEN: { <ID: ["A"-"Z","a"-"z", "_"](["A"-"Z","a"-"z","0"-"9","_"])* > }
@@ -582,6 +583,9 @@ Primary Primary() throws ParseException:
 	|
 		v = <BOOL>
 		{ p = new BooleanPrimary(v); }
+   |
+      v = <THIS>
+      { p = new ThisPrimary(v.beginLine); }
 	|
 		v=<ID>
 		{ p = new IdPrimary(v); }

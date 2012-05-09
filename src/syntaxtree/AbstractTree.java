@@ -20,6 +20,7 @@ import basic_tree.NotExpressionPrimary;
 import basic_tree.OrOperand;
 import basic_tree.Sufix;
 import basic_tree.Term;
+import basic_tree.ThisPrimary;
 import basic_tree.Variable;
 
 import error.ErrorMsg;
@@ -400,11 +401,9 @@ public class AbstractTree {
             e = new LongLiteral(lp.getLong());
         } else if (in instanceof IdPrimary) {
             IdPrimary ip = (IdPrimary) in;
-            if (ip.getId().equals("this")) {
-                e = new This();
-            } else {
-                e = new IdentifierExp(ip.getId());
-            }
+            e = new IdentifierExp(ip.getId());
+        } else if (in instanceof ThisPrimary) {
+            e = new This();
         } else if (in instanceof BooleanPrimary) {
             BooleanPrimary bp = (BooleanPrimary) in;
             if (bp.getBoolean()) {
