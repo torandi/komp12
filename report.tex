@@ -21,12 +21,11 @@
   This document describes the design process and decisions behind my compiler for the minijava language. The compiler compiles minijava into jasmine (JVM) assembler.
 
   \section{Lexer and Parser}
-  For the lexer and parser I used JavaCC, a LL parser code generator. LL feels more natural than LR and the
-  process of converting the grammar to LL was not too tedious. In some places I had to move away from LL(1) grammar, but in most cases LL(1) sufficed.
+  For the lexer and parser I used JavaCC, a LL parser code generator. I decided to use LL since it feelt more natural than LR and the
+  process of converting the grammar to LL was not too tedious. In some places I had to move away from LL(1) grammar (in favour for LL(k) grammars), but in most cases LL(1) sufficed.
 
   The thing that caused most problems writing a LL grammar was inserting new features into the complete code. Since the grammar had to be broken down into small pieces for
-  the LL conversion and what more for keeping the correct order of operations it was tedious to insert new grammar parts into this. This is the main reason why I have refrained from
-  implementing the logical or extension.
+  the LL conversion and what more for keeping the correct order of operations it was at times difficult to insert new grammar into it.
 
   \section{Abstract Syntax Tree}
   The syntax tree created by the parser (in the code called ''basic\_tree'') is more complex than
@@ -37,25 +36,25 @@
 
   \section{Type checking}
 
-  For typechecking and binding both, the visitor pattern is used. Type checking is done in two steps; first all definitions are handled:
+  For type checking and binding both, the visitor pattern is used. Type checking is done in two steps; first all definitions are handled:
   classes are defined in the program, methods defined in the methods and variables and formals defined in the methods. In this step the compiler catches any
   double declarations and like errors.
 
-  In the second step the classes are assigned to JVM records, the methods to JVM frames and the variables to accesses. Also all method calls are bound to the corresponding method, and the same with classes and symbols.
+  In the second step the classes are assigned to JVM records, the methods to JVM frames and the variables to accesses. All method calls are also bound to the corresponding method, and the same with classes and symbols.
   All remaining type checking is done in the second step.
 
-  Another thing worth of notice is that in the second step all the methods in the visitor call returns the type that subtree evaled to.
+  Another thing worth of notice is that in the second step all the methods in the visitor call returns the type that subtree evaluated to.
 
   \subsection{Symbol tree}
-  The symbol tree used in the typechecking and binding is a stack onto which the scopes are pushed and pop as the code traverses the tree, this has the advantage that only the currently active variables are
-  stored, which increases the performance of the compiler. This is only used for local variables, since class variables, methods and classes can be accessed outside of their scope. If a variable is not found in a scope
+  The symbol tree used in the type checking and binding is a stack onto which the scopes are pushed and pop as the code traverses the tree. This has the advantage that only the currently active variables are
+  kept in the symbol table, which increases the lookup speed for symbols, and in turn the performance of the compiler. This is only used for local variables, since class variables, methods and classes can be accessed outside of their declared scope. If a variable is not found in a scope
   the code proceeds to check the scope below in the stack and so on.
 
   \section{Assembling}
   Since I made the decision to target JVM the process are much easier than would I have targeted a real processor platform, therefore no IR-trees or register handling are needed and I can directly proceed to assembling.
 
-  This was done by once again by using the visitor pattern. Since jasmine require one to specify the stack size required for each method the assembling is also done in two passes; a first that doesn't write any output but just counts pushes and pops to the stacks,
-  and a second that actually writes this. This way I achieve an almost optimal stack limit. Otherwise the assembling part of the compiler is nothing special; it simply translate the AST into jasmin.
+  This was done by once again by using the visitor pattern. Since jasmine require one to specify the maximum stack size for each method the assembling is also done in two passes; a first that doesn't write any output but just counts pushes and pops to the stack and calculates the maximum stack size needed, 
+  and a second pass that actually outputs assembler. This way I achieve an almost optimal stack limit. Otherwise the assembling part of the compiler is straight forward; it simply translate the AST into jasmin.
 
   \section{Extensions}
   Besides implementing the given base language I have implemented the following predefined extensions:
@@ -64,6 +63,7 @@
      \item Comparison operators (all of them)
      \item Inheritance syntax check and code generation
      \item Long: The primary type long
+     \item Logical or: The ||-operator
   \end{itemize}
 
   I have also added the following non-standard extensions:
@@ -89,8 +89,8 @@
         \item \textbf{ErrorMsg} A class handling compile errors and warnings
         \item \textbf{InternalError} Error thrown on internal errors (errors in the compiler as opposed to errors in the compiled code)
         \item \textbf{TypeException} Superclass for type exceptions
-        \item \textbf{ImplicitCast} Exception thrown when an implicit cast occurred, subclass to TypeException
-        \item \textbf{LossOfPrecision} Exception thrown when loss of precision would occur in an implicit cast, subclass to TypeException
+        \item \textbf{ImplicitCast} Exception thrown when an implicit type cast occurrs, subclass to TypeException
+        \item \textbf{LossOfPrecision} Exception thrown when loss of precision would occur if an implicit type cast where done, subclass to TypeException
      \end{itemize}
 
   \subsection{basic\_tree}
@@ -106,18 +106,16 @@
      Classes for handling the symbol table
      \begin{itemize}
         \item \textbf{Scope} Abstract tree that all classes in the syntaxtree that are scopes should inherit, contains code for symbol store and lookup.
-        \item \textbf{Symbol} Class for a symbol
         \item \textbf{SymbolTable} Class handling all the scopes, including additions and lookups into them.
      \end{itemize}
 
   \subsection{visitor}
      Containing visitors for traversing the syntax tree. This is where the main processing is done.
      \begin{itemize}
-        \item \textbf{ASTPrintVisitor} Print Abstract Syntax Tree
         \item \textbf{Visitor} Base class for visitors
         \item \textbf{TypeVisitor} Base class for type visitors
-        \item \textbf{TypeDefVisitor} Pass one of typecheck, adds definitions for classes methods etc, and adds symbols to all variable definitions.
-        \item \textbf{TypeBindVisitor} Pass two of typecheck, links up all variable uses with corresponding symbol and creates VM records, frames and accesses.
+        \item \textbf{TypeDefVisitor} Pass one of type check, adds definitions for classes methods etc, and adds symbols to all variable definitions.
+        \item \textbf{TypeBindVisitor} Pass two of type check, links up all variable uses with corresponding symbol and creates VM records, frames and accesses.
         \item \textbf{AssemblerVisitor} Creates and outputs the final assembler.
      \end{itemize}
   \subsection{parse}
