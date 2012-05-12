@@ -40,6 +40,7 @@ public class TypeDefVisitor implements Visitor {
 
     public void visit(MainClass n) {
         st.pushScope(n);
+        st.addVariable(n.i2, new Symbol(new VoidType(-1))); //the param to main is a hack...
         for (VarDecl v : n.vl.getList()) {
             v.accept(this);
         }
