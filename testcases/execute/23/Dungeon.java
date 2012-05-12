@@ -1,5 +1,3 @@
-// EXT:INT32
-
 /*
  * A random dungeon map generator in MiniJava. It uses a digging
  * algorithm adapted from a labyrinth-making algorithm. You can

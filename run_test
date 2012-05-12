@@ -14,6 +14,8 @@ noncompile_tests="testcases/noncompile/*/*.java student-tests-2012/noncompile/*/
 execute_tests="testcases/execute/*/*.java student-tests-2012/execute/*/*.java"
 nonexecute_tests="testcases/nonexecute/*/*.java student-tests-2012/nonexecute/*/*.java"
 
+extra_extentions="INT32" # Extentions that should be concidered included even though they are not in DESC
+
 ###### COLORS
 txtblk='\e[0;30m' # Black - Regular
 txtred='\e[0;31m' # Red
@@ -78,6 +80,7 @@ function compile() {
 function extention_list() {
 	_lines=$(cat DESC | wc -l)
 	tail -n $(($_lines-2)) DESC
+   echo $extra_extentions
 }
 
 function test_extentions() {
@@ -86,7 +89,7 @@ function test_extentions() {
 		echo -e "$txtylw IGNORE $txtrst"
 		return 1
 	else
-		_extentions=$(cat $_file | grep -E "//.*EXT" | sed -re "s/\/\/.*EXT: *(!?[A-Z]{3,4}).*/\1/")
+		_extentions=$(cat $_file | grep -E "//.*EXT" | sed -re "s/\/\/.*EXT: *(!?[A-Z0-9]{3,5}).*/\1/")
 		for ext in $_extentions; do
 			if [[ $ext =~ \!(.*) ]]; then
 				#Negative extention
