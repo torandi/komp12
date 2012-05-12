@@ -37,7 +37,7 @@
 
    \section{Typechecking}
 
-   For typechecking and binding both the visitor pattern is used. The typechecking is done in two steps; first all definitions are handled: 
+   For typechecking and binding both, the visitor pattern is used. Typechecking is done in two steps; first all definitions are handled: 
    classes are defined in the program, methods defined in the methods and variabels and formals defined in the methods. In this step the complier catches any
    double declarations and like errors.
 
@@ -57,8 +57,6 @@
    This was done by once again by using the visitor pattern. Since jasmine require one to specify the stack size required for each method the assembling is also done in two passes; a first that doesn't write any output but just counts pushes and pops to the stacks,
    and a second that actually writes this. This way I achieve an almost optimal stack limit. Otherwise the assembling part of the compiler is nothing special; it simply translate the AST into jasmin.
 
-
-
    \section{Extentions}
    Besides implementing the given base languange I have implemented the following predefined extentions:
    \begin{itemize}
@@ -76,5 +74,53 @@
       \item Expressions as statements: Allowing expressions alone as a statement without anything to catch the output.
       \item Basic method overloading: Method overloading works both with and without inheritance.
    \end{itemize}
+
+   \section{Code overview}
+   In this section I will provide a brief overview of the packages in this project, with description of the most important or distinct classes in the package.
+   \subsection{mjc}
+      This is the package where the entry point for the program is.
+      \subsubsection{Important classes}
+         \begin{itemize}
+            \item \textbf{JVMMain} The main class for compiling to jvm
+         \end{itemize}
+   \subsection{error}
+      Package containing classes for error and exception handling
+      \subsubsection{Important classes}
+         \begin{itemize}
+            \item \textbf{ErrorMsg} A class handling compile errors and warnings
+            \item \textbf{InternalError} Error thrown on internal errors (errors in the compiler as opposed to errors in the compiled code
+
+            \item \textbf{TypeException} Superclass for type exceptions
+            \item \textbf{ImplicitCast} Exception thrown when an implicit cast occured, subclass to TypeException
+            \item \textbf{LossOfPrecision} Exception thrown when loss of precision would occur in an implicit cast, subclass to TypeException
+         \end{itemize}
+   \subsection{basic\_tree}
+      This package contains the classes that the parser translates the raw code into. Each class represents a language construct.
+   \subsection{syntaxtree}
+      This package contains the classes for the abstract syntax tree.
+      \subsubsection{Important classes}
+         \begin{itemize}
+            \item \textbf{AbstractTree} This class contains the code for converting the basic tree into an abstract syntax tree.
+         \end{itemize}
+   \subsection{symbol}
+      Classes for handling the symbol table
+      \subsubsection{Important classes}
+         \begin{itemize}
+            \item \textbf{Scope} Abstract tree that all classes in the syntaxtree that are scopes should inherit, contains code for symbol store and lookup.
+            \item \textbf{Symbol} Class for a symbol
+            \item \textbf{SymbolTable} Class handling all the scopes, including additions and lookups into them.
+         \end{itemize}
+   \subsection{visitor}
+      Containing visitors for traversing the syntax tree. This is where the main processing is done. 
+      \subsubsection{Important classes}
+         \begin{itemize}
+            \item \textbf{ASTPrintVisitor} Print Abstract Syntax Tree
+            \item \textbf{Visitor} Base class for visitors
+            \item \textbf{TypeVisitor} Base class for type visitors
+            \item \textbf{TypeDefVisitor} Pass one of typecheck, adds definitions for classes methods etc, and adds symbols to all variable definitions.
+            \item \textbf{TypeBindVisitor} Pass two of typecheck, links up all variable uses with corresponding symbol and creates VM records, frames and accesses.
+            \item \textbf{AssemblerVisitor} Creates and outputs the final assembler.
+         \end{itemize}
+
 
 \end{document}

@@ -1,5 +1,6 @@
 package syntaxtree;
 
+import error.TypeException;
 import error.MethodOverrideException;
 import java.util.ArrayList;
 import visitor.Visitor;

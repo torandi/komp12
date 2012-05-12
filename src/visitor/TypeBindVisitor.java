@@ -1,5 +1,8 @@
 package visitor;
 
+import error.ImplicitCast;
+import error.TypeException;
+import error.LossOfPrecision;
 import error.ErrorMsg;
 import java.util.ArrayList;
 import mjc.JVMMain;

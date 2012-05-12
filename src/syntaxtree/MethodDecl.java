@@ -1,5 +1,7 @@
 package syntaxtree;
 
+import error.TypeException;
+import error.LossOfPrecision;
 import java.util.ArrayList;
 import symbol.Scope;
 import visitor.Visitor;

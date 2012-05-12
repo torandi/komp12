@@ -1,5 +1,8 @@
 package syntaxtree;
 
+import error.ImplicitCast;
+import error.LossOfPrecision;
+
 public abstract class NumericType extends Type {
     public abstract int precision();
     

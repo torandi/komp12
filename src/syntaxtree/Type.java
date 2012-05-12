@@ -1,4 +1,6 @@
 package syntaxtree;
+import error.ImplicitCast;
+import error.LossOfPrecision;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
